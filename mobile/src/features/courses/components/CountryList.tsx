@@ -1,0 +1,51 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { router } from 'expo-router';
+import { FlatList, Pressable, View } from 'react-native';
+
+import { EmptyState } from '@/components/shared/EmptyState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { Text } from '@/components/ui/Text';
+import { useCountriesQuery } from '@/features/courses/api/courses.queries';
+import { useThemeColors } from '@/lib/theme';
+import { countryFlag } from '@/utils/flag';
+
+/** Courses tab, Countries mode: A–Z rows that open the Country page. */
+export function CountryList() {
+  const colors = useThemeColors();
+  const { data, isPending, isError, refetch } = useCountriesQuery();
+
+  const renderEmpty = () => {
+    if (isPending) return <LoadingState />;
+    if (isError) return <ErrorState onRetry={refetch} />;
+    return <EmptyState title="No countries yet" />;
+  };
+
+  return (
+    <FlatList
+      data={data ?? []}
+      keyExtractor={(c) => c.code}
+      contentContainerClassName="gap-3 px-4 pb-8"
+      ListEmptyComponent={renderEmpty}
+      renderItem={({ item }) => (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${item.name}: ${item.courseCount} courses, ${item.locationCount} places`}
+          onPress={() => router.push({ pathname: '/country/[code]', params: { code: item.code } })}
+          className="flex-row items-center gap-3 rounded-card border border-border bg-surface p-4 active:opacity-80"
+        >
+          <Text className="text-3xl">{countryFlag(item.code)}</Text>
+          <View className="flex-1">
+            <Text variant="label" className="text-base">
+              {item.name}
+            </Text>
+            <Text variant="caption">
+              {item.courseCount} courses · {item.locationCount} places
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+        </Pressable>
+      )}
+    />
+  );
+}
