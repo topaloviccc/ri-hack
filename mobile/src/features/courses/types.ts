@@ -55,6 +55,8 @@ export type Country = {
   /** ISO 3166-1 alpha-2 */
   code: string;
   name: string;
+  /** Hosted flag image URL supplied by the backend. */
+  flagUrl: string;
   blurb: string;
   courseCount: number;
   locationCount: number;

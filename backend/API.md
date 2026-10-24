@@ -21,7 +21,7 @@ origins with the backend `CORS_ALLOWED_ORIGINS` environment variable.
 | GET | `/courses/{id}` | `Course` |
 | POST | `/courses/{id}/unlock` | Required `Idempotency-Key` header, no body; `{ "balance": 60 }` |
 | POST | `/courses/{id}/dismiss` | No body; 204; persists the reel's "less like this" action |
-| GET | `/countries` | `Country[]`, ordered by name |
+| GET | `/countries` | All 249 ISO countries/territories, including zero-content rows; `Country[]`, ordered by English name |
 | GET | `/countries/{code}` | Uppercase ISO alpha-2 code; `Country` |
 | GET | `/locations` | Optional `countryCode`, `ids`; `Location[]` |
 | GET | `/locations/{id}` | `Location` |
@@ -50,12 +50,22 @@ use `application/problem+json` with `status` and `detail`.
 | Type | Fields |
 | --- | --- |
 | Course | `id`, `title`, `subject`, `countryCode`, `countryName`, `locations: Location[]`, `description`, `learnerCount`, `estimatedMinutes`, `difficulty`, `progress`, `unlockCost`, `isUnlocked` |
-| Country | `code`, `name`, `courseCount`, `locationCount` |
+| Country | `code`, `name`, `flagUrl`, `courseCount`, `locationCount` |
 | Location | `id`, `name`, `countryCode`, `countryName`, `lat`, `lng` |
 | User | `id`, `name`, `handle`, `avatarUrl`, `countryCode`, `stats: {completedCount,streakDays,countriesCount}`, `badgeCountryCodes`, `inProgressCourseIds`, `completedCourseIds`, `relation`, `mutualFriendsCount` |
 | FeedItem | `id`, `userId`, `userName`, `userAvatarUrl`, `courseId`, `courseTitle`, `completedAt` |
 | LeaderboardEntry | `rank`, `userId`, `userName`, `userAvatarUrl`, `completedThisWeek`, `isMe` |
 | Event | `id`, `title`, `startsAt`, `venue`, `lat`, `lng`, `description`, `organizer`, `isFree`, `registrationUrl` |
+
+Country `code` is the uppercase ISO 3166-1 alpha-2 identifier, for example `HR`.
+`name` is the full English display name, for example `Croatia`. `flagUrl` is an
+absolute HTTPS image URL such as `https://flagcdn.com/w160/hr.png`; clients load
+the image directly from FlagCDN. There is no backend flag-image endpoint.
+The country reference catalogue is supplied by production Liquibase migration
+`002-iso-countries.sql`, independently of optional demo content;
+`003-hosted-country-flags.sql` migrates flag paths to hosted URLs. The device
+needs internet access for flags, while country names/counts use the backend. See
+[reference/README.md](reference/README.md) for data sources and maintenance.
 
 `subject` is the alphabetically first linked field label, or null, since the schema
 allows several fields and the frontend displays one. Field labels are database data,

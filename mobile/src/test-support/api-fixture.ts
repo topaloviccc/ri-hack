@@ -94,6 +94,7 @@ export function installApiFixture() {
     if (path.startsWith('/courses/')) return httpResponse(course(path.split('/')[2]));
     const countries = MOCK_COUNTRIES.map(({ blurb: _blurb, ...country }) => ({
       ...country,
+      flagUrl: `https://flagcdn.com/w160/${country.code.toLowerCase()}.png`,
       courseCount: MOCK_COURSES.filter((c) => c.countryCode === country.code).length,
       locationCount: locations.filter((l) => l.countryCode === country.code).length,
     })).sort((a, b) => a.name.localeCompare(b.name));

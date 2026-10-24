@@ -13,7 +13,7 @@ import {
 import { CourseListItem } from '@/features/courses/components/CourseListItem';
 import { LocationCard } from '@/features/courses/components/LocationItems';
 import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
-import { countryFlag } from '@/utils/flag';
+import { CountryFlag } from '@/components/shared/CountryFlag';
 
 export type CountryDetailsProps = { code: string };
 
@@ -45,12 +45,18 @@ export function CountryDetails({ code }: CountryDetailsProps) {
       ListHeaderComponent={
         <View className="gap-4 pb-1">
           <View className="items-center gap-1 px-4 pt-4">
-            <Text className="text-6xl">{countryFlag(code)}</Text>
+            <CountryFlag
+              code={code}
+              name={country.data.name}
+              uri={country.data.flagUrl}
+              size="lg"
+            />
             <Text variant="title" accessibilityRole="header">
               {country.data.name}
             </Text>
             <Text variant="caption">
-              {country.data.courseCount} courses · {country.data.locationCount} places
+              {country.data.code} · {country.data.courseCount} courses ·{' '}
+              {country.data.locationCount} places
             </Text>
             <DemoNotice>country introduction</DemoNotice>
             <Text variant="body" className="mt-2 text-center">

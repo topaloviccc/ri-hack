@@ -15,7 +15,6 @@ import { useCourseQuery } from '@/features/courses/api/courses.queries';
 import { CourseMeta } from '@/features/courses/components/CourseMeta';
 import { LocationRow } from '@/features/courses/components/LocationItems';
 import { LockBadge } from '@/features/courses/components/LockBadge';
-import { countryFlag } from '@/utils/flag';
 import { capitalize, formatDuration } from '@/utils/format';
 
 export type CourseDetailsProps = { id: string };
@@ -73,7 +72,7 @@ export function CourseDetails({ id }: CourseDetailsProps) {
           <InfoRow
             icon="flag-outline"
             label="Country"
-            value={`${countryFlag(course.countryCode)} ${course.countryName}`}
+            value={course.countryName}
             onPress={
               course.countryCode
                 ? () =>

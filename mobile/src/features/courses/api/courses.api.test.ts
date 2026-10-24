@@ -51,9 +51,21 @@ describe('course HTTP mapping', () => {
 
   it('fetches actual country counts and does not substitute missing resources', async () => {
     fetchMock.mockResolvedValueOnce(
-      httpResponse({ code: 'ME', name: 'Montenegro', courseCount: 2, locationCount: 1 }),
+      httpResponse({
+        code: 'ME',
+        name: 'Montenegro',
+        flagUrl: 'https://flagcdn.com/w160/me.png',
+        courseCount: 2,
+        locationCount: 1,
+      }),
     );
-    expect(await countriesApi.getByCode('ME')).toMatchObject({ courseCount: 2, locationCount: 1 });
+    expect(await countriesApi.getByCode('ME')).toMatchObject({
+      code: 'ME',
+      name: 'Montenegro',
+      flagUrl: 'https://flagcdn.com/w160/me.png',
+      courseCount: 2,
+      locationCount: 1,
+    });
     fetchMock.mockResolvedValueOnce(httpResponse({ detail: 'Location not found' }, 404));
     await expect(locationsApi.getById('missing')).rejects.toMatchObject({ status: 404 });
   });

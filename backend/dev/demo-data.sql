@@ -40,21 +40,6 @@ UPDATE wallet w SET balance=w.balance+c.amount FROM opening_credit c WHERE w.id=
 
 
 
-INSERT INTO country (id,iso_code,label) VALUES
-  ('670e243e-3c9d-bf17-83d0-2f37b92b7c70','ES','Spain'),
-  ('a4a86458-eb79-6177-c5b8-8b7914e6da52','IT','Italy'),
-  ('f7d9522e-0961-ea06-b977-37f10174a562','GR','Greece'),
-  ('a8beea06-1194-3256-0291-a6960f7e4ee7','FR','France'),
-  ('0ce89002-4e9b-35a8-581d-7059f9ec1835','HR','Croatia'),
-  ('5830c380-1aa3-fb1c-cb94-4324f85528f3','ME','Montenegro'),
-  ('28f635a5-0246-5d51-3a52-a96bd09c3d7f','JP','Japan'),
-  ('eefbcfb2-adc8-9953-230f-a8a966a7e6ce','EG','Egypt'),
-  ('60310176-4c3f-9a78-c11e-645c18bb2890','IN','India'),
-  ('7da691ba-53dd-959f-072d-87f6a78711cb','PE','Peru'),
-  ('94639457-9416-124f-d636-affb5aca78fc','AU','Australia'),
-  ('8c8cd023-e152-a17e-54b2-2942a3086f47','IS','Iceland')
-ON CONFLICT DO NOTHING;
-
 INSERT INTO field (id,label) VALUES
   ('8e67f922-b9b2-941d-6795-c6447544374e','Nature & Wildlife'),
   ('20272133-51ab-446f-c5cc-cd23b589d553','Culture & Traditions'),

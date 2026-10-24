@@ -8,7 +8,7 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { Text } from '@/components/ui/Text';
 import { useCountriesQuery } from '@/features/courses/api/courses.queries';
 import { useThemeColors } from '@/lib/theme';
-import { countryFlag } from '@/utils/flag';
+import { CountryFlag } from '@/components/shared/CountryFlag';
 
 /** Courses tab, Countries mode: A–Z rows that open the Country page. */
 export function CountryList() {
@@ -34,10 +34,10 @@ export function CountryList() {
           onPress={() => router.push({ pathname: '/country/[code]', params: { code: item.code } })}
           className="flex-row items-center gap-3 rounded-card border border-border bg-surface p-4 active:opacity-80"
         >
-          <Text className="text-3xl">{countryFlag(item.code)}</Text>
+          <CountryFlag code={item.code} name={item.name} uri={item.flagUrl} size="md" />
           <View className="flex-1">
             <Text variant="label" className="text-base">
-              {item.name}
+              {item.name} ({item.code})
             </Text>
             <Text variant="caption">
               {item.courseCount} courses · {item.locationCount} places

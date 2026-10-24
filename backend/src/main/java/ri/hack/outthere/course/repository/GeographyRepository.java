@@ -17,7 +17,7 @@ public class GeographyRepository {
 
     public List<CountryResponse> countries() {
         return jdbc.sql("""
-                SELECT n.iso_code AS code, n.label AS name,
+                SELECT n.iso_code AS code, n.label AS name, n.flag_url,
                   (SELECT count(*) FROM course c JOIN course_version v ON v.id=c.current_published_version_id
                    JOIN visibility vis ON vis.id=c.visibility_id
                    JOIN publication_status ps ON ps.id=v.publication_status_id

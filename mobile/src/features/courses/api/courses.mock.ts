@@ -1,6 +1,6 @@
 import type { Country, Course, Location } from '@/features/courses/types';
 
-export type MockCountry = Omit<Country, 'courseCount' | 'locationCount'>;
+export type MockCountry = Omit<Country, 'courseCount' | 'locationCount' | 'flagUrl'>;
 
 export type MockLocation = Omit<Location, 'countryName'>;
 
