@@ -3,6 +3,7 @@ import { Alert, ScrollView, View } from 'react-native';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { AddFriendButton } from '@/features/users/components/AddFriendButton';
 import type { User } from '@/features/users/types';
 import { countryFlag } from '@/utils/flag';
@@ -33,6 +34,7 @@ export function ProfileHeader({ user, coins }: ProfileHeaderProps) {
         <Text variant="caption">
           @{user.handle} · {countryFlag(user.countryCode)}
         </Text>
+        <DemoNotice>bio</DemoNotice>
         <Text variant="body" className="text-center">
           {user.bio}
         </Text>

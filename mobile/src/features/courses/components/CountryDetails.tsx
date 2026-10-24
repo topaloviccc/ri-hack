@@ -3,6 +3,7 @@ import { FlatList, View } from 'react-native';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Text } from '@/components/ui/Text';
 import {
   useCountryQuery,
@@ -51,6 +52,7 @@ export function CountryDetails({ code }: CountryDetailsProps) {
             <Text variant="caption">
               {country.data.courseCount} courses · {country.data.locationCount} places
             </Text>
+            <DemoNotice>country introduction</DemoNotice>
             <Text variant="body" className="mt-2 text-center">
               {country.data.blurb}
             </Text>

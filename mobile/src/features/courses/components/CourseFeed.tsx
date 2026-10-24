@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { Alert, FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -7,6 +7,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Text } from '@/components/ui/Text';
 import { useCoursesQuery } from '@/features/courses/api/courses.queries';
+import { useDismissCourse } from '@/features/courses/api/courses.mutations';
 import { ReelCard } from '@/features/courses/components/ReelCard';
 import { SwipeableReel } from '@/features/courses/components/SwipeableReel';
 import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
@@ -22,25 +23,29 @@ export function CourseFeed() {
   const { openCourse } = useOpenCourse();
   const insets = useSafeAreaInsets();
   const [height, setHeight] = useState(0);
-  // TODO(hack): "less like this" only hides the reel locally; send it to the backend later. See BACKLOG.md.
-  const [hiddenIds, setHiddenIds] = useState<string[]>([]);
+  const dismiss = useDismissCourse();
   const [isToastVisible, setIsToastVisible] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(toastTimer.current), []);
 
   const handleLessLikeThis = (id: string) => {
-    setHiddenIds((ids) => [...ids, id]);
-    setIsToastVisible(true);
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setIsToastVisible(false), TOAST_DURATION_MS);
+    if (dismiss.isPending) return;
+    dismiss.mutate(id, {
+      onSuccess: () => {
+        setIsToastVisible(true);
+        clearTimeout(toastTimer.current);
+        toastTimer.current = setTimeout(() => setIsToastVisible(false), TOAST_DURATION_MS);
+      },
+      onError: (error) => Alert.alert('Could not save your preference', error.message),
+    });
   };
 
   if (isPending) return <LoadingState />;
   if (isError) return <ErrorState onRetry={refetch} />;
   if (data.length === 0) return <EmptyState title="No courses to show yet" />;
 
-  const items: FeedItem[] = [...data.filter((c) => !hiddenIds.includes(c.id)), { id: 'end' }];
+  const items: FeedItem[] = [...data, { id: 'end' }];
 
   return (
     <View
@@ -62,6 +67,7 @@ export function CourseFeed() {
             >
               {'title' in item ? (
                 <SwipeableReel
+                  disabled={dismiss.isPending}
                   onDismiss={() => handleLessLikeThis(item.id)}
                   onOpen={() => openCourse(item.id)}
                 >

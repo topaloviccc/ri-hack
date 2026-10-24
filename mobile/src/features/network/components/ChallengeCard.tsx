@@ -2,6 +2,7 @@ import { View } from 'react-native';
 
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Card } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Text } from '@/components/ui/Text';
@@ -38,6 +39,7 @@ export function ChallengeCard() {
       <Text variant="heading" accessibilityRole="header">
         Weekly challenge
       </Text>
+      <DemoNotice>example challenge, progress and reward</DemoNotice>
       <Card className="gap-2 border-primary p-4">{renderBody()}</Card>
     </View>
   );

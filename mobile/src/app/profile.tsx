@@ -3,6 +3,8 @@ import { Link, Stack } from 'expo-router';
 import { Pressable } from 'react-native';
 
 import { Screen } from '@/components/layout/Screen';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { LoadingState } from '@/components/shared/LoadingState';
 import { ProfileView, useMeQuery } from '@/features/users';
 import { useThemeColors } from '@/lib/theme';
 
@@ -22,10 +24,12 @@ function SettingsButton() {
 }
 
 export default function ProfileScreen() {
-  const { data: me } = useMeQuery();
+  const { data: me, isPending, isError, refetch } = useMeQuery();
   return (
     <Screen edgeToEdge>
       <Stack.Screen options={{ headerRight: () => <SettingsButton /> }} />
+      {isPending ? <LoadingState /> : null}
+      {isError ? <ErrorState message="Couldn't load your profile." onRetry={refetch} /> : null}
       {me ? <ProfileView userId={me.id} /> : null}
     </Screen>
   );

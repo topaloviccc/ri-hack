@@ -1,38 +1,37 @@
-import { MOCK_COURSES } from '@/features/courses/api/courses.mock';
 import { walletApi } from '@/features/wallet/api/wallet.api';
-import { isCourseUnlocked, mockUnlockCost, walletState } from '@/features/wallet/api/wallet.mock';
+import { httpResponse } from '@/test-support/api-fixture';
 
-jest.mock('@/utils/mock-delay', () => ({ mockDelay: () => Promise.resolve() }));
+describe('wallet HTTP adapter', () => {
+  const courseId = '10000000-0000-0000-0000-000000000001';
+  const fetchMock = jest.fn() as jest.MockedFunction<typeof fetch>;
 
-const lockedCourses = MOCK_COURSES.filter((c) => !isCourseUnlocked(c.id));
-
-describe('mockUnlockCost', () => {
-  it('scales with length within 40..200', () => {
-    expect(mockUnlockCost(15)).toBe(40);
-    expect(mockUnlockCost(120)).toBe(100);
-    expect(mockUnlockCost(1000)).toBe(200);
-  });
-});
-
-describe('walletApi.unlockCourse', () => {
-  it('charges once per idempotency key and unlocks the course', async () => {
-    const course = lockedCourses[0];
-    const cost = mockUnlockCost(course.estimatedMinutes);
-    const before = walletState.balance;
-
-    const first = await walletApi.unlockCourse({ courseId: course.id, idempotencyKey: 'k1' });
-    const retry = await walletApi.unlockCourse({ courseId: course.id, idempotencyKey: 'k1' });
-
-    expect(first.balance).toBe(before - cost);
-    expect(retry.balance).toBe(first.balance);
-    expect(isCourseUnlocked(course.id)).toBe(true);
+  beforeEach(() => {
+    fetchMock.mockReset();
+    globalThis.fetch = fetchMock;
   });
 
-  it('refuses when the balance is too low', async () => {
-    walletState.balance = 0;
+  it('sends the same purchase key on retry and returns server balances', async () => {
+    fetchMock.mockResolvedValue(httpResponse({ balance: 60 }));
+    const input = { courseId, idempotencyKey: 'purchase-1' };
+    expect(await walletApi.unlockCourse(input)).toEqual({ balance: 60 });
+    expect(await walletApi.unlockCourse(input)).toEqual({ balance: 60 });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      expect.stringContaining(`/courses/${courseId}/unlock`),
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          'X-User-Id': process.env.EXPO_PUBLIC_USER_ID,
+          'Idempotency-Key': 'purchase-1',
+        }),
+      }),
+    );
+  });
+
+  it('surfaces server purchase errors without changing local ownership or balance', async () => {
+    fetchMock.mockResolvedValue(httpResponse({ status: 402, detail: 'Not enough coins' }, 402));
     await expect(
-      walletApi.unlockCourse({ courseId: lockedCourses[1].id, idempotencyKey: 'k2' }),
-    ).rejects.toThrow('Not enough coins.');
-    expect(isCourseUnlocked(lockedCourses[1].id)).toBe(false);
+      walletApi.unlockCourse({ courseId, idempotencyKey: 'purchase-2' }),
+    ).rejects.toMatchObject({ status: 402, message: 'Not enough coins' });
   });
 });

@@ -7,13 +7,16 @@ import { Text } from '@/components/ui/Text';
 import { useCoursesQuery } from '@/features/courses/api/courses.queries';
 import { CourseListItem } from '@/features/courses/components/CourseListItem';
 import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
-import { SUBJECTS, type Course } from '@/features/courses/types';
+import type { Course } from '@/features/courses/types';
 
 const groupBySubject = (courses: Course[]) =>
-  SUBJECTS.map((subject) => ({
-    title: subject,
-    data: courses.filter((c) => c.subject === subject),
-  })).filter((section) => section.data.length > 0);
+  [...new Set(courses.map((course) => course.subject))]
+    .sort()
+    .map((subject) => ({
+      title: subject,
+      data: courses.filter((c) => c.subject === subject),
+    }))
+    .filter((section) => section.data.length > 0);
 
 /** Courses tab, Fields mode: every course grouped by subject. */
 export function CourseList() {

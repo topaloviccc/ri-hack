@@ -1,0 +1,63 @@
+{
+  "viewer": "11111111-1111-4111-8111-111111111111",
+  "openingBalance": 250,
+  "counts": {
+    "countries": 12,
+    "fields": 7,
+    "users": 16,
+    "courses": 48,
+    "places": 94,
+    "events": 32,
+    "learningHistories": 83
+  },
+  "scenarios": {
+    "paidUnlock": {
+      "id": "350bab1d-9928-ea03-26a3-c836689e00e4",
+      "title": "Alhambra and Moorish geometry",
+      "price": 100
+    },
+    "freeUnlock": {
+      "id": "9870388e-825d-f5f2-0931-6e02d194c186",
+      "title": "Doñana wetlands & the Iberian lynx",
+      "price": 0
+    },
+    "insufficientCoins": {
+      "id": "b566c2c2-4f85-58b7-4cd1-8eef5d941be6",
+      "title": "Thorrablot: Iceland midwinter feast",
+      "price": 1000
+    },
+    "continue": {
+      "id": "efdd2a13-b3a7-94bf-7dc8-e7cf1ce35da1",
+      "title": "Bull riding & the corrida tradition",
+      "price": 70
+    },
+    "ownedNotStarted": {
+      "id": "7babf7a6-8cb1-f669-ea13-3da800aba052",
+      "title": "Mount Etna volcanic ecosystems",
+      "price": 70
+    },
+    "ownedArchived": {
+      "id": "30265040-709b-d212-2e03-16ea3ea3332b",
+      "title": "Owned archived course example",
+      "price": 40
+    },
+    "optionalMetadata": {
+      "id": "6e9acdc3-fa17-8571-e149-cd75604ce87e",
+      "title": "Optional metadata example",
+      "price": 40
+    },
+    "hiddenUnpublished": {
+      "id": "0cbc5b03-99e7-9c68-7ba8-312ed4db1319",
+      "title": "Unpublished demo course (hidden)",
+      "price": 40
+    },
+    "suggestedFriend": {
+      "id": "325455dc-e3e5-2d16-8d41-8cf00b1af428",
+      "name": "Ivan Perović"
+    },
+    "pendingRequest": {
+      "id": "4c9c1d47-942c-448d-1240-ada8d9f3ee3d",
+      "name": "Jelena Bulatović"
+    }
+  }
+}

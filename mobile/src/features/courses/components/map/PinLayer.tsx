@@ -10,6 +10,7 @@ import {
   type Viewport,
 } from '@/features/courses/map/geometry';
 import type { Location } from '@/features/courses/types';
+import { hasCoordinates } from '@/utils/has-coordinates';
 
 // Pins whose centres are closer than this on screen merge into a group.
 const CLUSTER_DISTANCE_PX = PIN_SIZE;
@@ -38,7 +39,7 @@ export function PinLayer({
   onFocusGroup,
   onOpenLocation,
 }: PinLayerProps) {
-  const points = locations.map((l) => ({ ...l, ...project(l.lng, l.lat) }));
+  const points = locations.filter(hasCoordinates).map((l) => ({ ...l, ...project(l.lng, l.lat) }));
   const radius = (CLUSTER_DISTANCE_PX * settledWidth) / viewport.width;
   const isFullyZoomed = settledWidth <= MIN_CAMERA_WIDTH * FULL_ZOOM_TOLERANCE;
 
@@ -55,7 +56,7 @@ export function PinLayer({
           offsetX={rowOffset(i, cluster.members.length)}
           camera={camera}
           viewport={viewport}
-          label={`${site.name}, ${site.city}: show courses`}
+          label={`${site.name}: show courses. Demo image and location type`}
           onPress={() => onOpenLocation(site.id)}
         />
       ));

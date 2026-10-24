@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Button } from '@/components/ui/Button';
 import { CoinIcon } from '@/components/ui/CoinIcon';
 import { Image } from '@/components/ui/Image';
@@ -73,6 +74,7 @@ export function UnlockSheet({ courseId }: UnlockSheetProps) {
         <Image uri={course.data.imageUrl} className="h-16 w-16 rounded-lg bg-border" />
         <View className="flex-1">
           <Text variant="caption">Unlock this course</Text>
+          <DemoNotice>cover image</DemoNotice>
           <Text variant="heading" numberOfLines={2}>
             {course.data.title}
           </Text>

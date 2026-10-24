@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Image } from '@/components/ui/Image';
 import { Text } from '@/components/ui/Text';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { CATEGORY_ICONS } from '@/features/events/categories';
 import type { LearningEvent } from '@/features/events/types';
 import { useThemeColors } from '@/lib/theme';
 import { formatTime } from '@/utils/date';
+import { hasCoordinates } from '@/utils/has-coordinates';
 
 const ICON_SIZE = 20;
 
@@ -26,8 +28,12 @@ export const EventRow = memo(function EventRow({ event, onPress, onOpenMap }: Ev
       accessibilityRole="button"
       accessibilityLabel={`Open event ${event.title}`}
       // The row is one accessible element, so expose the map button as a custom action.
-      accessibilityActions={[{ name: 'openMap', label: 'Open in maps' }]}
-      onAccessibilityAction={() => onOpenMap(event)}
+      accessibilityActions={
+        hasCoordinates(event) ? [{ name: 'openMap', label: 'Open in maps' }] : []
+      }
+      onAccessibilityAction={() => {
+        if (hasCoordinates(event)) onOpenMap(event);
+      }}
       onPress={() => onPress(event.id)}
       className="active:opacity-80"
     >
@@ -46,6 +52,7 @@ export const EventRow = memo(function EventRow({ event, onPress, onOpenMap }: Ev
           />
         </View>
         <View className="flex-1 gap-1">
+          <DemoNotice>city, category and image</DemoNotice>
           <Text variant="label" className="text-base" numberOfLines={2}>
             {event.title}
           </Text>
@@ -55,13 +62,15 @@ export const EventRow = memo(function EventRow({ event, onPress, onOpenMap }: Ev
             </Text>
             , {event.venue}
           </Text>
-          <Button
-            variant="soft"
-            label="map"
-            accessibilityLabel={`Open ${event.venue} in maps`}
-            icon={<Ionicons name="location-outline" size={16} color={colors.text} />}
-            onPress={() => onOpenMap(event)}
-          />
+          {hasCoordinates(event) ? (
+            <Button
+              variant="soft"
+              label="map"
+              accessibilityLabel={`Open ${event.venue} in maps`}
+              icon={<Ionicons name="location-outline" size={16} color={colors.text} />}
+              onPress={() => onOpenMap(event)}
+            />
+          ) : null}
         </View>
         <Image uri={event.imageUrl} className="h-16 w-16 rounded-lg bg-border" />
       </Card>

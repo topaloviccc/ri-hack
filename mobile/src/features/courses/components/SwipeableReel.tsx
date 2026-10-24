@@ -22,13 +22,20 @@ export type SwipeableReelProps = {
   onDismiss: () => void;
   /** Swipe left: open the course; the reel springs back. */
   onOpen: () => void;
+  disabled?: boolean;
 };
 
-export function SwipeableReel({ children, onDismiss, onOpen }: SwipeableReelProps) {
+export function SwipeableReel({
+  children,
+  onDismiss,
+  onOpen,
+  disabled = false,
+}: SwipeableReelProps) {
   const { width } = useWindowDimensions();
   const translateX = useSharedValue(0);
 
   const pan = usePanGesture({
+    enabled: !disabled,
     activeOffsetX: [-ACTIVE_OFFSET_X, ACTIVE_OFFSET_X],
     failOffsetY: [-FAIL_OFFSET_Y, FAIL_OFFSET_Y],
     onUpdate: (e) => {
@@ -39,9 +46,11 @@ export function SwipeableReel({ children, onDismiss, onOpen }: SwipeableReelProp
       'worklet';
       const threshold = width * SWIPE_THRESHOLD;
       if (e.translationX > threshold) {
-        translateX.value = withTiming(width, { duration: DISMISS_DURATION_MS }, () =>
-          scheduleOnRN(onDismiss),
-        );
+        translateX.value = withTiming(width, { duration: DISMISS_DURATION_MS }, (finished) => {
+          if (finished) scheduleOnRN(onDismiss);
+          // The HTTP save may fail; keep the keyed row visible until server data removes it.
+          translateX.value = withSpring(0);
+        });
         return;
       }
       if (e.translationX < -threshold) scheduleOnRN(onOpen);
@@ -58,12 +67,13 @@ export function SwipeableReel({ children, onDismiss, onOpen }: SwipeableReelProp
       <Animated.View
         style={[styles.fill, animatedStyle]}
         accessibilityHint="Swipe left for details, swipe right to see less like this"
+        accessibilityState={{ disabled }}
         accessibilityActions={[
           { name: 'decrement', label: 'Show less like this' },
           { name: 'activate', label: 'Open details' },
         ]}
         onAccessibilityAction={(e) =>
-          e.nativeEvent.actionName === 'activate' ? onOpen() : onDismiss()
+          disabled ? undefined : e.nativeEvent.actionName === 'activate' ? onOpen() : onDismiss()
         }
       >
         {children}

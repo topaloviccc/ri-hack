@@ -8,7 +8,8 @@ export const SUBJECTS = [
   'Sport & Games',
 ] as const;
 
-export type Subject = (typeof SUBJECTS)[number];
+// Course subjects are database field labels; the demo expert form uses SUBJECTS separately.
+export type Subject = string;
 
 export const DIFFICULTIES = ['beginner', 'intermediate', 'advanced'] as const;
 
@@ -45,8 +46,8 @@ export type Location = {
   /** ISO 3166-1 alpha-2 */
   countryCode: string;
   countryName: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   imageUrl: string;
 };
 
@@ -71,7 +72,7 @@ export type Course = {
   locations: Location[];
   description: string;
   learnerCount: number;
-  estimatedMinutes: number;
+  estimatedMinutes: number | null;
   difficulty: Difficulty;
   /** 0..1, present only for owned courses in progress */
   progress?: number;

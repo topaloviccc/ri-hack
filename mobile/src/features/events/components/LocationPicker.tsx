@@ -18,7 +18,8 @@ export type LocationPickerProps = {
 export function LocationPicker({ city, onSelectCity }: LocationPickerProps) {
   const { locate, status } = useLocateCity(onSelectCity);
   // A GPS city outside the seeded list still gets its own chip.
-  const options = CITIES.includes(city as (typeof CITIES)[number]) ? CITIES : [city, ...CITIES];
+  const cities = CITIES.includes(city as (typeof CITIES)[number]) ? CITIES : [city, ...CITIES];
+  const options = ['', ...cities.filter(Boolean)];
 
   return (
     <View className="gap-1">
@@ -48,7 +49,10 @@ export function LocationPicker({ city, onSelectCity }: LocationPickerProps) {
             onPress={() => onSelectCity(option)}
             className="min-h-11 justify-center active:opacity-70"
           >
-            <Chip label={option} variant={option === city ? 'selected' : 'neutral'} />
+            <Chip
+              label={option || 'All cities'}
+              variant={option === city ? 'selected' : 'neutral'}
+            />
           </Pressable>
         ))}
       </ScrollView>

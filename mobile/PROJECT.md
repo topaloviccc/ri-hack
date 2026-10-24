@@ -14,6 +14,11 @@ extension, not a requirement. Users are general learners; reviewers, local contr
 admins are role capabilities added later.
 
 ## Built so far (mobile)
+Core records and mutations now use the Spring Boot backend. Images and unsupported
+extra details remain explicitly labelled demo content; expert applications and the
+weekly challenge remain demos. The table below records prototype feature coverage;
+see [API.md](API.md) for the current source of each field and run configuration.
+
 | Area | State |
 |---|---|
 | Tabs: Home · Scroll · Calendar · Network · Courses | ✅ |
@@ -39,6 +44,8 @@ F1 accounts/onboarding · F2 search · F3 lesson player · F4 quizzes (pass > 80
 F6 coins/unlocks · F7 spaced repetition, streaks · F8 knowledge map · F9 NFC visits/badges · F10 local stories ·
 F11–F13 AI generation/assistant · F14 expert review · F15 friends/leaderboards · F16 merchant rewards · F17 full event model.
 
-## Backend (planned, per spec)
-Spring Boot modular monolith, PostgreSQL + PostGIS, managed OIDC/JWT auth, S3-compatible storage.
-No API exists yet; see `BACKLOG.md`.
+## Backend
+Spring Boot modular monolith with PostgreSQL, JDBC and Liquibase. The frontend now
+connects its schema-backed reads and mutations to that API. Authentication, AI,
+bucket integration and other features outside the schema/frontend intersection are
+excluded. Viewer context is configured with `EXPO_PUBLIC_USER_ID`; see `API.md`.

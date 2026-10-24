@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { useExpertRequestsQuery } from '@/features/experts/api/experts.queries';
 
 /** Settings › Expert: apply, plus a small link to request status. */
@@ -18,6 +19,7 @@ export function ExpertSettingsSection() {
         Expert
       </Text>
       <Text variant="caption">Ask to be verified as an expert in a field.</Text>
+      <DemoNotice>expert requests are examples and are not submitted for review</DemoNotice>
       <Button
         label="Become an expert"
         onPress={() => router.push('/expert/apply')}

@@ -1,5 +1,8 @@
 import 'react-native-gesture-handler/jestSetup';
 
+process.env.EXPO_PUBLIC_API_URL ??= 'http://backend.test/api';
+process.env.EXPO_PUBLIC_USER_ID ??= '00000000-0000-0000-0000-000000000001';
+
 // shortcut: Reanimated 4's own mock crashes under jest, and expo-router's testing-library
 // silently falls back to `{}` when it does. Stub the mock path it loads with only the APIs the
 // app uses; delete when reanimated ships a working mock.

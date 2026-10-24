@@ -3,6 +3,10 @@
 Expo SDK 58 · Expo Router · TypeScript · NativeWind · TanStack Query. Rules: `CLAUDE.md`. Product: `PROJECT.md`. Deferred work: `BACKLOG.md`.
 
 ## Run on your phone
+Configure the backend URL and viewer UUID in `.env.local` first; see
+[API.md](API.md) and [.env.example](.env.example). Core screens use the backend;
+unsupported details remain visibly labelled demo content.
+
 1. Install **Expo Go** (iOS App Store / Google Play). It must support SDK 58.
 2. `npm install`
 3. `npm start` and scan the QR code (iOS: Camera app, Android: Expo Go). Phone and laptop on the same Wi-Fi; otherwise `npx expo start --tunnel`.

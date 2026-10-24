@@ -7,16 +7,19 @@ import {
   MOCK_LOCATIONS,
 } from '@/features/courses/api/courses.mock';
 import { MOCK_EVENTS } from '@/features/events/api/events.mock';
-import { isCourseUnlocked } from '@/features/wallet/api/wallet.mock';
+import { installApiFixture, isTestCourseUnlocked } from '@/test-support/api-fixture';
 
 // Smoke tests: boot the real app at each route and check its key content renders.
 // Relative to the jest rootDir.
 const APP_DIR = './src/app';
+// The first full router mount includes font/theme restoration and several HTTP queries.
+jest.setTimeout(15_000);
 const courseTitle = (id: string) => MOCK_COURSES.find((c) => c.id === id)?.title ?? '';
 
 const renderAt = (initialUrl: string) => renderRouter(APP_DIR, { initialUrl });
 
 describe('screens', () => {
+  beforeEach(() => installApiFixture());
   it('Home shows the three course rows', async () => {
     await renderAt('/');
     expect(await screen.findByText('Continue with…')).toBeOnTheScreen();
@@ -82,7 +85,8 @@ describe('screens', () => {
     await renderAt('/courses');
     await fireEvent.press(await screen.findByText('Fields'));
     // Group headers read "<subject> · <count>".
-    expect(await screen.findByText(/^Nature & Wildlife · \d+$/)).toBeOnTheScreen();
+    // SectionList virtualizes later sections; fields now sort by their database labels.
+    expect(await screen.findByText(/^Arts & Music · \d+$/)).toBeOnTheScreen();
     expect((await screen.findAllByLabelText(/^Open course /)).length).toBeGreaterThan(0);
   });
 
@@ -134,7 +138,7 @@ describe('screens', () => {
   });
 
   it('Unlocking a locked course spends coins and celebrates', async () => {
-    const locked = MOCK_COURSES.find((c) => !isCourseUnlocked(c.id));
+    const locked = MOCK_COURSES.find((c) => !isTestCourseUnlocked(c.id));
     if (!locked) throw new Error('mock data has no locked course');
     await renderAt(`/course/${locked.id}`);
     await fireEvent.press(await screen.findByLabelText(/^Unlock for \d+ coins$/));

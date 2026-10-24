@@ -5,6 +5,7 @@ import { Pressable, View } from 'react-native';
 
 import { Image } from '@/components/ui/Image';
 import { Text } from '@/components/ui/Text';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { LOCATION_KIND_ICONS, LOCATION_KIND_LABELS } from '@/features/courses/location-kinds';
 import type { Location } from '@/features/courses/types';
 import { useThemeColors } from '@/lib/theme';
@@ -20,7 +21,7 @@ export const LocationRow = memo(function LocationRow({ location }: LocationItemP
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${location.name}, ${location.city}. Show courses`}
+      accessibilityLabel={`${location.name}. Show courses. Demo image, type and city`}
       onPress={() => openLocation(location.id)}
       className="flex-row items-center gap-3 rounded-card border border-border bg-surface p-3 active:opacity-80"
     >
@@ -32,6 +33,7 @@ export const LocationRow = memo(function LocationRow({ location }: LocationItemP
         <Text variant="caption" numberOfLines={1}>
           {LOCATION_KIND_LABELS[location.kind]} · {location.city}
         </Text>
+        <DemoNotice>image, type and city</DemoNotice>
       </View>
       <Ionicons name={LOCATION_KIND_ICONS[location.kind]} size={18} color={colors.primary} />
     </Pressable>
@@ -43,7 +45,7 @@ export const LocationCard = memo(function LocationCard({ location }: LocationIte
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${location.name}, ${location.city}. Show courses`}
+      accessibilityLabel={`${location.name}. Show courses. Demo image, type and city`}
       onPress={() => openLocation(location.id)}
       className="w-40 overflow-hidden rounded-card border border-border bg-surface active:opacity-80"
     >
@@ -55,6 +57,7 @@ export const LocationCard = memo(function LocationCard({ location }: LocationIte
         <Text variant="caption" numberOfLines={1}>
           {LOCATION_KIND_LABELS[location.kind]} · {location.city}
         </Text>
+        <DemoNotice>image, type and city</DemoNotice>
       </View>
     </Pressable>
   );

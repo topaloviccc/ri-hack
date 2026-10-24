@@ -1,0 +1,83 @@
+# Database setup
+
+The application uses PostgreSQL through Spring JDBC. Liquibase runs the configured
+master changelog at startup and records applied changes in its own tracking tables.
+The master changelog includes `001-worldlearn.sql`, the frontend-backed subset of
+`../worldlearn.sql`. See [SCOPE.md](SCOPE.md) for the included tables and intentional
+omissions. UUIDs, defaults, keys and relationships follow the source schema;
+CHECK constraints, stored functions and triggers are intentionally omitted.
+Subsequent changes belong in new changesets; do not edit an applied migration.
+
+## Local PostgreSQL with Docker
+
+From the repository root, start the database container:
+
+```powershell
+docker compose -f backend/compose.yaml up -d postgres
+```
+
+The Compose service creates database `outthere` with username and password
+`outthere`, published on `localhost:5432`. These match the application's local
+defaults. From `backend`, run `.\mvnw.cmd spring-boot:run` on Windows (or
+`./mvnw spring-boot:run` on Unix) with Java 21. Liquibase runs
+on startup. Stop the container while keeping its data with
+`docker compose -f backend/compose.yaml down` from the repository root.
+
+This subset needs ordinary PostgreSQL 16: decimal latitude/longitude are retained,
+but the unused generated PostGIS point and vector tables are omitted. Neither
+extension is required. Do not execute `worldlearn.sql` separately before startup;
+it is a reference schema, not a second migration path. The initial changeset
+targets a fresh database, not a database already populated from that file.
+
+Only the source schema's lookup values are seeded. There are no production mock
+users, wallet credits, countries, fields, courses or events. Provision application
+data with SQL or an existing import process. Account creation is outside this
+task, and there is no wallet-creation trigger: provisioning a user must also insert
+a `wallet` row. The integration fixture in `src/test/resources/db/worldlearn-test-data.sql`
+shows the relationships, but starts with destructive TRUNCATE statements and is
+only for disposable test databases.
+
+For an optional local demo learner (UUID `11111111-1111-4111-8111-111111111111`)
+and wallet with 250 demo coins, run this manually from the repository root:
+
+```powershell
+Get-Content -Raw backend/dev/demo-learner.sql | docker exec -i outthere-postgres psql -U outthere -d outthere -v ON_ERROR_STOP=1
+```
+
+This script is outside Liquibase, adds no courses or events, and preserves the
+existing balance on subsequent runs. It creates the opening ledger credit once.
+Set that UUID in the frontend's `EXPO_PUBLIC_USER_ID` for local use.
+
+For the full catalogue, geography, learning history, friends and events dataset,
+see [dev/README.md](dev/README.md). The optional seed is additive and separate
+from application migrations. Its scenario guide lists what can be tested in the app.
+
+Run `.\mvnw.cmd test` on Windows (or `./mvnw test` on Unix) from `backend`
+with Java 21 and Docker available. Tests use
+disposable PostgreSQL containers, apply Liquibase, and never use the configured
+application database. API contracts and example requests are in [API.md](API.md).
+
+## Connect to a cloud PostgreSQL database
+
+Set the connection values in the environment where the application runs. `DB_URL`
+must be a PostgreSQL JDBC URL; use the hostname, port, and database name supplied
+by your provider. For example, when the provider requires TLS:
+
+```text
+DB_URL=jdbc:postgresql://db.example.com:5432/outthere?sslmode=require
+DB_USERNAME=provided_username
+DB_PASSWORD=provided_password
+```
+
+In PowerShell, set them for the current terminal before starting the app:
+
+```powershell
+$env:DB_URL = "jdbc:postgresql://db.example.com:5432/outthere?sslmode=require"
+$env:DB_USERNAME = "provided_username"
+$env:DB_PASSWORD = "provided_password"
+```
+
+Use the provider's required SSL settings and network access rules. In particular,
+allow connections from the app's runtime network and keep credentials in the
+deployment platform's secret or environment-variable configuration, not in source
+control. Liquibase and application queries use the same configured database.

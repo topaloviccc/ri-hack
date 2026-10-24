@@ -4,6 +4,7 @@ import { FlatList, View } from 'react-native';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { Image } from '@/components/ui/Image';
@@ -14,6 +15,7 @@ import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
 import { LOCATION_KIND_LABELS } from '@/features/courses/location-kinds';
 import { useThemeColors } from '@/lib/theme';
 import { countryFlag } from '@/utils/flag';
+import { hasCoordinates } from '@/utils/has-coordinates';
 import { openInMaps } from '@/utils/open-in-maps';
 
 export type LocationDetailsProps = { id: string };
@@ -47,6 +49,7 @@ export function LocationDetails({ id }: LocationDetailsProps) {
         <View className="gap-3">
           <Image uri={site.imageUrl} className="h-44 w-full bg-border" />
           <View className="gap-2 px-4">
+            <DemoNotice>image, location type and city</DemoNotice>
             <Chip label={LOCATION_KIND_LABELS[site.kind]} />
             <Text variant="title" accessibilityRole="header">
               {site.name}
@@ -54,12 +57,14 @@ export function LocationDetails({ id }: LocationDetailsProps) {
             <Text variant="caption">
               {site.city}, {countryFlag(site.countryCode)} {site.countryName}
             </Text>
-            <Button
-              variant="soft"
-              label="Open in maps"
-              icon={<Ionicons name="navigate-outline" size={16} color={colors.text} />}
-              onPress={() => openInMaps(site.lat, site.lng, site.name)}
-            />
+            {hasCoordinates(site) ? (
+              <Button
+                variant="soft"
+                label="Open in maps"
+                icon={<Ionicons name="navigate-outline" size={16} color={colors.text} />}
+                onPress={() => openInMaps(site.lat, site.lng, site.name)}
+              />
+            ) : null}
             <Text variant="heading" className="mt-2">
               Courses here
             </Text>

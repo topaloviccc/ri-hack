@@ -17,6 +17,7 @@ export function ReelCard({ course }: ReelCardProps) {
       <Scrim />
       <View className="flex-row gap-2">
         <Chip label={course.subject} />
+        <Chip label="Demo image" variant="onImage" />
         {course.isUnlocked ? null : <LockBadge cost={course.unlockCost} />}
       </View>
       <Text variant="title" className="text-on-image">

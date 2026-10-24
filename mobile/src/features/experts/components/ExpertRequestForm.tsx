@@ -4,6 +4,7 @@ import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-n
 
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Text } from '@/components/ui/Text';
@@ -75,7 +76,10 @@ function Form({ requests }: FormProps) {
       {
         onSuccess: () => {
           router.replace('/expert/requests');
-          Alert.alert('Request submitted', "We'll let you know once it has been reviewed.");
+          Alert.alert(
+            'Demo request saved',
+            'This example is kept in memory only. No certificate was uploaded or request sent for review.',
+          );
         },
       },
     );
@@ -83,6 +87,7 @@ function Form({ requests }: FormProps) {
 
   return (
     <ScrollView contentContainerClassName="gap-5 p-4 pb-10" keyboardShouldPersistTaps="handled">
+      <DemoNotice>expert requests and certificates; changes reset when the app restarts</DemoNotice>
       <Text variant="body">
         Share your qualifications to become an expert in a field. Each field is reviewed separately.
       </Text>

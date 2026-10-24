@@ -125,7 +125,7 @@ No `any` (use `unknown` + narrowing). No `!` without a comment. Props type `<Com
 - Inspect `git status --short`, `git diff --stat`, `git diff`, `git diff --check`; review staged and untracked files separately. Confirm every intended file is present and nothing accidental is.
 - Report what changed, which checks actually ran, any new reusable piece, and unresolved limitations. Never claim a check passed when it was skipped or blocked.
 
-**Context:** idea → `PROJECT.md` · deferred → `BACKLOG.md` · API contract → `API.md` (not written yet: no backend) · Expo SDK notes → `AGENTS.md` · commands: dev `npm start` · lint `npm run lint` · typecheck `npm run typecheck` · test `npm test` · all `npm run check`
+**Context:** idea → `PROJECT.md` · deferred → `BACKLOG.md` · API integration → `API.md` · backend contracts → `../backend/API.md` · Expo SDK notes → `AGENTS.md` · commands: dev `npm start` · lint `npm run lint` · typecheck `npm run typecheck` · test `npm test` · all `npm run check`
 
 ## 13. Lessons learned
 When a user correction or verified mistake reveals a reusable lesson, append a short entry: the mistake, its cause, and the rule that prevents a repeat. Keep entries project-relevant, avoid duplicates, reconcile with the rules above. Never turn guesses or task history into rules.

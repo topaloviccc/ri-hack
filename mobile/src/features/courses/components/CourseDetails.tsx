@@ -5,6 +5,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { Hero } from '@/components/shared/Hero';
 import { InfoRow } from '@/components/shared/InfoRow';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { CoinIcon } from '@/components/ui/CoinIcon';
@@ -42,6 +43,7 @@ export function CourseDetails({ id }: CourseDetailsProps) {
         }
       />
       <View className="gap-5 p-4">
+        <DemoNotice>cover image</DemoNotice>
         <CourseMeta course={course} />
         {hasStarted ? (
           <View className="gap-1">
@@ -72,14 +74,24 @@ export function CourseDetails({ id }: CourseDetailsProps) {
             icon="flag-outline"
             label="Country"
             value={`${countryFlag(course.countryCode)} ${course.countryName}`}
-            onPress={() =>
-              router.push({ pathname: '/country/[code]', params: { code: course.countryCode } })
+            onPress={
+              course.countryCode
+                ? () =>
+                    router.push({
+                      pathname: '/country/[code]',
+                      params: { code: course.countryCode },
+                    })
+                : undefined
             }
           />
           <InfoRow
             icon="time-outline"
             label="Estimated length"
-            value={formatDuration(course.estimatedMinutes)}
+            value={
+              course.estimatedMinutes === null
+                ? 'Not specified'
+                : formatDuration(course.estimatedMinutes)
+            }
           />
           <InfoRow
             icon="bar-chart-outline"

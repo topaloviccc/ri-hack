@@ -4,6 +4,7 @@ import { FlatList, View } from 'react-native';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Chip, type ChipVariant } from '@/components/ui/Chip';
@@ -41,6 +42,9 @@ export function ExpertRequestList() {
       data={data ?? []}
       keyExtractor={(r) => r.id}
       contentContainerClassName="gap-3 p-4 pb-10"
+      ListHeaderComponent={
+        <DemoNotice>example requests and statuses; changes are not sent for review</DemoNotice>
+      }
       ListEmptyComponent={renderEmpty}
       renderItem={({ item }) => (
         <Card className="gap-2 p-4">

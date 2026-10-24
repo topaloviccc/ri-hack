@@ -4,6 +4,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { Hero } from '@/components/shared/Hero';
 import { InfoRow } from '@/components/shared/InfoRow';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { Text } from '@/components/ui/Text';
@@ -11,6 +12,7 @@ import { useEventQuery } from '@/features/events/api/events.queries';
 import { CATEGORY_ICONS, CATEGORY_LABELS, LANGUAGE_NAMES } from '@/features/events/categories';
 import { formatDayHeading, formatTime, toDateKey } from '@/utils/date';
 import { openInMaps } from '@/utils/open-in-maps';
+import { hasCoordinates } from '@/utils/has-coordinates';
 
 export type EventDetailsProps = { id: string };
 
@@ -30,12 +32,15 @@ export function EventDetails({ id }: EventDetailsProps) {
         eyebrow={<Chip label={CATEGORY_LABELS[event.category]} />}
       />
       <View className="gap-5 p-4">
-        <Button
-          label="Register"
-          accessibilityHint="Opens the organizer's registration page"
-          onPress={() => Linking.openURL(event.registrationUrl)}
-          className="self-stretch"
-        />
+        <DemoNotice>city, category, image, language and paid price</DemoNotice>
+        {event.registrationUrl ? (
+          <Button
+            label="Register"
+            accessibilityHint="Opens the organizer's registration page"
+            onPress={() => Linking.openURL(event.registrationUrl)}
+            className="self-stretch"
+          />
+        ) : null}
         <Text variant="body">{event.description}</Text>
         <View className="gap-2">
           <InfoRow
@@ -47,7 +52,11 @@ export function EventDetails({ id }: EventDetailsProps) {
             icon="location-outline"
             label="Where"
             value={`${event.venue}, ${event.city}`}
-            onPress={() => openInMaps(event.lat, event.lng, `${event.title}, ${event.venue}`)}
+            onPress={
+              hasCoordinates(event)
+                ? () => openInMaps(event.lat, event.lng, `${event.title}, ${event.venue}`)
+                : undefined
+            }
           />
           <InfoRow
             icon={CATEGORY_ICONS[event.category]}

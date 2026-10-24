@@ -148,6 +148,10 @@ Keep each feature's code together, with clear responsibilities inside it:
 
 ## Lessons learned
 
+- Codebooks use a separate table per codebook with only `id` and `label`.
+  The initial generic design assumed extra code, discriminator, and ordering
+  columns; keep shared infrastructure in Java and follow this minimal table contract.
+
 When a user correction or verified mistake reveals a reusable lesson, append a
 short entry here: the mistake, its cause, and the concrete rule that prevents a
 repeat. Keep lessons relevant to this project, avoid duplicates, and reconcile

@@ -3,6 +3,7 @@ import { View } from 'react-native';
 
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { DemoNotice } from '@/components/shared/DemoNotice';
 import { useCountriesQuery, useLocationsQuery } from '@/features/courses/api/courses.queries';
 import { MapView } from '@/features/courses/components/map/MapView';
 import type { Viewport } from '@/features/courses/map/geometry';
@@ -37,6 +38,7 @@ export function WorldMap() {
         setViewport({ width: layout.width, height: layout.height })
       }
     >
+      <DemoNotice>map images and location types</DemoNotice>
       {renderBody()}
     </View>
   );
