@@ -3,7 +3,9 @@
 The application uses PostgreSQL through Spring JDBC. Liquibase runs the configured
 master changelog at startup and records applied changes in its own tracking tables.
 The master changelog includes `001-worldlearn.sql`, the frontend-backed subset of
-`../worldlearn.sql`. See [SCOPE.md](SCOPE.md) for the included tables and intentional
+`../worldlearn.sql`, followed by `002-iso-countries.sql` for production country
+reference data and `003-hosted-country-flags.sql` for hosted flag image URLs.
+See [SCOPE.md](SCOPE.md) for the included tables and intentional
 omissions. UUIDs, defaults, keys and relationships follow the source schema;
 CHECK constraints, stored functions and triggers are intentionally omitted.
 Subsequent changes belong in new changesets; do not edit an applied migration.
@@ -29,8 +31,17 @@ extension is required. Do not execute `worldlearn.sql` separately before startup
 it is a reference schema, not a second migration path. The initial changeset
 targets a fresh database, not a database already populated from that file.
 
-Only the source schema's lookup values are seeded. There are no production mock
-users, wallet credits, countries, fields, courses or events. Provision application
+The source schema's lookup values and all 249 ISO 3166-1 alpha-2 countries and
+territories are seeded in production. Country rows contain an uppercase `iso_code`,
+English name in `label`, and `flag_url` such as `https://flagcdn.com/w160/hr.png`.
+The frontend loads images directly from FlagCDN; no image files or bucket are
+stored/managed by the backend. The device needs internet access to the CDN.
+See [reference/README.md](reference/README.md) for sources and update guidance.
+The country migration upserts by ISO code, preserving existing UUIDs, foreign keys
+and application data. Restart an existing backend to apply it; do not reset the
+database or rerun the optional demo seed just to obtain countries/flag URLs.
+
+There are no production mock users, wallet credits, fields, courses or events. Provision application
 data with SQL or an existing import process. Account creation is outside this
 task, and there is no wallet-creation trigger: provisioning a user must also insert
 a `wallet` row. The integration fixture in `src/test/resources/db/worldlearn-test-data.sql`

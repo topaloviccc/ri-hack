@@ -1,15 +1,12 @@
-TRUNCATE country, field CASCADE;
-
-INSERT INTO country(id,iso_code,label) VALUES
- ('80000000-0000-0000-0000-000000000001','ME','Montenegro'),
- ('80000000-0000-0000-0000-000000000002','HR','Croatia');
+-- Keep production country reference data while resetting disposable application records.
+TRUNCATE app_user, place, field CASCADE;
 INSERT INTO field(id,label) VALUES
  ('90000000-0000-0000-0000-000000000001','History'),
  ('90000000-0000-0000-0000-000000000002','Arts & Music');
 INSERT INTO app_user(id,first_name,last_name,username,email,country_id,avatar_url) VALUES
- ('00000000-0000-0000-0000-000000000001','Current','Learner','me','me@example.test','80000000-0000-0000-0000-000000000001','https://example.test/me.png'),
- ('00000000-0000-0000-0000-000000000002','Alex','Friend','alex','alex@example.test','80000000-0000-0000-0000-000000000001',null),
- ('00000000-0000-0000-0000-000000000003','Sam','Other','sam','sam@example.test','80000000-0000-0000-0000-000000000002',null);
+ ('00000000-0000-0000-0000-000000000001','Current','Learner','me','me@example.test',(SELECT id FROM country WHERE iso_code='ME'),'https://example.test/me.png'),
+ ('00000000-0000-0000-0000-000000000002','Alex','Friend','alex','alex@example.test',(SELECT id FROM country WHERE iso_code='ME'),null),
+ ('00000000-0000-0000-0000-000000000003','Sam','Other','sam','sam@example.test',(SELECT id FROM country WHERE iso_code='HR'),null);
 INSERT INTO wallet(user_id,balance) VALUES
  ('00000000-0000-0000-0000-000000000001',100),
  ('00000000-0000-0000-0000-000000000002',0),
@@ -17,12 +14,12 @@ INSERT INTO wallet(user_id,balance) VALUES
 INSERT INTO friendship(requester_id,addressee_id,friendship_status_id) VALUES
  ('00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','1fd341a9-517a-5e85-b681-2f558ce03441');
 INSERT INTO place(id,name,country_id,address,latitude,longitude) VALUES
- ('70000000-0000-0000-0000-000000000001','Museum','80000000-0000-0000-0000-000000000001','Test address',42.424662,18.771234);
+ ('70000000-0000-0000-0000-000000000001','Museum',(SELECT id FROM country WHERE iso_code='ME'),'Test address',42.424662,18.771234);
 INSERT INTO course(id,creator_id,title,description,country_id,estimated_minutes,price_coins,reward_coins) VALUES
- ('10000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','Paid course','Paid description','80000000-0000-0000-0000-000000000001',30,40,10),
- ('10000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000002','Free course','Free description','80000000-0000-0000-0000-000000000002',15,0,0),
- ('10000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000002','Started course','Started description','80000000-0000-0000-0000-000000000001',60,20,5),
- ('10000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-000000000002','Expensive course',null,'80000000-0000-0000-0000-000000000001',100,500,10),
+ ('10000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','Paid course','Paid description',(SELECT id FROM country WHERE iso_code='ME'),30,40,10),
+ ('10000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000002','Free course','Free description',(SELECT id FROM country WHERE iso_code='HR'),15,0,0),
+ ('10000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000002','Started course','Started description',(SELECT id FROM country WHERE iso_code='ME'),60,20,5),
+ ('10000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-000000000002','Expensive course',null,(SELECT id FROM country WHERE iso_code='ME'),100,500,10),
  ('10000000-0000-0000-0000-000000000005','00000000-0000-0000-0000-000000000002','Draft course',null,null,null,0,0);
 INSERT INTO course_version(id,course_id,version_number,title,created_by,publication_status_id,published_at)
  SELECT ('20000000-0000-0000-0000-' || right(c.id::text,12))::uuid,c.id,1,c.title,c.creator_id,

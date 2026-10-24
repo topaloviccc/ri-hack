@@ -99,6 +99,7 @@ export function MapView({ viewport, countries, locations }: MapViewProps) {
               key={country.code}
               code={country.code}
               name={country.name}
+              flagUrl={country.flagUrl}
               courseCount={country.courseCount}
               point={{ x: shape.label[0], y: shape.label[1] }}
               camera={camera}

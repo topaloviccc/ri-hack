@@ -6,7 +6,7 @@ import { Text } from '@/components/ui/Text';
 import { DemoNotice } from '@/components/shared/DemoNotice';
 import { AddFriendButton } from '@/features/users/components/AddFriendButton';
 import type { User } from '@/features/users/types';
-import { countryFlag } from '@/utils/flag';
+import { CountryFlag } from '@/components/shared/CountryFlag';
 
 export type ProfileHeaderProps = {
   user: User;
@@ -31,9 +31,10 @@ export function ProfileHeader({ user, coins }: ProfileHeaderProps) {
         <Text variant="title" accessibilityRole="header">
           {user.name}
         </Text>
-        <Text variant="caption">
-          @{user.handle} · {countryFlag(user.countryCode)}
-        </Text>
+        <View className="flex-row items-center gap-2">
+          <Text variant="caption">@{user.handle}</Text>
+          <CountryFlag code={user.countryCode} />
+        </View>
         <DemoNotice>bio</DemoNotice>
         <Text variant="body" className="text-center">
           {user.bio}
@@ -76,7 +77,7 @@ export function ProfileHeader({ user, coins }: ProfileHeaderProps) {
                 accessibilityLabel={`Badge: ${code}`}
                 className="h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-surface"
               >
-                <Text className="text-2xl">{countryFlag(code)}</Text>
+                <CountryFlag code={code} size="md" />
               </View>
             ))}
           </ScrollView>

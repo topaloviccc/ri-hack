@@ -4,7 +4,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { Text } from '@/components/ui/Text';
 import type { MapCamera } from '@/features/courses/hooks/useMapCamera';
 import type { MapPoint, Viewport } from '@/features/courses/map/geometry';
-import { countryFlag } from '@/utils/flag';
+import { CountryFlag } from '@/components/shared/CountryFlag';
 
 const CHIP_WIDTH = 64;
 const CHIP_HEIGHT = 32;
@@ -12,6 +12,7 @@ const CHIP_HEIGHT = 32;
 export type CountryChipProps = {
   code: string;
   name: string;
+  flagUrl: string;
   courseCount: number;
   point: MapPoint;
   camera: MapCamera;
@@ -23,6 +24,7 @@ export type CountryChipProps = {
 export function CountryChip({
   code,
   name,
+  flagUrl,
   courseCount,
   point,
   camera,
@@ -50,7 +52,7 @@ export function CountryChip({
         hitSlop={8}
         className="h-full flex-row items-center justify-center gap-1 rounded-full bg-surface shadow-md shadow-overlay active:opacity-70"
       >
-        <Text className="text-base">{countryFlag(code)}</Text>
+        <CountryFlag code={code} name={name} uri={flagUrl} />
         <Text variant="label">{courseCount}</Text>
       </Pressable>
     </Animated.View>

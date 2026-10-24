@@ -3,6 +3,7 @@ import type { Difficulty } from '@/features/courses/types';
 export type CountryResponse = {
   code: string;
   name: string;
+  flagUrl: string;
   courseCount: number;
   locationCount: number;
 };
