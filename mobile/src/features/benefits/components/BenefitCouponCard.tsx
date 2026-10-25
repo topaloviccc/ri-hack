@@ -31,7 +31,7 @@ export function BenefitCouponCard({
       accessibilityHint="Opens offer details"
       onPress={onPress}
       onPressIn={onPressIn}
-      className="relative mx-4 mb-3 flex-row items-center gap-3 rounded-card border border-primary/20 bg-primary/10 p-3 active:opacity-80"
+      className="mx-4 mb-3 flex-row items-center gap-3 rounded-card border border-primary/20 bg-primary/10 p-3 active:opacity-80"
     >
       <BenefitArtwork offer={offer} className="h-28 w-20 shrink-0 rounded-lg" />
       <View className="flex-1 gap-1.5">
@@ -68,16 +68,6 @@ export function BenefitCouponCard({
           coins
         </Text>
       </View>
-      <View
-        pointerEvents="none"
-        className="absolute -left-2 h-4 w-4 rounded-full bg-background"
-        style={{ top: '50%' }}
-      />
-      <View
-        pointerEvents="none"
-        className="absolute -right-2 h-4 w-4 rounded-full bg-background"
-        style={{ top: '50%' }}
-      />
     </Pressable>
   );
 }

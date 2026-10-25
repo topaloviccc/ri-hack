@@ -181,4 +181,4 @@ Intentional differences. Don't flag these.
 
 - **Welcome screen logo gradient** (`WelcomeScreen.tsx`): 18 hardcoded blue→orange hex stops. It's the brand mark, not UI, so it doesn't follow the theme.
 - **Unlock celebration lock** (`UnlockCelebration.tsx`): its own `rounded-2xl`, `rounded-t-full`, `border-8` shapes. It's an illustration, not UI.
-- **Benefits coupon card tint** (`BenefitCouponCard.tsx`): `bg-primary/10` + `border-primary/20` with ticket notches instead of a plain surface card. The ticket look is what makes it read as a coupon. Radius, thumbnail and type follow the standard rules.
+- **Benefits coupon card tint** (`BenefitCouponCard.tsx`): `bg-primary/10` + `border-primary/20` instead of a plain surface card, so it reads as a coupon (no side notches). Radius, thumbnail and type follow the standard rules.
