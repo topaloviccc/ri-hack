@@ -1,4 +1,3 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -8,6 +7,7 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { Select } from '@/components/ui/Select';
 import { Text } from '@/components/ui/Text';
 import { TextField } from '@/components/ui/TextField';
@@ -17,12 +17,12 @@ import {
   useOffersQuery,
   usePartnersQuery,
 } from '@/features/benefits/api/benefits.queries';
+import { ActiveFilterChips } from '@/features/benefits/components/ActiveFilterChips';
 import { BenefitCouponCard } from '@/features/benefits/components/BenefitCouponCard';
 import { PartnerAvatar } from '@/features/benefits/components/BenefitArtwork';
 import { BenefitsFilterSheet } from '@/features/benefits/components/BenefitsFilterSheet';
 import type { OfferFilters, OfferSort } from '@/features/benefits/types';
 import { CoinBalance, useWalletQuery } from '@/features/wallet';
-import { useThemeColors } from '@/lib/theme';
 
 const SORTS: { value: OfferSort; label: string }[] = [
   { value: 'POPULAR', label: 'Popular' },
@@ -31,8 +31,20 @@ const SORTS: { value: OfferSort; label: string }[] = [
   { value: 'NEWEST', label: 'Newest' },
 ];
 
+function HeaderActions() {
+  return (
+    <View className="flex-row items-center gap-2">
+      <IconButton
+        icon="ticket-outline"
+        accessibilityLabel="My coupons"
+        onPress={() => router.push('/benefits/coupons')}
+      />
+      <CoinBalance />
+    </View>
+  );
+}
+
 export function BenefitsList() {
-  const colors = useThemeColors();
   const queryClient = useQueryClient();
   const { partnerId } = useLocalSearchParams<{ partnerId?: string }>();
   const [filters, setFilters] = useState<OfferFilters>({ sort: 'POPULAR', partnerId });
@@ -56,7 +68,7 @@ export function BenefitsList() {
   const country = countries.data?.find((c) => c.code === filters.countryCode);
   return (
     <>
-      <Stack.Screen options={{ headerRight: () => <CoinBalance /> }} />
+      <Stack.Screen options={{ headerRight: () => <HeaderActions /> }} />
       <FlatList
         data={offers.data?.pages.flatMap((page) => page.items) ?? []}
         contentContainerClassName="pb-6"
@@ -82,36 +94,35 @@ export function BenefitsList() {
                   returnKeyType="search"
                 />
               </View>
-              <Pressable
-                accessibilityRole="button"
+              <IconButton
+                icon="options-outline"
                 accessibilityLabel="Filter benefits"
                 onPress={() => setShowFilters(true)}
-                className="h-11 w-11 items-center justify-center rounded-full bg-secondary/20 active:opacity-70"
-              >
-                <Ionicons name="options-outline" size={22} color={colors.text} />
-              </Pressable>
-            </View>
-            <View className="flex-row flex-wrap gap-2 px-4">
-              <Button
-                label={partner?.name ?? 'Partner'}
-                variant="soft"
-                icon={<Ionicons name="storefront-outline" size={16} color={colors.text} />}
-                onPress={() => setShowFilters(true)}
+                className="bg-secondary/20"
               />
-              <Button
-                label={country?.name ?? filters.countryCode ?? 'Country'}
-                variant="soft"
-                icon={<Ionicons name="globe-outline" size={16} color={colors.text} />}
-                onPress={() => setShowFilters(true)}
-              />
-              {filters.partnerId || filters.countryCode || filters.q ? (
-                <Button
-                  label="Clear"
-                  variant="soft"
-                  onPress={() => setFilters({ sort: filters.sort })}
-                />
-              ) : null}
             </View>
+            <ActiveFilterChips
+              filters={[
+                ...(filters.partnerId
+                  ? [
+                      {
+                        key: 'partner',
+                        label: partner?.name ?? 'Partner',
+                        onClear: () => setFilters({ ...filters, partnerId: undefined }),
+                      },
+                    ]
+                  : []),
+                ...(filters.countryCode
+                  ? [
+                      {
+                        key: 'country',
+                        label: country?.name ?? filters.countryCode,
+                        onClear: () => setFilters({ ...filters, countryCode: undefined }),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
             <View className="flex-row items-center justify-between px-4">
               <Text variant="heading">Popular partners</Text>
               <Pressable
@@ -188,12 +199,6 @@ export function BenefitsList() {
                 />
               </View>
             </View>
-            <Button
-              label="My coupons"
-              className="mx-4 self-end"
-              variant="soft"
-              onPress={() => router.push('/benefits/coupons')}
-            />
           </View>
         }
         renderItem={({ item }) => (
