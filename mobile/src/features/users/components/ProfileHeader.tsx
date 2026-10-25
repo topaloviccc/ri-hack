@@ -1,7 +1,6 @@
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/Avatar';
-import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { DemoNotice } from '@/components/shared/DemoNotice';
 import { AddFriendButton } from '@/features/users/components/AddFriendButton';
@@ -46,17 +45,8 @@ export function ProfileHeader({ user, coins }: ProfileHeaderProps) {
         <Text variant="body" className="text-center">
           {user.bio}
         </Text>
-        {isOwn ? (
-          <Button
-            variant="soft"
-            label="Edit profile"
-            // TODO(hack): edit profile is deferred. See BACKLOG.md.
-            onPress={() => Alert.alert('Coming soon', 'Editing your profile is on its way.')}
-            className="self-center"
-          />
-        ) : (
-          <FriendshipButton user={user} />
-        )}
+        {/* TODO(hack): own profile gets an Edit profile button once editing exists. See BACKLOG.md. */}
+        {isOwn ? null : <FriendshipButton user={user} />}
       </View>
 
       <View className="flex-row gap-3">

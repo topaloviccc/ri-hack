@@ -156,10 +156,10 @@ describe('screens', () => {
     expect(screen.getByText('Country')).toBeOnTheScreen();
   });
 
-  it('Own profile shows Edit profile and in-progress courses', async () => {
+  it('Own profile shows in-progress courses and coins', async () => {
     await renderAt('/profile');
-    expect(await screen.findByText('Edit profile')).toBeOnTheScreen();
-    expect(screen.getByText('In progress')).toBeOnTheScreen();
+    expect(await screen.findByText('In progress')).toBeOnTheScreen();
+    expect(screen.queryByText('Edit profile')).toBeNull();
     expect(screen.getByText('Coins')).toBeOnTheScreen();
   });
 

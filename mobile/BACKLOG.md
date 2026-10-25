@@ -17,7 +17,7 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **Spaced revision** - incorrect-answer revision scheduling is not part of the course player.
 - [ ] **Benefits device acceptance** — verify coupon activation/code display, narrow layouts, large font sizes, Android back and iOS modal behavior on physical devices. Automated checks do not establish device acceptance.
 - [ ] **Benefits beyond the current slice** — public commercial partner onboarding, push expiry reminders, offline merchant acceptance and merchant administration are deliberately deferred.
-- [ ] **Edit profile** — button on your own profile shows "coming soon".
+- [ ] **Edit profile** — not built; the button is hidden on your own profile until it is.
 - [ ] **Profile privacy** — other people's profiles show completed courses to everyone; rules come with the backend.
 - [ ] **Friend requests: accept/decline, unfriend, incoming requests** — only "send request" exists; it now persists in the backend.
 - [ ] **Global leaderboard** — Leaderboards shows friends only, this week only.
