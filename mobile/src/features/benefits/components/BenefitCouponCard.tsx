@@ -33,7 +33,7 @@ export function BenefitCouponCard({
     >
       <BenefitArtwork offer={offer} className="h-28 w-20 shrink-0 rounded-lg" />
       <View className="flex-1 gap-1.5">
-        <Text variant="label" className="font-sans-bold text-base" numberOfLines={2}>
+        <Text variant="label" className="text-base" numberOfLines={2}>
           {offer.title}
         </Text>
         <Text variant="caption" numberOfLines={1}>
@@ -61,7 +61,7 @@ export function BenefitCouponCard({
       </View>
       <View className="items-center gap-1 rounded-xl bg-primary/25 px-2.5 py-3">
         <CoinIcon />
-        <Text variant="label" className="font-sans-bold">
+        <Text variant="label">
           {offer.priceCoins}
         </Text>
         <Text variant="caption" className="text-xs text-text">
