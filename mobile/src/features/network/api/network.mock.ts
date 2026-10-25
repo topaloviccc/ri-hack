@@ -1,5 +1,3 @@
-import type { WeeklyChallenge } from '@/features/network/types';
-
 export type MockFeedItem = { id: string; userId: string; courseId: string; hoursAgo: number };
 
 export const MOCK_FEED: MockFeedItem[] = [
@@ -12,15 +10,6 @@ export const MOCK_FEED: MockFeedItem[] = [
   { id: 'f7', userId: 'u4', courseId: 'c11', hoursAgo: 88 },
   { id: 'f8', userId: 'u6', courseId: 'c29', hoursAgo: 120 },
 ];
-
-export const MOCK_CHALLENGE: Omit<WeeklyChallenge, 'endsAt'> & { daysLeft: number } = {
-  id: 'ch1',
-  title: 'Complete 3 Italy courses',
-  reward: '🍕 Free pizza',
-  progress: 1,
-  target: 3,
-  daysLeft: 4,
-};
 
 export const MOCK_WEEKLY_COMPLETIONS: Record<string, number> = {
   u0: 3,

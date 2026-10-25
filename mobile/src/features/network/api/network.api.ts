@@ -1,5 +1,4 @@
-import { MOCK_CHALLENGE } from './network.mock';
-import type { FeedItem, LeaderboardEntry, WeeklyChallenge } from '@/features/network/types';
+import type { FeedItem, LeaderboardEntry } from '@/features/network/types';
 import { apiRequest } from '@/lib/api-client';
 
 type FeedItemResponse = Omit<FeedItem, 'userAvatarUrl'> & { userAvatarUrl: string | null };
@@ -18,9 +17,4 @@ export const networkApi = {
       ...row,
       userAvatarUrl: row.userAvatarUrl ?? '',
     })),
-  // Demo only: the schema has no challenge definitions/progress. Never mixed with live scores.
-  getChallenge: async (): Promise<WeeklyChallenge> => ({
-    ...MOCK_CHALLENGE,
-    endsAt: new Date(Date.now() + MOCK_CHALLENGE.daysLeft * 86_400_000).toISOString(),
-  }),
 };

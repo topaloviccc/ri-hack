@@ -6,7 +6,7 @@ When you defer something, add it here; when you build it, delete the line.
 ## Connected backend and demo boundaries
 Core data and mutations now use Spring Boot. Setup, endpoint mapping and remaining
 demo fields are documented in `API.md` and `../backend/SCOPE.md`.
-- [ ] **Unsupported demo content** — course/place/event images, bios, country introductions, location types/cities, event categories/cities/languages/paid prices, expert applications and weekly challenges remain visibly labelled demos by request. Country names, codes and image flags are production reference data. Replace the remaining demos only after a schema/product decision.
+- [ ] **Unsupported demo content** — course/place/event images, bios, country introductions, location types/cities, event categories/cities/languages/paid prices and expert applications remain visibly labelled demos by request. Country names, codes and image flags are production reference data. Replace the remaining demos only after a schema/product decision.
 - [ ] **Real event city filtering** — current city filters operate on demo city labels; the calendar defaults to all live events. The schema has no structured city field.
 - [ ] **Verify mock content** — location coordinates and course facts were written from memory. Least certain: Ronda bullring, Las Ventas, Giverny, Camargue, Krka, St John Fortress, Our Lady of the Rocks, Skadar/Virpazar, Path of Philosophy, Jigokudani, Al-Muizz Street, Ranthambore, Sacsayhuaman, Qorikancha, Heron Island, Port Arthur, MCG, Strokkur, Thingvellir, Jökulsárlón, Etna, Blue Lagoon, Abu Simbel. Event coordinates are approximate too.
 
@@ -21,7 +21,6 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **Profile privacy** — other people's profiles show completed courses to everyone; rules come with the backend.
 - [ ] **Friend requests: accept/decline, unfriend, incoming requests** — only "send request" exists; it now persists in the backend.
 - [ ] **Global leaderboard** — Leaderboards shows friends only, this week only.
-- [ ] **Weekly challenge tap** — card does nothing when tapped; more than one challenge.
 - [ ] **Feed "see all"** — feed card shows the 5 latest completions only.
 - [ ] **Saved events / registered state, capacity** (spec F17) — Register just opens the external link.
 - [ ] **Search** on Home (spec F2).

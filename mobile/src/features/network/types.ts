@@ -9,17 +9,6 @@ export type FeedItem = {
   completedAt: string;
 };
 
-export type WeeklyChallenge = {
-  id: string;
-  title: string;
-  reward: string;
-  progress: number;
-  target: number;
-  /** ISO 8601 */
-  endsAt: string;
-  daysLeft: number;
-};
-
 export type LeaderboardEntry = {
   rank: number;
   userId: string;

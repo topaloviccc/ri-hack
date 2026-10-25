@@ -15,8 +15,8 @@ admins are role capabilities added later.
 
 ## Built so far (mobile)
 Core records and mutations now use the Spring Boot backend. Images and unsupported
-extra details remain explicitly labelled demo content; expert applications and the
-weekly challenge remain demos. The table below records prototype feature coverage;
+extra details remain explicitly labelled demo content; expert applications remain
+demos. The table below records prototype feature coverage;
 see [API.md](API.md) for the current source of each field and run configuration.
 
 | Area | State |
@@ -25,7 +25,7 @@ see [API.md](API.md) for the current source of each field and run configuration.
 | Home: "Continue with…", "Most Popular" (by learner count), "Recommended for you" | ✅ mock data |
 | Scroll: full-screen reels; swipe right = less like this (local), swipe left = details | ✅ mock data |
 | Events: city picker + "my location", calendar with event dots, day list, event details + Register link | ✅ mock data |
-| Network: friends strip, feed, weekly challenge, suggested friends; Leaderboards (friends, weekly); People search; send friend request | ✅ mock data |
+| Network: friends strip, feed, suggested friends; Leaderboards (friends, weekly); People search; send friend request | ✅ mock data |
 | Courses: Map (SVG world, tap country → site pins + country card, clustering, location sheet) · Countries (A–Z → Country page) · Fields (by subject) | ✅ mock data |
 | Course details, Profile (own + others, one view), Settings (System/Light/Dark, persisted) | ✅ mock data |
 | Shared coins: posted/held/available balances and course unlocks with a celebration | Connected backend |
@@ -42,7 +42,7 @@ completion coins are paid once per course. Content is seeded; LLM generation is 
 - **Country**: production ISO 3166-1 alpha-2 code, English display name, hosted image flag URL and course/location counts; introduction text remains demo content.
 - **Event** (`LearningEvent`): title, category, start time, city, venue, coordinates, image, description, organizer, price (null = free), language, registration URL. Seed cities are in Montenegro.
 - **User**: name, handle, avatar, country, bio, stats (completed, streak, countries), country badges, in-progress/completed course ids, relation to me (me/friend/requested/none).
-- **Network**: feed of friends' completions, one weekly challenge, weekly friends leaderboard.
+- **Network**: feed of friends' completions, weekly friends leaderboard.
 
 ## Spec features not started (pick from here when asked)
 F1 accounts/onboarding · F2 search · F5 completion timing ·

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
-import { ChallengeCard } from '@/features/network/components/ChallengeCard';
 import { FeedCard } from '@/features/network/components/FeedCard';
 import { Leaderboard } from '@/features/network/components/Leaderboard';
 import { FriendRequests, FriendStrip, SuggestedFriends } from '@/features/users';
@@ -26,7 +25,6 @@ export function NetworkPanel() {
           <FriendRequests />
           <FriendStrip />
           <FeedCard />
-          <ChallengeCard />
           <SuggestedFriends />
         </ScrollView>
       )}

@@ -53,7 +53,7 @@ through the computer's firewall if that URL cannot be reached.
 | Event identity, start time, venue/coordinates, organizer, description, free/paid status and registration link | Backend |
 | Course/place/event images, location kinds/cities, country introductions and profile bios | Stable demo supplements, labelled in the UI |
 | Event city/category/language and numeric paid-price examples | Stable demo supplements, labelled in list and details |
-| Expert applications/statuses/certificates and weekly challenge | Explicitly labelled demos; expert changes are in memory only |
+| Expert applications/statuses/certificates | Explicitly labelled demos; expert changes are in memory only |
 | Theme preference | Device storage |
 
 Demo supplements use a stable ID hash, or country code for introductions. They never

@@ -49,11 +49,10 @@ describe('screens', () => {
     expect((await screen.findAllByLabelText(/ in maps$/)).length).toBeGreaterThan(0);
   });
 
-  it('Network shows friends, feed, challenge and suggestions', async () => {
+  it('Network shows friends, feed and suggestions', async () => {
     await renderAt('/network');
     expect(await screen.findByText('My friends')).toBeOnTheScreen();
     expect(await screen.findByText('My feed')).toBeOnTheScreen();
-    expect(await screen.findByText('Weekly challenge')).toBeOnTheScreen();
     expect(await screen.findByText('Suggested friends')).toBeOnTheScreen();
   });
 
