@@ -44,7 +44,7 @@ describe('screens', () => {
 
   it('Events shows the location picker and today’s events', async () => {
     await renderAt('/events');
-    expect(await screen.findByText('Events')).toBeOnTheScreen();
+    expect(await screen.findByRole('header', { name: 'Events' })).toBeOnTheScreen();
     expect(screen.getByLabelText('Use my location')).toBeOnTheScreen();
     expect((await screen.findAllByLabelText(/ in maps$/)).length).toBeGreaterThan(0);
   });
