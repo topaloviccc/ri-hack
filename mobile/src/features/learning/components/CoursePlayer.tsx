@@ -1,8 +1,9 @@
 import { View } from 'react-native';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { Text } from '@/components/ui/Text';
 import { useLearningQuery } from '@/features/learning/api/learning.queries';
+import { LearningBackLink } from './LearningBackLink';
 import { LearningOutline } from './LearningOutline';
 import { LessonReader } from './LessonReader';
 import { QuizPlayer } from './QuizPlayer';
@@ -21,7 +22,10 @@ export function CoursePlayer({ id, lesson, quiz }: CoursePlayerProps) {
       ) : selected ? (
         <LessonReader key={selected.id} course={id} lesson={selected} />
       ) : lesson ? (
-        <Text>Lesson not found.</Text>
+        <View className="flex-1 p-4">
+          <LearningBackLink />
+          <EmptyState title="Lesson not found" message="It may have been moved or removed." />
+        </View>
       ) : (
         <LearningOutline learning={learning} />
       )}
