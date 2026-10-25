@@ -4,6 +4,8 @@ import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
+  withSequence,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
@@ -14,17 +16,22 @@ const HORIZONTAL_SWIPE_THRESHOLD = 0.25;
 const VERTICAL_SWIPE_THRESHOLD = 0.16;
 const ACTIVE_OFFSET = 20;
 const DISMISS_DURATION_MS = 200;
+const OPEN_DURATION_MS = 180;
+// Snap the reel back only once the details screen has slid over it.
+const OPEN_RESET_DELAY_MS = 600;
 
 export type SwipeableReelProps = {
   children: ReactNode;
-  /** Swipe left: the reel flies off ("less like this"). */
+  /** Swipe right: the reel flies off ("less like this"). */
   onDismiss: () => void;
-  /** Swipe right: open the course; the reel springs back. */
+  /** Swipe left: the reel slides out and the course opens. */
   onOpen: () => void;
   /** Swipe down to see the next course. */
   onNext: () => void;
   /** Swipe up to return to the previous course. */
   onPrevious: () => void;
+  /** A swipe has started: a chance to load what `onOpen` will show. */
+  onSwipeStart?: () => void;
   disabled?: boolean;
 };
 
@@ -32,6 +39,7 @@ export function SwipeableReel({
   children,
   onDismiss,
   onOpen,
+  onSwipeStart,
   onNext,
   onPrevious,
   disabled = false,
@@ -43,6 +51,10 @@ export function SwipeableReel({
     enabled: !disabled,
     activeOffsetX: [-ACTIVE_OFFSET, ACTIVE_OFFSET],
     activeOffsetY: [-ACTIVE_OFFSET, ACTIVE_OFFSET],
+    onActivate: () => {
+      'worklet';
+      if (onSwipeStart) scheduleOnRN(onSwipeStart);
+    },
     onUpdate: (e) => {
       'worklet';
       translateX.value = Math.abs(e.translationX) > Math.abs(e.translationY) ? e.translationX : 0;
@@ -59,15 +71,23 @@ export function SwipeableReel({
       }
 
       const threshold = width * HORIZONTAL_SWIPE_THRESHOLD;
-      if (e.translationX < -threshold) {
-        translateX.value = withTiming(-width, { duration: DISMISS_DURATION_MS }, (finished) => {
+      if (e.translationX > threshold) {
+        translateX.value = withTiming(width, { duration: DISMISS_DURATION_MS }, (finished) => {
           if (finished) scheduleOnRN(onDismiss);
-          // The HTTP save may fail; keep the keyed row visible until server data removes it.
+          // The feed removes the card; reset so an undone (restored) card comes back in place.
           translateX.value = withSpring(0);
         });
         return;
       }
-      if (e.translationX > threshold) scheduleOnRN(onOpen);
+      if (e.translationX < -threshold) {
+        // Navigate right away and let the reel finish its slide under the incoming screen.
+        scheduleOnRN(onOpen);
+        translateX.value = withSequence(
+          withTiming(-width, { duration: OPEN_DURATION_MS }),
+          withDelay(OPEN_RESET_DELAY_MS, withTiming(0, { duration: 0 })),
+        );
+        return;
+      }
       translateX.value = withSpring(0);
     },
   });
@@ -80,15 +100,31 @@ export function SwipeableReel({
     <GestureDetector gesture={pan}>
       <Animated.View
         style={[styles.fill, animatedStyle]}
-        accessibilityHint="Swipe left to recommend less, swipe right to open the course, and swipe down for the next course"
+        accessibilityHint="Swipe left to open the course, swipe right to recommend less, and swipe down for the next course"
         accessibilityState={{ disabled }}
         accessibilityActions={[
           { name: 'decrement', label: 'Recommend less like this' },
           { name: 'activate', label: 'Open details' },
+          { name: 'increment', label: 'Next course' },
+          { name: 'previous', label: 'Previous course' },
         ]}
-        onAccessibilityAction={(e) =>
-          disabled ? undefined : e.nativeEvent.actionName === 'activate' ? onOpen() : onDismiss()
-        }
+        onAccessibilityAction={(e) => {
+          if (disabled) return;
+          switch (e.nativeEvent.actionName) {
+            case 'activate':
+              onOpen();
+              break;
+            case 'decrement':
+              onDismiss();
+              break;
+            case 'increment':
+              onNext();
+              break;
+            case 'previous':
+              onPrevious();
+              break;
+          }
+        }}
       >
         {children}
       </Animated.View>

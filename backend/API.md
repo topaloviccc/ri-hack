@@ -26,6 +26,9 @@ origins with the backend `CORS_ALLOWED_ORIGINS` environment variable.
 | GET | `/courses/{id}` | `Course` |
 | POST | `/courses/{id}/unlock` | Required `Idempotency-Key` header, no body; `Wallet` |
 | POST | `/courses/{id}/dismiss` | No body; 204; persists the reel's "less like this" action |
+| POST | `/courses/{id}/feedback` | `{action: "OPEN" \| "NEXT", dwellMs: 0..120000}`; 204; persists bounded per-course signals |
+| GET | `/users/me/interests` | `{fieldIds: UUID[], onboardingComplete: boolean}` |
+| POST | `/users/me/interests` | `{fieldIds: UUID[]}`; atomically replaces interests and completes onboarding; empty skips/clears |
 | GET | `/countries` | All 249 ISO countries/territories, including zero-content rows; `Country[]`, ordered by English name |
 | GET | `/countries/{code}` | Uppercase ISO alpha-2 code; `Country` |
 | GET | `/locations` | Optional `countryCode`, `ids`; `Location[]` |
@@ -101,10 +104,12 @@ counts exclude those additional owned courses. Archive behavior is a catalogue r
 not an access-control implementation.
 
 `popular` returns up to five courses ordered by distinct completers in the past
-30 days, then total enrolled users. `recommended` orders public courses by summed
-matching `user_interest.weight`, with stable ID tie-breaking. With no interests it
-uses that stable order. `feed` orders public courses by creation date. Both omit
-the viewer's dismissed courses. These are SQL rules with no AI or external service.
+30 days, then total enrolled users. `recommended` and `feed` combine selected
+learning categories, semantic course similarity, swipe feedback, learning history
+and a small popularity signal. Both omit the viewer's dismissed courses and keep
+stable ID tie breaks. Course embeddings are generated asynchronously using OpenAI
+when a backend API key is configured. See [RECOMMENDATIONS.md](RECOMMENDATIONS.md)
+for ranking weights, model setup, caching, exploration and retry behavior.
 
 Profiles count distinct completed courses. Country badges are derived from the
 countries of completed courses, matching the frontend's definition; they are not

@@ -33,6 +33,11 @@ export const coursesApi = {
     toCourse(await apiRequest<CourseResponse>(`/courses/${encodeURIComponent(id)}`)),
   dismiss: (id: string): Promise<void> =>
     apiRequest(`/courses/${encodeURIComponent(id)}/dismiss`, { method: 'POST' }),
+  feedback: (id: string, action: 'OPEN' | 'NEXT', dwellMs: number): Promise<void> =>
+    apiRequest(`/courses/${encodeURIComponent(id)}/feedback`, {
+      method: 'POST',
+      body: { action, dwellMs },
+    }),
 };
 
 export const locationsApi = {

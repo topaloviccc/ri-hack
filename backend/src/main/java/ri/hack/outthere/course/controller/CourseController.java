@@ -41,6 +41,14 @@ public class CourseController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void dismiss(@Viewer UUID viewer, @PathVariable UUID id) { service.dismiss(viewer, id); }
 
+    public record FeedbackRequest(String action, Integer dwellMs) { }
+
+    @PostMapping("/courses/{id}/feedback")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void feedback(@Viewer UUID viewer, @PathVariable UUID id, @RequestBody FeedbackRequest request) {
+        service.feedback(viewer, id, request.action(), request.dwellMs());
+    }
+
     @GetMapping("/countries")
     public List<CountryResponse> countries() { return service.countries(); }
 

@@ -10,6 +10,9 @@ import {
 import { MOCK_EVENTS } from '@/features/events/api/events.mock';
 import { installApiFixture, isTestCourseUnlocked } from '@/test-support/api-fixture';
 
+// The Scroll feed's undo window is 4 s; wait a little longer for the deferred save.
+const UNDO_WAIT_MS = 6000;
+
 // Smoke tests: boot the real app at each route and check its key content renders.
 // Relative to the jest rootDir.
 const APP_DIR = './src/app';
@@ -21,6 +24,17 @@ const renderAt = (initialUrl: string) => renderRouter(APP_DIR, { initialUrl });
 
 describe('screens', () => {
   beforeEach(() => installApiFixture());
+  it('edits saved learning interests from Settings', async () => {
+    await renderAt('/settings');
+    await fireEvent.press(await screen.findByRole('button', { name: 'Learning interests' }));
+    await fireEvent.press(await screen.findByRole('checkbox', { name: 'Nature & Wildlife' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Save interests' }));
+    expect(await screen.findByText('Appearance')).toBeOnTheScreen();
+    const saved = (globalThis.fetch as jest.Mock).mock.calls.find(
+      ([url, init]) => String(url).endsWith('/users/me/interests') && init?.method === 'POST',
+    );
+    expect(JSON.parse(saved?.[1].body)).toEqual({ fieldIds: ['nature'] });
+  });
   it('Home shows the three course rows', async () => {
     await renderAt('/');
     expect(await screen.findByText('Continue with…')).toBeOnTheScreen();
@@ -40,8 +54,48 @@ describe('screens', () => {
     await fireEvent(await screen.findByTestId('course-feed'), 'layout', {
       nativeEvent: { layout: { width: 400, height: 800 } },
     });
+    // First visit: the gesture hints cover the feed until dismissed.
+    await fireEvent.press(await screen.findByText('Got it'));
     expect(await screen.findByText(courseTitle(MOCK_FEED_IDS[0]))).toBeOnTheScreen();
-  });
+    expect(screen.queryByText('How the feed works')).toBeNull();
+    const gestureHint =
+      'Swipe left to open the course, swipe right to recommend less, and swipe down for the next course';
+    const activeReel = () =>
+      screen.getAllByHintText(gestureHint).find((node) => !node.props.accessibilityState.disabled)!;
+    await fireEvent(activeReel(), 'accessibilityAction', {
+      nativeEvent: { actionName: 'increment' },
+    });
+    await waitFor(() =>
+      expect(
+        (globalThis.fetch as jest.Mock).mock.calls.some(
+          ([url, init]) =>
+            String(url).endsWith(`/courses/${MOCK_FEED_IDS[0]}/feedback`) &&
+            JSON.parse(init?.body).action === 'NEXT',
+        ),
+      ).toBe(true),
+    );
+    await waitFor(() => expect(activeReel()).toBeDefined());
+    const dismissSent = () =>
+      (globalThis.fetch as jest.Mock).mock.calls.some(([url]) =>
+        String(url).endsWith(`/courses/${MOCK_FEED_IDS[1]}/dismiss`),
+      );
+    // "Less like this" hides the card at once but only saves when the undo window closes.
+    await fireEvent(activeReel(), 'accessibilityAction', {
+      nativeEvent: { actionName: 'decrement' },
+    });
+    expect(await screen.findByText('We’ll show less like this')).toBeOnTheScreen();
+    expect(dismissSent()).toBe(false);
+    await fireEvent.press(screen.getByLabelText('Undo, keep showing this course'));
+    expect(screen.queryByText('We’ll show less like this')).toBeNull();
+    expect(await screen.findByText(courseTitle(MOCK_FEED_IDS[1]))).toBeOnTheScreen();
+    expect(dismissSent()).toBe(false);
+    // Dismiss again and let the undo window close: the choice is saved.
+    await fireEvent(activeReel(), 'accessibilityAction', {
+      nativeEvent: { actionName: 'decrement' },
+    });
+    expect(await screen.findByText('We’ll show less like this')).toBeOnTheScreen();
+    await waitFor(() => expect(dismissSent()).toBe(true), { timeout: UNDO_WAIT_MS });
+  }, 30_000);
 
   it('Events shows the location picker and today’s events', async () => {
     await renderAt('/events');

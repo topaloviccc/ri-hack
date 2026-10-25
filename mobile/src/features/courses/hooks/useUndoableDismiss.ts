@@ -1,68 +1,60 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { useDismissCourse } from '@/features/courses/api/courses.mutations';
-
 // The backend has no "undo dismiss" endpoint, so the save waits until the undo window closes.
 const UNDO_WINDOW_MS = 4000;
 
 export type FeedToast = 'dismissed' | 'error';
 
-/** "Less like this" with Undo: hides the reel at once and saves it when the toast closes. */
-export function useUndoableDismiss() {
-  const { mutate } = useDismissCourse();
-  const [hiddenIds, setHiddenIds] = useState<string[]>([]);
-  const [toast, setToast] = useState<FeedToast>();
-  const pendingId = useRef<string>(undefined);
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+type Pending = { id: string; restore: () => void };
 
-  const unhide = (id: string) => setHiddenIds((ids) => ids.filter((hidden) => hidden !== id));
+/**
+ * "Less like this" with Undo. The caller hides the card at once; `save` runs when the toast
+ * closes, on the next dismissal, or when the feed unmounts. `save` must be stable.
+ */
+export function useUndoableDismiss(save: (id: string) => Promise<void>) {
+  const [toast, setToast] = useState<FeedToast>();
+  const pending = useRef<Pending>(undefined);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   function showToast(kind: FeedToast) {
     setToast(kind);
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      save();
+      flush();
       setToast(undefined);
     }, UNDO_WINDOW_MS);
   }
 
-  function save() {
-    const id = pendingId.current;
-    pendingId.current = undefined;
-    if (!id) return;
-    mutate(id, {
-      onError: () => {
-        unhide(id);
-        showToast('error');
-      },
-    });
+  function flush() {
+    const item = pending.current;
+    pending.current = undefined;
+    if (item) save(item.id).catch(() => showToast('error'));
   }
 
-  const dismiss = (id: string) => {
-    save(); // A second swipe ends the previous undo window.
-    pendingId.current = id;
-    setHiddenIds((ids) => [...ids, id]);
+  const dismiss = (id: string, restore: () => void) => {
+    flush(); // A second dismissal ends the previous undo window.
+    pending.current = { id, restore };
     showToast('dismissed');
   };
 
   const undo = () => {
-    const id = pendingId.current;
-    pendingId.current = undefined;
+    const item = pending.current;
+    pending.current = undefined;
     clearTimeout(timer.current);
     setToast(undefined);
-    if (id) unhide(id);
+    item?.restore();
   };
 
   // Leaving the feed closes the undo window, so the pending choice is still saved.
   useEffect(
     () => () => {
       clearTimeout(timer.current);
-      save();
+      flush();
     },
-    // save reads only refs and the stable mutate; it must run once, on unmount.
+    // flush reads only refs and the stable `save`; it must run once, on unmount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
-  return { hiddenIds, toast, dismiss, undo };
+  return { toast, dismiss, undo, showError: () => showToast('error') };
 }
