@@ -40,7 +40,7 @@ export function BenefitCouponCard({
           {offer.partner.name}
         </Text>
         <View className="flex-row items-center gap-1">
-          <Ionicons name="location-outline" size={13} color={colors.muted} />
+          <Ionicons name="location-outline" size={16} color={colors.muted} />
           <Text variant="caption" className="flex-1" numberOfLines={1}>
             {scope}
           </Text>

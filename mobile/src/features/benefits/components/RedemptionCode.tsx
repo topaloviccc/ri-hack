@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { Text } from '@/components/ui/Text';
+import { useThemeColors } from '@/lib/theme';
 
 export function RedemptionCode({ code }: { code: string }) {
+  const colors = useThemeColors();
   const [copied, setCopied] = useState(false);
   return (
     <View className="w-full items-center gap-3 rounded-xl border border-border bg-background p-4">
@@ -24,7 +26,7 @@ export function RedemptionCode({ code }: { code: string }) {
           }}
           className="min-h-11 min-w-11 flex-row items-center justify-center gap-1 rounded-xl bg-secondary/30 px-2 active:opacity-70"
         >
-          <Ionicons name={copied ? 'checkmark' : 'copy-outline'} size={18} />
+          <Ionicons name={copied ? 'checkmark' : 'copy-outline'} size={18} color={colors.text} />
           <Text variant="caption">{copied ? 'Copied' : 'Copy'}</Text>
         </Pressable>
       </View>
