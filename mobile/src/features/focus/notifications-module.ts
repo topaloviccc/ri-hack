@@ -9,7 +9,11 @@ export type NotificationsModule = typeof import('expo-notifications');
  */
 export async function loadNotifications(): Promise<NotificationsModule | null> {
   if (Platform.OS !== 'android') return null;
-  return requireOptionalNativeModule('ExpoNotificationScheduler')
+  // expo-notifications eagerly imports its Android topic module from its public entry point.
+  // Checking only the scheduler lets an older development build pass this check and then throw
+  // while importing the package because it does not contain ExpoTopicSubscriptionModule yet.
+  return requireOptionalNativeModule('ExpoNotificationScheduler') &&
+    requireOptionalNativeModule('ExpoTopicSubscriptionModule')
     ? import('expo-notifications')
     : null;
 }
