@@ -51,7 +51,7 @@ export function CourseRow({ section }: CourseRowProps) {
   };
 
   return (
-    <View className="gap-3">
+    <View className="gap-2">
       <Text variant="heading" className="px-4" accessibilityRole="header">
         {SECTION_TITLES[section]}
       </Text>

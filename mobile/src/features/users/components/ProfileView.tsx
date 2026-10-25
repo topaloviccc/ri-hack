@@ -19,18 +19,22 @@ function CourseSection({ title, ids, emptyMessage }: CourseSectionProps) {
     if (isPending) return <LoadingState />;
     if (isError) return <ErrorState onRetry={refetch} />;
     // Profiles show a handful of courses, so a plain column is fine inside the page ScrollView.
-    return data.map((course) => (
-      <CourseListItem
-        key={course.id}
-        course={course}
-        onPress={openCourse}
-        onPressIn={prefetchCourse}
-      />
-    ));
+    return (
+      <View className="gap-3">
+        {data.map((course) => (
+          <CourseListItem
+            key={course.id}
+            course={course}
+            onPress={openCourse}
+            onPressIn={prefetchCourse}
+          />
+        ))}
+      </View>
+    );
   };
 
   return (
-    <View className="gap-3">
+    <View className="gap-2">
       <Text variant="heading" accessibilityRole="header">
         {title}
       </Text>
