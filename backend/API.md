@@ -108,8 +108,11 @@ the same key return the current wallet balance; reusing that key for a different
 course returns 409. Already-owned courses return the current balance without a
 second debit, including with a different key. Free acquisition writes an entitlement
 and no ledger row, so its retry guarantee is course ownership, not a stored key.
-Unlock does not create/open an enrollment because the frontend has no lesson player.
-There are no write APIs for credits, course completion, grading or course authoring.
+Unlock does not create/open an enrollment; starting the course player does.
+The `/courses/{id}/learning` endpoints now provide ordered lessons/quizzes, answer
+submission, persisted progress, question-based 80% completion and promised coin
+rewards. See [LEARNING.md](LEARNING.md) for paths, JSON contracts and retry rules.
+There are no arbitrary credit/top-up, generation or course-authoring APIs.
 
 ## Benefits and coupons
 

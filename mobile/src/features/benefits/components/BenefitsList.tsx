@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList, Pressable, ScrollView, View } from 'react-native';
 
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -33,15 +33,17 @@ export function BenefitsList() {
   const colors = useThemeColors();
   const { partnerId } = useLocalSearchParams<{ partnerId?: string }>();
   const [filters, setFilters] = useState<OfferFilters>({ sort: 'POPULAR', partnerId });
+  const [previousPartnerId, setPreviousPartnerId] = useState(partnerId);
+  if (partnerId !== previousPartnerId) {
+    setPreviousPartnerId(partnerId);
+    setFilters((current) => ({ ...current, partnerId: partnerId || undefined }));
+  }
   const [showFilters, setShowFilters] = useState(false);
   const offers = useOffersQuery(filters);
   const wallet = useWalletQuery();
   const partners = usePartnersQuery();
   const countries = useCountriesQuery();
   const { refetch } = offers;
-  useEffect(() => {
-    setFilters((current) => ({ ...current, partnerId: partnerId || undefined }));
-  }, [partnerId]);
   useFocusEffect(
     useCallback(() => {
       void refetch();

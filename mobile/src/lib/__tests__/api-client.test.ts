@@ -25,6 +25,26 @@ describe('HTTP client', () => {
     expect(init?.headers).toEqual(expect.objectContaining({ 'X-User-Id': env.userId }));
   });
 
+  it('sends quiz answers as JSON with viewer and idempotency headers', async () => {
+    fetchMock.mockResolvedValue(httpResponse({ attemptId: 'attempt' }));
+    const body = { answers: [{ questionId: 'question', optionIds: ['a', 'b'] }] };
+    await apiRequest('/courses/course/learning/quizzes/quiz/attempts', {
+      method: 'POST',
+      viewer: true,
+      body,
+      headers: { 'Idempotency-Key': 'retry-key' },
+    });
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({
+      body: JSON.stringify(body),
+      method: 'POST',
+      headers: expect.objectContaining({
+        'Content-Type': 'application/json',
+        'X-User-Id': env.userId,
+        'Idempotency-Key': 'retry-key',
+      }),
+    });
+  });
+
   it('normalizes Problem Detail and rejects malformed success JSON', async () => {
     fetchMock.mockResolvedValueOnce(httpResponse({ detail: 'Course not found' }, 404));
     await expect(apiRequest('/courses/missing')).rejects.toMatchObject({

@@ -13,7 +13,8 @@ export class ApiError extends Error {
 
 const REQUEST_TIMEOUT_MS = 15_000;
 type QueryValue = string | number | boolean | readonly string[] | undefined;
-type JsonValue = string | number | boolean | null | readonly JsonValue[] | { [key: string]: JsonValue };
+type JsonValue =
+  string | number | boolean | null | readonly JsonValue[] | { [key: string]: JsonValue };
 type RequestOptions = {
   method?: 'GET' | 'POST';
   query?: Record<string, QueryValue>;
@@ -54,7 +55,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
         ...options.headers,
       },
       signal: abort.signal,
-      body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+      ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
     });
     const raw = await response.text();
     let body: unknown;

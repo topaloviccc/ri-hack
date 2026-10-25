@@ -1,16 +1,18 @@
-# Schema/frontend intersection and gaps
+# Schema/frontend coverage and gaps
 
-Sources: `../worldlearn.sql`, `../mobile/src/features/*/types.ts`, the current screens,
-and the API implementation.
-The reference SQL is unchanged. This backend implements only shared
-behaviors and the relational dependencies needed to read or write them.
+Sources: `../worldlearn.sql`, `../mobile/src/features/*/types.ts`, mock API adapters,
+the current screens and the API implementation. The product specification is not used to expand this scope.
+The reference SQL is unchanged. The initial integration covered shared behaviors;
+explicitly requested country reference data and the lesson/quiz player extend it.
+The learning/scoring policy is detailed in [LEARNING.md](LEARNING.md).
 
 ## Implemented overlap
 
 | Frontend behavior | Schema backing |
 | --- | --- |
 | Home rows, course cards/details, reel feed, country/location filters, map coordinates | `course`, `course_version`, `difficulty`, `visibility`, `publication_status`, `course_field`, `field`, `course_place`, `place`, `country` |
-| Continue/progress and profile course lists | `course_entitlement`, `enrollment`, `enrollment_status`, `lesson`, `lesson_progress`, `course_completion`; read only for learning history |
+| Lesson/quiz player, progress, grading and course completion | `course_entitlement`, `enrollment`, `enrollment_status`, `lesson`, `lesson_progress`, `quiz`, `question_type`, `question`, `answer_option`, `quiz_attempt`, `question_response`, `course_completion`, `course_completion_quiz_result`; transactional writes |
+| Once-per-course promised completion reward | `course_completion_reward`, entitlement promise, wallet and ledger; atomic with completion |
 | Wallet balance and unlock | `wallet`, `wallet_transaction`, `wallet_transaction_type`, `course_entitlement`; transactional writes |
 | Benefits catalogue, direct coupon activation/code, history, expiry and immediate wallet debit | `partner`, `partner_venue`, `benefit_offer`, `offer_venue`, `coupon_redemption`; same persisted wallet and ledger |
 | Less like this on reels | `user_course_preference.is_dismissed`; persistent write |
@@ -42,15 +44,16 @@ behaviors and the relational dependencies needed to read or write them.
 - AI course generation, durable generation jobs, extraction, source grants/chunks,
   provenance, embeddings/pgvector, model integrations and workers.
 - Uploads/media assets, buckets, private file delivery and presigned URLs.
-- Lesson player/content writes, quizzes/questions/options, grading, attempts,
-  completion/reward writes, spaced revision and scheduling. Minimal lesson/history
-  tables are present only to supply the progress and completion data already displayed.
+- Course authoring/generation/import APIs, short-answer and matching question
+  rendering/grading, spaced revision and scheduling. Choice/true-false quizzes,
+  lesson progress, answer submission, completion and promised coin rewards are implemented.
 - Course authoring/publication/version editing, prerequisites and concepts; no CRUD
   APIs beyond the actual frontend mutations. Existing version/status columns remain
   part of the selected schema but have no administration endpoints.
 - Focus sessions, NFC tags/verified visits/rewards and explicit badge award workflows.
 - Expert grants, course reviews, contribution rewards, content reports and audit events.
-- Cosmetics, refund/adjustment/credit/top-up APIs and reward payments. Benefits use
+- Cosmetics, wallet reservations, refund/adjustment/credit/top-up APIs and rewards
+  other than course completion. Benefits use
   the `BENEFIT_ACTIVATION` transaction type; other lookup labels do not imply
   implemented flows. Merchant self-service, payouts, real partner agreements,
   offline acceptance, geofencing and badge/visit eligibility remain deferred.
@@ -75,9 +78,11 @@ columns (for example event capacity and version objectives) have no extra APIs.
 In the initial 001 subset, source CHECK constraints and stored functions/triggers are omitted, including
 validation, immutability, scoring, publication guards, financial link checks and
 automatic wallet/reward creation. Primary keys, NOT NULL, unique keys and foreign
-keys remain as the structural relational model. No equivalent range/format/state
-validation was recreated for that initial subset. The incremental Benefits migration
-adds feature-specific state/amount/time constraints and explicit transactional validation.
+keys remain as the structural relational model. Exhaustive source validation
+was not recreated. The player enforces its answer/progression contracts and grades
+questions in application code, including the explicitly chosen equal-question
+80% rule (different from the reference's equal-quiz mean). The incremental Benefits
+migration adds feature-specific state/amount/time constraints and explicit transactional validation.
 HTTP binding, missing-resource handling,
 insufficient-balance behavior and idempotent unlocks implement the existing frontend
 contract. The wallet use case updates balance and ledger itself because its trigger

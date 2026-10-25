@@ -1,5 +1,5 @@
 import { benefitsApi } from '@/features/benefits/api/benefits.api';
-import { benefitsKeys, couponsQueryOptions, offersQueryOptions } from '@/features/benefits/api/benefits.queries';
+import { benefitsKeys, offersQueryOptions } from '@/features/benefits/api/benefits.queries';
 import { BENEFIT_OFFER } from '@/test-support/benefits-fixture';
 import { installApiFixture } from '@/test-support/api-fixture';
 import { walletApi } from '@/features/wallet/api/wallet.api';

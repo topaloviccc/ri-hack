@@ -5,6 +5,11 @@ master changelog at startup and records applied changes in its own tracking tabl
 The master changelog includes `001-worldlearn.sql`, the frontend-backed subset of
 `../worldlearn.sql`, followed by `002-iso-countries.sql` for production country
 reference data and `003-hosted-country-flags.sql` for hosted flag image URLs.
+The Benefits migrations (`002-benefits-redemption.sql`,
+`003-benefits-instant-coupons.sql`, `004-benefit-remote-images.sql`) add the
+coupon flow. `004-course-learning.sql` adds quizzes, answers, attempts and
+completion rewards. Changesets retain their original names and identities
+across both feature branches; the numeric prefixes are not globally unique.
 See [SCOPE.md](SCOPE.md) for the included tables and intentional
 omissions. UUIDs, defaults, keys and relationships follow the source schema;
 CHECK constraints, stored functions and triggers are omitted from that initial subset.
@@ -64,6 +69,12 @@ For the full catalogue, geography, learning history, friends and events dataset,
 see [dev/README.md](dev/README.md). The optional seed is additive and separate
 from application migrations. Its scenario guide lists what can be tested in the app.
 
+The full demo seed now includes answerable lesson/quiz content. Existing demo
+databases can load `dev/demo-learning.sql` separately after the new migration,
+without resetting learner history or balances. Learning content is optional demo
+data, not production reference data. See [LEARNING.md](LEARNING.md) for commands,
+the content shape, scoring policy and transactional completion/reward behavior.
+
 Run `.\mvnw.cmd test` on Windows (or `./mvnw test` on Unix) from `backend`
 with Java 21 and Docker available. Tests use
 disposable PostgreSQL containers, apply Liquibase, and never use the configured
@@ -79,19 +90,13 @@ For recovery, prefer a forward migration or restore the pre-upgrade backup; do n
 drop populated Benefits tables or erase captured ledger history to roll back an
 application deployment. Historical partner/offers should be deactivated, not deleted.
 
-Focused disposable-database checks from `backend`:
+The backend test command above applies the complete merged Liquibase changelog,
+including Benefits, to disposable PostgreSQL databases and exercises the shared
+wallet and course HTTP flows. Dedicated Benefits activation, upgrade/restart and
+concurrency test classes are not currently committed. Mobile Benefits adapter and
+screen tests use backend-shaped HTTP fixtures; they do not establish those server
+guarantees.
 
-```powershell
-.\mvnw.cmd '-Dtest=BenefitsIntegrationTests,BenefitsMigrationTests,BenefitsRestartIntegrationTests,BenefitsHttpIntegrationTests' test
-```
-
-The migration test starts with populated 001, applies the current master twice,
-and checks original balances/history plus empty Benefits tables. It then executes
-the optional dev seed repeatedly after simulated spending, verifying the separate
-520-coin opening credit occurs once and the original 250-coin learner is preserved.
-Integration tests exercise actual HTTP controller/service/JDBC transactions through MockMvc and
-PostgreSQL, including concurrent requests. They do not connect to the dev database.
-Tests use disposable PostgreSQL containers, not the dev database.
 ## Connect to a cloud PostgreSQL database
 
 Set the connection values in the environment where the application runs. `DB_URL`

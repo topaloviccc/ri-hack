@@ -1,4 +1,4 @@
-﻿import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { FlatList, Pressable, View } from 'react-native';

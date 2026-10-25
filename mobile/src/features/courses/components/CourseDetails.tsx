@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { ErrorState } from '@/components/shared/ErrorState';
 import { Hero } from '@/components/shared/Hero';
@@ -26,8 +26,7 @@ export function CourseDetails({ id }: CourseDetailsProps) {
   if (isError) return <ErrorState message="Couldn't load this course." onRetry={refetch} />;
 
   const hasStarted = course.progress !== undefined;
-  // TODO(hack): no lesson player yet. See BACKLOG.md.
-  const handleStart = () => Alert.alert('Coming soon', 'The lesson player is on its way.');
+  const handleStart = () => router.push({ pathname: '/course/[id]/learn', params: { id } });
 
   return (
     <ScrollView contentContainerClassName="pb-10">
@@ -46,7 +45,9 @@ export function CourseDetails({ id }: CourseDetailsProps) {
         <CourseMeta course={course} />
         {hasStarted ? (
           <View className="gap-1">
-            <Text variant="caption">{Math.round((course.progress ?? 0) * 100)}% complete</Text>
+            <Text variant="caption">
+              {Math.round((course.progress ?? 0) * 100)}% of content completed
+            </Text>
             <ProgressBar value={course.progress ?? 0} />
           </View>
         ) : null}
