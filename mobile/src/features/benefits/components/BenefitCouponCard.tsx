@@ -25,8 +25,8 @@ export function BenefitCouponCard({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`View / Redeem ${offer.title}, ${offer.partner.name}, ${scope}, ${offer.priceCoins} coins, ${offer.availability}`}
-      accessibilityHint="Opens redemption confirmation"
+      accessibilityLabel={`View offer ${offer.title}, ${offer.partner.name}, ${scope}, ${offer.priceCoins} coins, ${offer.availability}`}
+      accessibilityHint="Opens offer details"
       onPress={onPress}
       onPressIn={onPressIn}
       className="relative mx-4 mb-3 flex-row items-center gap-3 rounded-card border border-primary/20 bg-primary/10 p-3 active:opacity-80"

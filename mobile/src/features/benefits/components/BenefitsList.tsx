@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { FlatList, Pressable, ScrollView, View } from 'react-native';
@@ -11,6 +12,7 @@ import { Select } from '@/components/ui/Select';
 import { Text } from '@/components/ui/Text';
 import { TextField } from '@/components/ui/TextField';
 import {
+  offerQueryOptions,
   useCountriesQuery,
   useOffersQuery,
   usePartnersQuery,
@@ -31,6 +33,7 @@ const SORTS: { value: OfferSort; label: string }[] = [
 
 export function BenefitsList() {
   const colors = useThemeColors();
+  const queryClient = useQueryClient();
   const { partnerId } = useLocalSearchParams<{ partnerId?: string }>();
   const [filters, setFilters] = useState<OfferFilters>({ sort: 'POPULAR', partnerId });
   const [previousPartnerId, setPreviousPartnerId] = useState(partnerId);
@@ -198,8 +201,9 @@ export function BenefitsList() {
             offer={item}
             availableBalance={wallet.data?.availableBalance}
             onPress={() =>
-              router.push({ pathname: '/benefits/offer/[id]/confirm', params: { id: item.id } })
+              router.push({ pathname: '/benefits/offer/[id]', params: { id: item.id } })
             }
+            onPressIn={() => void queryClient.prefetchQuery(offerQueryOptions(item.id))}
           />
         )}
         ListEmptyComponent={
