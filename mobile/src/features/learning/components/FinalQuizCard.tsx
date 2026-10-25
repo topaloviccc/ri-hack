@@ -6,6 +6,7 @@ import { useThemeColors } from '@/lib/theme';
 import type { LearningQuizSummary } from '../api/learning.dto';
 import { quizState } from '../progress';
 import { StepStatus } from './StepStatus';
+import { pluralize } from '@/utils/format';
 
 export type FinalQuizCardProps = {
   quiz: LearningQuizSummary;
@@ -35,7 +36,9 @@ export function FinalQuizCard({ quiz, completed, onOpen }: FinalQuizCardProps) {
         <StepStatus state={state} />
       </View>
       <Text variant="heading">Final summary quiz</Text>
-      <Text variant="caption">{quiz.questionCount} questions to bring everything together.</Text>
+      <Text variant="caption">
+        {pluralize(quiz.questionCount, 'question')} to bring everything together.
+      </Text>
       <View className="flex-row items-center justify-between border-t border-border pt-3">
         <Text variant="label" className="flex-1">
           {locked

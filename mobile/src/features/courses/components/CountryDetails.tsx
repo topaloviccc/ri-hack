@@ -14,6 +14,7 @@ import { CourseListItem } from '@/features/courses/components/CourseListItem';
 import { LocationCard } from '@/features/courses/components/LocationItems';
 import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
 import { CountryFlag } from '@/components/shared/CountryFlag';
+import { pluralize } from '@/utils/format';
 
 export type CountryDetailsProps = { code: string };
 
@@ -55,8 +56,8 @@ export function CountryDetails({ code }: CountryDetailsProps) {
               {country.data.name}
             </Text>
             <Text variant="caption">
-              {country.data.code} · {country.data.courseCount} courses ·{' '}
-              {country.data.locationCount} places
+              {country.data.code} · {pluralize(country.data.courseCount, 'course')} ·{' '}
+              {pluralize(country.data.locationCount, 'place')}
             </Text>
             <DemoNotice>country introduction</DemoNotice>
             <Text variant="body" className="mt-2 text-center">

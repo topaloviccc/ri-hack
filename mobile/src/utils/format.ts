@@ -7,6 +7,13 @@ export const formatCount = (n: number) => {
   return `${k < 10 ? k.toFixed(1).replace(/\.0$/, '') : Math.round(k)}k`;
 };
 
+/** 1234 -> '1,234'. Fixed locale so numbers read the same on every device. */
+export const formatNumber = (n: number) => n.toLocaleString('en-GB');
+
+/** (1, 'course') -> '1 course', (1240, 'coin') -> '1,240 coins'. */
+export const pluralize = (count: number, singular: string, plural = `${singular}s`) =>
+  `${formatNumber(count)} ${count === 1 ? singular : plural}`;
+
 /** 95 -> '1 h 35 min', 45 -> '45 min' */
 export const formatDuration = (minutes: number) => {
   const h = Math.floor(minutes / 60);

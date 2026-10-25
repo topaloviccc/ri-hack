@@ -7,6 +7,7 @@ import { AddFriendButton } from '@/features/users/components/AddFriendButton';
 import { RemoveFriendButton } from '@/features/users/components/RemoveFriendButton';
 import type { User } from '@/features/users/types';
 import { CountryFlag } from '@/components/shared/CountryFlag';
+import { formatNumber } from '@/utils/format';
 
 // Only the full profile offers unfriending; list rows just show "Friends".
 function FriendshipButton({ user }: { user: User }) {
@@ -27,7 +28,7 @@ export function ProfileHeader({ user, coins }: ProfileHeaderProps) {
     { label: 'Completed', value: String(user.stats.completedCount) },
     { label: 'Day streak', value: String(user.stats.streakDays) },
     isOwn
-      ? { label: 'Coins', value: coins === undefined ? '…' : String(coins) }
+      ? { label: 'Coins', value: coins === undefined ? '…' : formatNumber(coins) }
       : { label: 'Countries', value: String(user.stats.countriesCount) },
   ];
   return (

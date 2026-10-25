@@ -5,6 +5,7 @@ import { Text } from '@/components/ui/Text';
 import type { MapCamera } from '@/features/courses/hooks/useMapCamera';
 import type { MapPoint, Viewport } from '@/features/courses/map/geometry';
 import { CountryFlag } from '@/components/shared/CountryFlag';
+import { pluralize } from '@/utils/format';
 
 const CHIP_WIDTH = 64;
 const CHIP_HEIGHT = 32;
@@ -47,7 +48,7 @@ export function CountryChip({
     >
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`${name}: ${courseCount} courses`}
+        accessibilityLabel={`${name}: ${pluralize(courseCount, 'course')}`}
         onPress={() => onPress(code)}
         hitSlop={8}
         className="h-full flex-row items-center justify-center gap-1 rounded-full bg-surface shadow-md shadow-overlay active:opacity-70"

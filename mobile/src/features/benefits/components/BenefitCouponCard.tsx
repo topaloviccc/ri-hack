@@ -7,6 +7,7 @@ import { BenefitArtwork } from '@/features/benefits/components/BenefitArtwork';
 import { availabilityLabel, unavailableReason } from '@/features/benefits/labels';
 import type { Offer } from '@/features/benefits/types';
 import { useThemeColors } from '@/lib/theme';
+import { pluralize } from '@/utils/format';
 
 export type BenefitCouponCardProps = {
   offer: Offer;
@@ -26,7 +27,7 @@ export function BenefitCouponCard({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`View offer ${offer.title}, ${offer.partner.name}, ${scope}, ${offer.priceCoins} coins, ${availabilityLabel(offer.availability)}`}
+      accessibilityLabel={`View offer ${offer.title}, ${offer.partner.name}, ${scope}, ${pluralize(offer.priceCoins, 'coin')}, ${availabilityLabel(offer.availability)}`}
       accessibilityHint="Opens offer details"
       onPress={onPress}
       onPressIn={onPressIn}
@@ -52,19 +53,17 @@ export function BenefitCouponCard({
           </Text>
         ) : null}
         {!offer.eligible || offer.availability !== 'AVAILABLE' ? (
-          <Text variant="caption">
-            {unavailableReason(offer)}
-          </Text>
+          <Text variant="caption">{unavailableReason(offer)}</Text>
         ) : null}
         {availableBalance !== undefined && availableBalance < offer.priceCoins ? (
-          <Text variant="caption">Need {offer.priceCoins - availableBalance} more coins</Text>
+          <Text variant="caption">
+            Need {pluralize(offer.priceCoins - availableBalance, 'more coin', 'more coins')}
+          </Text>
         ) : null}
       </View>
       <View className="items-center gap-1 rounded-xl bg-primary/25 px-2.5 py-3">
         <CoinIcon />
-        <Text variant="label">
-          {offer.priceCoins}
-        </Text>
+        <Text variant="label">{offer.priceCoins}</Text>
         <Text variant="caption" className="text-xs text-text">
           coins
         </Text>

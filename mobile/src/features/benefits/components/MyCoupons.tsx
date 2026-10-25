@@ -15,6 +15,7 @@ import { COUPON_STATUS_LABELS } from '@/features/benefits/labels';
 import type { CouponSegment } from '@/features/benefits/types';
 import { walletKeys } from '@/features/wallet';
 import { formatDateTime } from '@/utils/date';
+import { pluralize } from '@/utils/format';
 
 const SEGMENTS: { value: CouponSegment; label: string }[] = [
   { value: 'ACTIVE', label: 'Active' },
@@ -34,11 +35,7 @@ export function MyCoupons() {
   );
   useEffect(() => {
     if (!coupons.dataUpdatedAt) return;
-    for (const queryKey of [
-      walletKeys.all,
-      benefitsKeys.offerLists(),
-      benefitsKeys.offerDetails(),
-    ])
+    for (const queryKey of [walletKeys.all, benefitsKeys.offerLists(), benefitsKeys.offerDetails()])
       void client.invalidateQueries({ queryKey });
   }, [client, coupons.dataUpdatedAt]);
   return (
@@ -79,8 +76,7 @@ export function MyCoupons() {
             <Text variant="caption">Demo partner offer</Text>
           ) : null}
           <Text variant="label">
-            {COUPON_STATUS_LABELS[item.status]} ·{' '}
-            {item.priceCoins} coins used
+            {COUPON_STATUS_LABELS[item.status]} · {pluralize(item.priceCoins, 'coin')} used
           </Text>
           <Text variant="caption">
             Issued {formatDateTime(item.issuedAt)}

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { Text } from '@/components/ui/Text';
 import { useCountryQuery } from '@/features/courses/api/courses.queries';
 import { CountryFlag } from '@/components/shared/CountryFlag';
+import { pluralize } from '@/utils/format';
 
 export type CountryCardProps = { code: string };
 
@@ -26,7 +27,7 @@ export function CountryCard({ code }: CountryCardProps) {
             </Text>
           </View>
           <Text variant="caption">
-            {data.courseCount} courses · {data.locationCount} places
+            {pluralize(data.courseCount, 'course')} · {pluralize(data.locationCount, 'place')}
           </Text>
         </View>
         <Button

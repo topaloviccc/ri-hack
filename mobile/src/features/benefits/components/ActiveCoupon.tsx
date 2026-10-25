@@ -11,6 +11,7 @@ import { useMarkCouponUsed } from '@/features/benefits/api/benefits.mutations';
 import { BenefitArtwork, PartnerAvatar } from '@/features/benefits/components/BenefitArtwork';
 import { RedemptionCode } from '@/features/benefits/components/RedemptionCode';
 import { confirmDestructive } from '@/utils/confirm';
+import { pluralize } from '@/utils/format';
 
 export function ActiveCoupon({ couponId }: { couponId: string }) {
   const coupon = useQuery(couponQueryOptions(couponId));
@@ -57,7 +58,7 @@ export function ActiveCoupon({ couponId }: { couponId: string }) {
             <Text>This coupon has expired.</Text>
           )}
           <Text variant="caption" className="text-center">
-            {data.priceCoins} coins used
+            {pluralize(data.priceCoins, 'coin')} used
           </Text>
           {data.status === 'ACTIVE' ? (
             <View className="w-full items-center gap-2">

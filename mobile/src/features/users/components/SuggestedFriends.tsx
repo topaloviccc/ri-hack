@@ -8,6 +8,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Text } from '@/components/ui/Text';
 import { useUsersQuery } from '@/features/users/api/users.queries';
 import { AddFriendButton } from '@/features/users/components/AddFriendButton';
+import { pluralize } from '@/utils/format';
 
 const ROW_HEIGHT_CLASS = 'h-48';
 
@@ -40,7 +41,7 @@ export function SuggestedFriends() {
               {item.name}
             </Text>
             <Text variant="caption" numberOfLines={1}>
-              {item.mutualFriendsCount} mutual friends
+              {pluralize(item.mutualFriendsCount, 'mutual friend')}
             </Text>
             <AddFriendButton user={item} className="self-center" />
           </Pressable>

@@ -10,6 +10,7 @@ import { StepStatus } from './StepStatus';
 import { lessonSections } from '../lesson-sections';
 import { cn } from '@/lib/cn';
 import { MarkdownBlocks, MarkdownInteractions } from '@/components/shared/markdown';
+import { pluralize } from '@/utils/format';
 
 export type LessonReaderProps = { course: string; lesson: LearningLesson };
 export function LessonReader({ course, lesson }: LessonReaderProps) {
@@ -68,7 +69,7 @@ export function LessonReader({ course, lesson }: LessonReaderProps) {
               ) : null}
               <Text variant="label">Ready to check what you learned?</Text>
               <Text variant="caption">
-                {lesson.quiz.questionCount} questions · Unlimited retries
+                {pluralize(lesson.quiz.questionCount, 'question')} · Unlimited retries
               </Text>
               <LearningAction
                 label={complete.isPending ? 'Saving…' : 'Continue to quiz'}

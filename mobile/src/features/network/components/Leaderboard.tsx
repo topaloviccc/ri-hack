@@ -7,6 +7,7 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { Text } from '@/components/ui/Text';
 import { useLeaderboardQuery } from '@/features/network/api/network.queries';
 import { UserListItem } from '@/features/users';
+import { pluralize } from '@/utils/format';
 
 const openProfile = (id: string) => router.push({ pathname: '/user/[id]', params: { id } });
 
@@ -40,7 +41,10 @@ export function Leaderboard() {
             </Text>
           }
           trailing={
-            <Text variant="heading" accessibilityLabel={`${item.completedThisWeek} courses`}>
+            <Text
+              variant="heading"
+              accessibilityLabel={pluralize(item.completedThisWeek, 'course')}
+            >
               {item.completedThisWeek}
             </Text>
           }

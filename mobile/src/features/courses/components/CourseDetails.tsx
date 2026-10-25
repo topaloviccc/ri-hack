@@ -15,7 +15,7 @@ import { useCourseQuery } from '@/features/courses/api/courses.queries';
 import { CourseMeta } from '@/features/courses/components/CourseMeta';
 import { LocationRow } from '@/features/courses/components/LocationItems';
 import { LockBadge } from '@/features/courses/components/LockBadge';
-import { capitalize, formatDuration } from '@/utils/format';
+import { capitalize, formatDuration, formatNumber, pluralize } from '@/utils/format';
 
 export type CourseDetailsProps = { id: string };
 
@@ -59,8 +59,8 @@ export function CourseDetails({ id }: CourseDetailsProps) {
           />
         ) : (
           <Button
-            label={`Unlock for ${course.unlockCost}`}
-            accessibilityLabel={`Unlock for ${course.unlockCost} coins`}
+            label={`Unlock for ${formatNumber(course.unlockCost)}`}
+            accessibilityLabel={`Unlock for ${pluralize(course.unlockCost, 'coin')}`}
             icon={<CoinIcon />}
             onPress={() =>
               router.push({ pathname: '/course/[id]/unlock', params: { id: course.id } })

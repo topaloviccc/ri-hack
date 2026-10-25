@@ -9,6 +9,7 @@ import { Text } from '@/components/ui/Text';
 import { offerQueryOptions } from '@/features/benefits/api/benefits.queries';
 import { OfferInformation } from '@/features/benefits/components/OfferInformation';
 import { unavailableReason } from '@/features/benefits/labels';
+import { pluralize } from '@/utils/format';
 
 export function BenefitDetails({ offerId }: { offerId: string }) {
   const offer = useQuery(offerQueryOptions(offerId));
@@ -32,7 +33,7 @@ export function BenefitDetails({ offerId }: { offerId: string }) {
         </Text>
       ) : null}
       <Button
-        label={`Redeem for ${offer.data.priceCoins} coins`}
+        label={`Redeem for ${pluralize(offer.data.priceCoins, 'coin')}`}
         disabled={!available}
         className="self-stretch"
         onPress={() =>

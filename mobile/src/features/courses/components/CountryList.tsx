@@ -9,6 +9,7 @@ import { Text } from '@/components/ui/Text';
 import { useCountriesQuery } from '@/features/courses/api/courses.queries';
 import { useThemeColors } from '@/lib/theme';
 import { CountryFlag } from '@/components/shared/CountryFlag';
+import { pluralize } from '@/utils/format';
 
 /** Courses tab, Countries mode: A–Z rows that open the Country page. */
 export function CountryList() {
@@ -30,7 +31,7 @@ export function CountryList() {
       renderItem={({ item }) => (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${item.name}: ${item.courseCount} courses, ${item.locationCount} places`}
+          accessibilityLabel={`${item.name}: ${pluralize(item.courseCount, 'course')}, ${pluralize(item.locationCount, 'place')}`}
           onPress={() => router.push({ pathname: '/country/[code]', params: { code: item.code } })}
           className="flex-row items-center gap-3 rounded-card border border-border bg-surface p-4 active:opacity-80"
         >
@@ -40,7 +41,7 @@ export function CountryList() {
               {item.name} ({item.code})
             </Text>
             <Text variant="caption">
-              {item.courseCount} courses · {item.locationCount} places
+              {pluralize(item.courseCount, 'course')} · {pluralize(item.locationCount, 'place')}
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.muted} />

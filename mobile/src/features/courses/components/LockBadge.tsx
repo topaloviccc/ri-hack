@@ -5,6 +5,7 @@ import { CoinIcon } from '@/components/ui/CoinIcon';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/cn';
 import { useThemeColors } from '@/lib/theme';
+import { formatNumber, pluralize } from '@/utils/format';
 
 export type LockBadgeProps = {
   cost: number;
@@ -17,7 +18,7 @@ export function LockBadge({ cost, className }: LockBadgeProps) {
   return (
     <View
       accessible
-      accessibilityLabel={`Locked. Unlock for ${cost} coins`}
+      accessibilityLabel={`Locked. Unlock for ${pluralize(cost, 'coin')}`}
       className={cn(
         'flex-row items-center gap-1 self-start rounded-full bg-surface px-2 py-1 shadow-sm shadow-overlay',
         className,
@@ -26,7 +27,7 @@ export function LockBadge({ cost, className }: LockBadgeProps) {
       <Ionicons name="lock-closed" size={12} color={colors.text} />
       <CoinIcon />
       <Text variant="label" className="text-xs">
-        {cost}
+        {formatNumber(cost)}
       </Text>
     </View>
   );

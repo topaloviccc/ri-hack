@@ -10,6 +10,7 @@ import { useActivateCoupon } from '@/features/benefits/api/benefits.mutations';
 import { offerQueryOptions } from '@/features/benefits/api/benefits.queries';
 import { OfferInformation } from '@/features/benefits/components/OfferInformation';
 import { unavailableReason } from '@/features/benefits/labels';
+import { pluralize } from '@/utils/format';
 
 /** Last step before spending coins; the header ("Redeem coupon") is the question. */
 export function RedeemConfirmModal({ offerId }: { offerId: string }) {
@@ -34,7 +35,9 @@ export function RedeemConfirmModal({ offerId }: { offerId: string }) {
         options={{ gestureEnabled: !redeem.isPending, headerBackVisible: !redeem.isPending }}
       />
       <OfferInformation offer={offer.data} compact />
-      <Text className="text-center">{offer.data.priceCoins} coins will be used now.</Text>
+      <Text className="text-center">
+        {pluralize(offer.data.priceCoins, 'coin')} will be used now.
+      </Text>
       {!available ? (
         <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
           {unavailableReason(offer.data)}
@@ -42,12 +45,14 @@ export function RedeemConfirmModal({ offerId }: { offerId: string }) {
       ) : null}
       {redeem.isError ? (
         <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
-          {redeem.error.message} Redemption could not be confirmed. Check My coupons to see
-          whether the coupon was created.
+          {redeem.error.message} Redemption could not be confirmed. Check My coupons to see whether
+          the coupon was created.
         </Text>
       ) : null}
       <Button
-        label={redeem.isPending ? 'Redeeming…' : `Redeem for ${offer.data.priceCoins} coins`}
+        label={
+          redeem.isPending ? 'Redeeming…' : `Redeem for ${pluralize(offer.data.priceCoins, 'coin')}`
+        }
         disabled={isBlocked}
         accessibilityState={{ disabled: isBlocked, busy: redeem.isPending }}
         className="self-stretch"

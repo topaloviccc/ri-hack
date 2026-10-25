@@ -1,4 +1,4 @@
-import { formatBytes, formatCount, formatDuration } from '@/utils/format';
+import { formatBytes, formatCount, formatDuration, pluralize } from '@/utils/format';
 
 describe('formatCount', () => {
   it.each([
@@ -24,4 +24,15 @@ describe('formatBytes', () => {
     [1_480_000, '1.4 MB'],
     [2 * 1024 * 1024, '2 MB'],
   ])('%i -> %s', (n, expected) => expect(formatBytes(n)).toBe(expected));
+});
+
+describe('pluralize', () => {
+  it.each([
+    [1, 'course', undefined, '1 course'],
+    [0, 'course', undefined, '0 courses'],
+    [1240, 'coin', undefined, '1,240 coins'],
+    [2, 'quiz', 'quizzes', '2 quizzes'],
+  ])('%i %s -> %s', (n, singular, plural, expected) =>
+    expect(pluralize(n, singular, plural)).toBe(expected),
+  );
 });

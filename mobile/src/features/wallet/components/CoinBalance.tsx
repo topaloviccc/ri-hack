@@ -5,7 +5,7 @@ import { CoinIcon } from '@/components/ui/CoinIcon';
 import { Text } from '@/components/ui/Text';
 import { useWalletQuery } from '@/features/wallet/api/wallet.queries';
 import { cn } from '@/lib/cn';
-import { formatCount } from '@/utils/format';
+import { formatNumber, pluralize } from '@/utils/format';
 
 export type CoinBalanceProps = {
   /** Drop shadow for use over photos. */
@@ -15,11 +15,11 @@ export type CoinBalanceProps = {
 /** "🪙 340" pill for headers; opens the coins info sheet. */
 export function CoinBalance({ elevated = false }: CoinBalanceProps) {
   const { data } = useWalletQuery();
-  const balance = data ? formatCount(data.availableBalance) : '…';
+  const balance = data ? formatNumber(data.availableBalance) : '…';
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={data ? `${data.availableBalance} coins` : 'Coins loading'}
+      accessibilityLabel={data ? pluralize(data.availableBalance, 'coin') : 'Coins loading'}
       accessibilityHint="Shows what coins are for"
       onPress={() => router.push('/coins')}
       className={cn(

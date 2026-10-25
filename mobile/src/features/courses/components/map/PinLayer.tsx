@@ -11,6 +11,7 @@ import {
 } from '@/features/courses/map/geometry';
 import type { Location } from '@/features/courses/types';
 import { hasCoordinates } from '@/utils/has-coordinates';
+import { pluralize } from '@/utils/format';
 
 // Pins whose centres are closer than this on screen merge into a group.
 const CLUSTER_DISTANCE_PX = PIN_SIZE;
@@ -69,7 +70,7 @@ export function PinLayer({
         point={cluster}
         camera={camera}
         viewport={viewport}
-        label={`${cluster.members.length} places: zoom in`}
+        label={`${pluralize(cluster.members.length, 'place')}: zoom in`}
         onPress={() => onFocusGroup(boxOfPoints(cluster.members))}
       />
     );

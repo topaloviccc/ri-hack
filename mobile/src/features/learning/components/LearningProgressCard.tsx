@@ -5,6 +5,7 @@ import { Text } from '@/components/ui/Text';
 import type { LearningResponse } from '../api/learning.dto';
 import { learningProgress } from '../progress';
 import { StepStatus } from './StepStatus';
+import { pluralize } from '@/utils/format';
 
 export type LearningProgressCardProps = { learning: LearningResponse };
 export function LearningProgressCard({ learning }: LearningProgressCardProps) {
@@ -28,7 +29,7 @@ export function LearningProgressCard({ learning }: LearningProgressCardProps) {
         accessibilityLabel="Course content progress"
       />
       <Text variant="caption">
-        {progress.done} of {progress.total} steps completed · lessons and quizzes
+        {progress.done} of {pluralize(progress.total, 'step')} completed · lessons and quizzes
       </Text>
       <View className="flex-row border-t border-border pt-3">
         <View className="flex-1 gap-1">
@@ -55,7 +56,7 @@ export function LearningProgressCard({ learning }: LearningProgressCardProps) {
           <View className="flex-row items-center gap-2">
             <CoinIcon />
             <Text variant="heading">
-              {learning.completed ? learning.awardedCoins : learning.rewardCoins} coins
+              {pluralize(learning.completed ? learning.awardedCoins : learning.rewardCoins, 'coin')}
             </Text>
           </View>
           <Text variant="caption" className="text-xs">

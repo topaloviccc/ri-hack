@@ -12,6 +12,7 @@ import { LearningBackLink } from './LearningBackLink';
 import { LearningAction } from './LearningAction';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { DemoNotice } from '@/components/shared/DemoNotice';
+import { pluralize } from '@/utils/format';
 
 const requestKey = () => `quiz-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 export type QuizPlayerProps = { learning: LearningResponse; quizId: string };
@@ -70,7 +71,7 @@ export function QuizPlayer({ learning, quizId }: QuizPlayerProps) {
           ) : null}
           <View className="gap-2 rounded-card bg-secondary/20 p-4">
             <Text variant="label">
-              {answered} of {quiz.questions.length} questions answered
+              {answered} of {pluralize(quiz.questions.length, 'question')} answered
             </Text>
             <ProgressBar
               value={answered / Math.max(1, quiz.questions.length)}

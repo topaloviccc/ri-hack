@@ -8,6 +8,7 @@ import { Text } from '@/components/ui/Text';
 import { useCourseQuery } from '@/features/courses';
 import type { LearningResponse } from '../api/learning.dto';
 import { useThemeColors } from '@/lib/theme';
+import { pluralize } from '@/utils/format';
 
 export type LearningHeaderProps = { learning: LearningResponse };
 export function LearningHeader({ learning }: LearningHeaderProps) {
@@ -53,9 +54,9 @@ export function LearningHeader({ learning }: LearningHeaderProps) {
           </>
         ) : null}
         <Ionicons name="layers-outline" size={16} color={colors.text} />
-        <Text variant="label">{learning.lessons.length} lessons</Text>
+        <Text variant="label">{pluralize(learning.lessons.length, 'lesson')}</Text>
         <Text variant="caption">·</Text>
-        <Text variant="label">{learning.lessons.length + 1} quizzes</Text>
+        <Text variant="label">{pluralize(learning.lessons.length + 1, 'quiz', 'quizzes')}</Text>
         <Text variant="caption">·</Text>
         <Text variant="label">80% to pass</Text>
       </View>

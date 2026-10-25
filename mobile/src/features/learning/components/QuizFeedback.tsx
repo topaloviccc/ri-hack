@@ -6,6 +6,7 @@ import type { QuizResponse, QuizResult } from '@/features/learning/api/learning.
 import { LearningAction } from './LearningAction';
 import { LearningBackLink } from './LearningBackLink';
 import { StepStatus } from './StepStatus';
+import { pluralize } from '@/utils/format';
 
 export type QuizFeedbackProps = { quiz: QuizResponse; result: QuizResult; onRetry: () => void };
 export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
@@ -41,7 +42,7 @@ export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
           </View>
           {result.learning.completed ? (
             <Text variant="heading" className="rounded-card bg-primary/15 p-4 text-base">
-              Course passed! {result.learning.awardedCoins} coins awarded.
+              Course passed! {pluralize(result.learning.awardedCoins, 'coin')} awarded.
             </Text>
           ) : (
             <Text variant="caption">

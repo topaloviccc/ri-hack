@@ -13,6 +13,7 @@ import { useCourseQuery } from '@/features/courses';
 import { useUnlockCourse } from '@/features/wallet/api/wallet.mutations';
 import { useWalletQuery } from '@/features/wallet/api/wallet.queries';
 import { cn } from '@/lib/cn';
+import { formatNumber, pluralize } from '@/utils/format';
 
 type AmountRowProps = { label: string; amount: number; isEmphasized?: boolean };
 
@@ -23,7 +24,7 @@ function AmountRow({ label, amount, isEmphasized = false }: AmountRowProps) {
       <View className="flex-row items-center gap-1.5">
         <CoinIcon />
         <Text variant="label" className={cn(isEmphasized && 'text-base')}>
-          {amount}
+          {formatNumber(amount)}
         </Text>
       </View>
     </View>
@@ -88,7 +89,7 @@ export function UnlockSheet({ courseId }: UnlockSheetProps) {
           <AmountRow label="After unlocking" amount={balance - cost} isEmphasized />
         ) : (
           <Text variant="label" className="text-primary">
-            You need {shortfall} more coins
+            You need {pluralize(shortfall, 'more coin')}
           </Text>
         )}
       </View>
@@ -109,7 +110,7 @@ export function UnlockSheet({ courseId }: UnlockSheetProps) {
       ) : null}
 
       <Button
-        label={unlock.isPending ? 'Unlocking…' : `Unlock for ${cost} coins`}
+        label={unlock.isPending ? 'Unlocking…' : `Unlock for ${pluralize(cost, 'coin')}`}
         icon={unlock.isPending ? undefined : <CoinIcon />}
         disabled={!canAfford || unlock.isPending}
         accessibilityState={{ disabled: !canAfford || unlock.isPending, busy: unlock.isPending }}
