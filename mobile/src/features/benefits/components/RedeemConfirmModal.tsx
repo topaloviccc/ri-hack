@@ -24,9 +24,9 @@ export function RedeemConfirmModal({ offerId }: { offerId: string }) {
         <Text variant="heading" className="text-center" accessibilityRole="header">Activate this coupon?</Text>
         <OfferInformation offer={offer.data} compact />
         <Text className="text-center">{offer.data.priceCoins} coins will be used now.</Text>
-        {!available ? <Text accessibilityLiveRegion="polite">{offer.data.reasonIfIneligible ?? offer.data.availability.replace(/_/g, ' ')}</Text> : null}
+        {!available ? <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">{offer.data.reasonIfIneligible ?? offer.data.availability.replace(/_/g, ' ')}</Text> : null}
         {activate.isError ? (
-          <Text accessibilityLiveRegion="polite">{activate.error.message} Activation could not be confirmed. Check My Coupons to see whether the coupon was created.</Text>
+          <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">{activate.error.message} Activation could not be confirmed. Check My Coupons to see whether the coupon was created.</Text>
         ) : null}
         <Button
           label={activate.isPending ? 'Activating…' : `Activate for ${offer.data.priceCoins} coins`}

@@ -79,9 +79,7 @@ export function QuizPlayer({ learning, quizId }: QuizPlayerProps) {
               accessibilityLabel="Quiz answer progress"
               className="h-2"
             />
-            <Text variant="caption">
-              Take your time. Only your best attempt counts.
-            </Text>
+            <Text variant="caption">Take your time. Only your best attempt counts.</Text>
           </View>
         </View>
       }
@@ -97,7 +95,11 @@ export function QuizPlayer({ learning, quizId }: QuizPlayerProps) {
       )}
       ListFooterComponent={
         <View className="gap-3">
-          {submit.isError ? <Text accessibilityRole="alert">{submit.error.message}</Text> : null}
+          {submit.isError ? (
+            <Text variant="caption" className="text-primary" accessibilityRole="alert">
+              {submit.error.message}
+            </Text>
+          ) : null}
           <LearningAction
             label={submit.isPending ? 'Submitting...' : 'Submit quiz'}
             disabled={!ready || submit.isPending}

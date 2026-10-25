@@ -48,12 +48,14 @@ export function LearningOutline({ learning }: LearningOutlineProps) {
             disabled={start.isPending}
             onPress={handleContinue}
           />
-          {start.isError ? <Text accessibilityRole="alert">{start.error.message}</Text> : null}
+          {start.isError ? (
+            <Text variant="caption" className="text-primary" accessibilityRole="alert">
+              {start.error.message}
+            </Text>
+          ) : null}
           <View className="mt-2 flex-row items-center justify-between">
             <Text variant="heading">Course path</Text>
-            <Text variant="caption">
-              Learn at your own pace
-            </Text>
+            <Text variant="caption">Learn at your own pace</Text>
           </View>
         </View>
       }

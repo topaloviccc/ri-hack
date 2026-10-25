@@ -68,7 +68,9 @@ export function LessonReader({ course, lesson }: LessonReaderProps) {
           lesson.unlocked ? (
             <View className="gap-3 rounded-card bg-secondary/20 p-4">
               {complete.isError ? (
-                <Text accessibilityRole="alert">{complete.error.message}</Text>
+                <Text variant="caption" className="text-primary" accessibilityRole="alert">
+                  {complete.error.message}
+                </Text>
               ) : null}
               <Text variant="label">Ready to check what you learned?</Text>
               <Text variant="caption">

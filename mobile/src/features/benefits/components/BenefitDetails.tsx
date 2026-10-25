@@ -26,7 +26,7 @@ export function BenefitDetails({ offerId }: { offerId: string }) {
     <ScrollView contentContainerClassName="gap-4 p-4">
       <OfferInformation offer={offer.data} />
       {!available ? (
-        <Text accessibilityLiveRegion="polite">
+        <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
           {offer.data.reasonIfIneligible ?? offer.data.availability.replace(/_/g, ' ')}
         </Text>
       ) : null}
