@@ -46,6 +46,9 @@ origins with the backend `CORS_ALLOWED_ORIGINS` environment variable.
 | GET | `/network/leaderboard` | Friends and viewer, this UTC week; `LeaderboardEntry[]` |
 | GET | `/events` | All non-cancelled events, ordered by actual start time; `Event[]` |
 | GET | `/events/{id}` | `Event` |
+| POST | `/badges/scan` | `{code}` (an NFC tag's `public_code`); `{badge: Badge, newlyCollected, awardedCoins}`. The first scan adds the badge to the viewer's profile and pays its coins; repeats pay nothing. Unknown, inactive or revoked codes: 404 |
+| GET | `/badges/{id}` | `Badge`; `story` is null until the viewer has collected it |
+| GET | `/users/{id}/badges` | `{id,name,hook,imageUrl,collectedAt}[]`, newest first |
 | GET | `/codebooks` | Registered keys: `difficulties`, `fields` |
 | GET | `/codebooks/{key}` | `{id,label}[]` with original UUID IDs |
 | GET | `/codebooks/{key}/{id}` | One `{id,label}` |
@@ -133,6 +136,22 @@ The `/courses/{id}/learning` endpoints now provide ordered lessons/quizzes, answ
 submission, persisted progress, question-based 80% completion and promised coin
 rewards. See [LEARNING.md](LEARNING.md) for paths, JSON contracts and retry rules.
 There are no arbitrary credit/top-up, generation or course-authoring APIs.
+
+## Badges and NFC tags
+
+`Badge` is `{id,name,hook,subtitle,story,imageUrl,countryCode,rewardCoins,collected,collectedAt,awardedCoins}`.
+`story` is Markdown, returned only to viewers who have collected the badge; `awardedCoins` is
+what the viewer was paid for it. A badge's `reward_coins` are paid once per user, in the same
+transaction that records the badge, as a positive `NFC_VISIT` ledger entry keyed
+`nfc-badge:<badgeId>` (stored on `user_badge`). Badges have no place, so they never appear on
+the map or in location counts. They are separate from the derived `badgeCountryCodes`.
+
+Badges and tags are created in Liquibase (`007-badges.sql`); there is no admin API. The first is
+**Trsat Stairs**, tag code `trsat-stairs`. To make a physical tag, write one NDEF **URI** record
+`mobile://nfc/<code>` with a writer app such as NFC Tools ("Write" › "Add a record" › "Custom
+URL / URI"). The Android app reads it while open, and the same link opens the app's scan screen
+when the app is closed. A plain **Text** record holding only the code also works while the app
+is open. Set a tag's `status_id` to `INACTIVE` or `REVOKED` to stop it awarding its badge.
 
 ## Benefits and coupons
 

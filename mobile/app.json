@@ -18,6 +18,13 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
+      "intentFilters": [
+        {
+          "action": "android.nfc.action.NDEF_DISCOVERED",
+          "category": ["DEFAULT"],
+          "data": [{ "scheme": "mobile", "host": "nfc" }]
+        }
+      ],
       "package": "ri.hack.outthere"
     },
     "web": {

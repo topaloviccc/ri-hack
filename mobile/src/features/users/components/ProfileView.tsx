@@ -3,6 +3,7 @@ import { ScrollView, View } from 'react-native';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Text } from '@/components/ui/Text';
+import { CollectedBadges } from '@/features/badges';
 import { CourseListItem, useCoursesQuery, useOpenCourse } from '@/features/courses';
 import { useUserQuery } from '@/features/users/api/users.queries';
 import { useWalletQuery } from '@/features/wallet';
@@ -57,6 +58,7 @@ export function ProfileView({ userId }: ProfileViewProps) {
   return (
     <ScrollView contentContainerClassName="gap-6 p-4 pb-10">
       <ProfileHeader user={user} coins={isOwn ? wallet.data?.availableBalance : undefined} />
+      <CollectedBadges userId={user.id} isOwn={isOwn} />
       {/* TODO(hack): privacy rules for other people's profiles come with the backend. See BACKLOG.md. */}
       {isOwn ? (
         <CourseSection

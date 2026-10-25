@@ -1,13 +1,17 @@
 import * as Haptics from 'expo-haptics';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { loadNfcModule, type NfcModule } from '@/features/nfc/nfc-module';
 import { parseTag } from '@/features/nfc/parse-tag';
 import type { NfcTag } from '@/features/nfc/types';
 
-/** Listens for NFC tags while the app is in the foreground and keeps the last one read. */
-export function useNfcTagReader() {
-  const [tag, setTag] = useState<NfcTag | null>(null);
+/** Listens for NFC tags while the app is in the foreground and hands each one to `onTag`. */
+export function useNfcTagReader(onTag: (tag: NfcTag) => void) {
+  // The native listener is registered once; it calls whatever handler the latest render passed.
+  const onTagRef = useRef(onTag);
+  useEffect(() => {
+    onTagRef.current = onTag;
+  }, [onTag]);
 
   useEffect(() => {
     let isActive = true;
@@ -23,7 +27,7 @@ export function useNfcTagReader() {
       nfc = loaded;
       manager.setEventListener(loaded.NfcEvents.DiscoverTag, (event) => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        setTag(parseTag(event));
+        onTagRef.current(parseTag(event));
       });
       await manager.registerTagEvent();
     };
@@ -37,6 +41,4 @@ export function useNfcTagReader() {
       nfc.default.unregisterTagEvent().catch(() => {});
     };
   }, []);
-
-  return { tag, dismiss: () => setTag(null) };
 }

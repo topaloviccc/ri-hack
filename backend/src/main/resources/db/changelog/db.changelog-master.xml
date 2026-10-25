@@ -13,4 +13,5 @@
     <include file="005-auth.sql" relativeToChangelogFile="true"/>
     <include file="006-recommendations.sql" relativeToChangelogFile="true"/>
     <include file="006-content-details.sql" relativeToChangelogFile="true"/>
+    <include file="007-badges.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

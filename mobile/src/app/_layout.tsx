@@ -98,6 +98,8 @@ function AppShell() {
               <Stack.Screen name="country/[code]" options={{ title: '' }} />
               {/* A full page like the Country page; the former form sheet blanked when resized on iOS. */}
               <Stack.Screen name="location/[id]" options={{ title: '' }} />
+              <Stack.Screen name="badge/[id]" options={{ title: '' }} />
+              <Stack.Screen name="nfc/[code]" options={{ title: 'Badge' }} />
             </Stack.Protected>
           </Stack>
         </InterestOnboardingGate>
