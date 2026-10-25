@@ -130,6 +130,7 @@ now a rule; don't re-open without a reason.
 
 ### Navigation chrome
 - **Stack headers** share `useStackScreenOptions()` (`src/hooks`): `primary` back arrow, Jakarta Bold title, `background` header. Every nested `Stack` uses it.
+- **Tab headers** always show, right to left: avatar, coin pill, Benefits button. Over photos (Scroll) all three use `elevated`.
 
 ### Copy
 - **Sentence case** for titles, sections, buttons and chips ("My coupons", "Most popular", "Course"). Proper nouns (Benefits) keep their capital.
