@@ -47,7 +47,7 @@ Observed size overrides: `text-xs` (chips, small meta), `text-base` on `label` (
 Line heights: default, plus `leading-6`/`leading-7` for long-form reading (markdown, quiz).
 Letter spacing: `tracking-tight` (welcome wordmark), `tracking-widest` (coupon code) only.
 Native header titles and tab labels set `fontFamily` by name in JS (`PlusJakartaSans_700Bold`,
-`_600SemiBold`).
+`_600SemiBold`); stack headers get it from `useStackScreenOptions()`.
 
 ### Spacing (Tailwind 4px scale)
 
@@ -83,6 +83,7 @@ Color: always pass a theme color (`useThemeColors()`), never omit it (defaults t
 
 - Touch targets ≥ 44 (`min-h-11`, `h-11 w-11`).
 - Press feedback: `active:opacity-70` on buttons/controls, `active:opacity-80` on pressable cards, `active:bg-secondary/10` on rows inside a card.
+- Disabled: `Button` dims itself to `opacity-50`.
 - Loading: `LoadingState` (primary spinner). Error: `ErrorState` (caption + "Try again"). Empty: `EmptyState` (heading + caption).
 - Pending labels end with `…` (single ellipsis character).
 
@@ -102,8 +103,47 @@ None. Phone-only layout; wide screens only cap modal width (`max-w-lg`).
 
 ## 2. Decisions
 
-_Filled in during review._
+Resolved during the final design review (2026-10-25, branch `design/final-review`). Each one is
+now a rule; don't re-open without a reason.
+
+### Surfaces and shape
+- **Cards** are `rounded-card` (16px) + `border border-border` + `bg-surface` everywhere, Benefits included (was 24px borderless). Prefer the `Card` primitive.
+- **Inner panels** inside a card (price pill, compact offer panel, coupon-code box, quiz options) use `rounded-xl` (12px).
+- **Image thumbnails** in rows/cards use `rounded-lg` (8px) everywhere, Benefits artwork included.
+- **Icon buttons** are 44px circles (`h-11 w-11 rounded-full`), icon 22px. Header icon buttons use `bg-surface` with a `primary` icon, no shadow (Home's Benefits button matches the coin pill).
+
+### Typography and color
+- **Secondary text** is the `caption` variant (`muted`). No `text-text/80` overrides.
+- **List-row titles** are `label` + `text-base`. No extra `font-sans-bold` on labels.
+- **No uppercase/mono eyebrows.** Step and context labels ("Lesson 01", "Question 2 of 5", "Pause & think") are sentence-case `caption`. `mono` is for numbers, times and codes only.
+- **Inline errors and blocking reasons** are `caption` + `text-primary`, with `accessibilityRole="alert"` or a polite live region.
+
+### Components and states
+- **Primary button label** is `on-primary` (white) everywhere; no per-feature label color.
+- **Disabled buttons** dim to `opacity-50`, applied once in the `Button` primitive. No ad-hoc disabled opacity in screens.
+- **Press feedback**: pressable cards `active:opacity-80`; buttons, links and small controls `active:opacity-70`.
+- **Images** always go through `ui/Image` (200ms fade, NativeWind className). No direct `expo-image` in features.
+- **Icons** always get an explicit theme color.
+
+### Layout
+- **Section heading → content** gap is `gap-2`. Items inside the section keep the list gap (`gap-3`).
+
+### Navigation chrome
+- **Stack headers** share `useStackScreenOptions()` (`src/hooks`): `primary` back arrow, Jakarta Bold title, `background` header. Every nested `Stack` uses it.
+
+### Copy
+- **Sentence case** for titles, sections, buttons and chips ("My coupons", "Most popular", "Course"). Proper nouns (Benefits) keep their capital.
+- **Tab labels match their screen title** ("Events", not "Calendar").
+- **Text links** are capitalized and `text-primary` ("Search", "See all", "Check request status").
+- **Pending labels** end with the `…` character, never `...`.
+
+### Scope
+- **Weekly challenge removed** from Network (out of scope): card, demo API/query/mock/type, test and docs.
 
 ## 3. Exceptions
 
-_Filled in during review._
+Intentional differences. Don't flag these.
+
+- **Welcome screen logo gradient** (`WelcomeScreen.tsx`): 18 hardcoded blue→orange hex stops. It's the brand mark, not UI, so it doesn't follow the theme.
+- **Unlock celebration lock** (`UnlockCelebration.tsx`): its own `rounded-2xl`, `rounded-t-full`, `border-8` shapes. It's an illustration, not UI.
+- **Benefits coupon card tint** (`BenefitCouponCard.tsx`): `bg-primary/10` + `border-primary/20` with ticket notches instead of a plain surface card. The ticket look is what makes it read as a coupon. Radius, thumbnail and type follow the standard rules.
