@@ -28,16 +28,39 @@ export type CourseCollection = HomeSection | 'feed';
 
 /** All fields optional: no filter lists every course. */
 export type CourseFilters = {
+  query?: string;
   collection?: CourseCollection;
   countryCode?: string;
   locationId?: string;
   ids?: string[];
 };
 
+export type CourseGeneration = {
+  id: string;
+  query: string;
+  state: 'QUEUED' | 'RUNNING' | 'READY' | 'REFUSED' | 'FAILED';
+  message: string | null;
+  courseId: string | null;
+};
+
 export type LocationFilters = { countryCode?: string; ids?: string[] };
+
+export type CoverImage = {
+  url: string;
+  sourceUrl: string;
+  author: string;
+  license: string;
+  licenseUrl: string;
+  caption: string;
+  width: number;
+  height: number;
+};
 
 /** A real site (monument, park, arena…). These are the waypoints on the Courses map. */
 export type Location = {
+  coverImage?: CoverImage | null;
+  coverImagePending?: boolean;
+  geocoderAttribution?: string | null;
   id: string;
   name: string;
   kind: LocationKind;
@@ -64,6 +87,8 @@ export type Country = {
 
 /** A concept strongly tied to one country (e.g. bull riding → Spain). */
 export type Course = {
+  coverImage?: CoverImage | null;
+  coverImagePending?: boolean;
   id: string;
   title: string;
   imageUrl: string;

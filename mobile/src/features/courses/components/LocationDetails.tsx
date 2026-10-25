@@ -17,6 +17,7 @@ import { useThemeColors } from '@/lib/theme';
 import { CountryFlag } from '@/components/shared/CountryFlag';
 import { hasCoordinates } from '@/utils/has-coordinates';
 import { openInMaps } from '@/utils/open-in-maps';
+import { CoverImageCredit } from './CoverImageCredit';
 
 export type LocationDetailsProps = { id: string };
 
@@ -49,7 +50,8 @@ export function LocationDetails({ id }: LocationDetailsProps) {
         <View className="gap-3">
           <Image uri={site.imageUrl} className="h-44 w-full bg-border" />
           <View className="gap-2 px-4">
-            <DemoNotice>image, location type and city</DemoNotice>
+            <CoverImageCredit image={site.coverImage} />
+            <DemoNotice>location type and city</DemoNotice>
             <Chip label={LOCATION_KIND_LABELS[site.kind]} />
             <Text variant="title" accessibilityRole="header">
               {site.name}
@@ -68,6 +70,7 @@ export function LocationDetails({ id }: LocationDetailsProps) {
                 onPress={() => openInMaps(site.lat, site.lng, site.name)}
               />
             ) : null}
+            {site.geocoderAttribution ? <Text variant="caption">{site.geocoderAttribution}</Text> : null}
             <Text variant="heading" className="mt-2">
               Courses here
             </Text>

@@ -10,7 +10,8 @@ and app restarts. Updating interests replaces the complete selection atomically.
 
 Set `OPENAI_API_KEY` in the environment of the **backend process**, then restart
 the backend. Never put this key in an `EXPO_PUBLIC_*` variable or commit it.
-The backend does not automatically load `.env` files.
+When started from `backend/`, the backend also loads the ignored `backend/.env`
+file as plain `KEY=value` properties. Process environment variables take precedence.
 
 ```powershell
 cd backend

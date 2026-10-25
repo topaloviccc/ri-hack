@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/Text';
 import { LockBadge } from '@/features/courses/components/LockBadge';
 import type { Course } from '@/features/courses/types';
 import { CountryFlag } from '@/components/shared/CountryFlag';
+import { CoverImageCredit } from './CoverImageCredit';
 
 export type ReelCardProps = { course: Course };
 
@@ -17,7 +18,6 @@ export function ReelCard({ course }: ReelCardProps) {
       <Scrim />
       <View className="flex-row gap-2">
         <Chip label={course.subject} />
-        <Chip label="Demo image" variant="onImage" />
         {course.isUnlocked ? null : <LockBadge cost={course.unlockCost} />}
       </View>
       <Text variant="title" className="text-on-image">
@@ -32,6 +32,7 @@ export function ReelCard({ course }: ReelCardProps) {
       <Text variant="body" className="text-on-image" numberOfLines={3}>
         {course.description}
       </Text>
+      <CoverImageCredit image={course.coverImage} compact onImage />
     </View>
   );
 }

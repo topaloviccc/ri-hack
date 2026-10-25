@@ -43,6 +43,12 @@ through the computer's firewall if that URL cannot be reached.
 
 ## Live and demo data
 
+Course title/topic search uses the backend's `query` filter. An empty successful
+search shows one explicit course-creation row. Creation submits the original
+query, restores/polls the signed-in user's saved generation job, shows refusals or
+failures, and refreshes catalogue/geography data after success. Model credentials
+and place resolution stay on the backend. See [generation setup](../backend/GENERATION.md).
+
 | Data | Source |
 | --- | --- |
 | Courses, subjects, prices, learner counts, country/place identity and coordinates, progress and ownership | Backend |
@@ -51,7 +57,8 @@ through the computer's firewall if that URL cannot be reached.
 | Lessons/quizzes, submitted answers, best scores, reading progress, completion and coin rewards | Backend; optional sample lesson/quiz content is stored in PostgreSQL and labelled Demo |
 | Benefits partners/countries/offers, coupon activation and history | Backend; demo partners are explicitly labelled |
 | Event identity, start time, venue/coordinates, organizer, description, free/paid status and registration link | Backend |
-| Course/place/event images, location kinds/cities, country introductions and profile bios | Stable demo supplements, labelled in the UI |
+| Course/place cover images and photo attribution | Retrieved Commons photographs selected by the backend; neutral placeholder while missing; see [image setup](../backend/IMAGES.md) |
+| Event images, location kinds/cities, country introductions and profile bios | Stable demo supplements, labelled in the UI |
 | Event city/category/language and numeric paid-price examples | Stable demo supplements, labelled in list and details |
 | Expert applications/statuses/certificates and weekly challenge | Explicitly labelled demos; expert changes are in memory only |
 | Theme preference | Device storage |

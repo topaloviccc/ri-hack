@@ -21,7 +21,8 @@ public class CourseController {
     @GetMapping("/courses")
     public List<CourseResponse> courses(@Viewer UUID viewer,
             @RequestParam(required = false) String collection, @RequestParam(required = false) String countryCode,
-            @RequestParam(required = false) UUID locationId, @RequestParam(required = false) List<UUID> ids) {
+            @RequestParam(required = false) UUID locationId, @RequestParam(required = false) List<UUID> ids,
+            @RequestParam(required = false) String query) {
         CourseService.Collection selected = null;
         if (collection != null) {
             try { selected = CourseService.Collection.valueOf(collection.toUpperCase(Locale.ROOT)); }
@@ -29,7 +30,7 @@ public class CourseController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown course collection");
             }
         }
-        return service.list(viewer, selected, countryCode, locationId, ids);
+        return service.search(viewer, selected, countryCode, locationId, ids, query);
     }
 
     @GetMapping("/courses/{id}")

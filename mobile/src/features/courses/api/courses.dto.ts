@@ -1,4 +1,4 @@
-import type { Difficulty } from '@/features/courses/types';
+import type { CoverImage, Difficulty } from '@/features/courses/types';
 
 export type CountryResponse = {
   code: string;
@@ -9,6 +9,9 @@ export type CountryResponse = {
 };
 
 export type LocationResponse = {
+  coverImage?: CoverImage | null;
+  coverImagePending?: boolean;
+  geocoderAttribution?: string | null;
   id: string;
   name: string;
   countryCode: string;
@@ -18,6 +21,8 @@ export type LocationResponse = {
 };
 
 export type CourseResponse = {
+  coverImage?: CoverImage | null;
+  coverImagePending?: boolean;
   id: string;
   title: string;
   subject: string | null;

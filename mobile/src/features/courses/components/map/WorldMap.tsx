@@ -38,7 +38,7 @@ export function WorldMap() {
         setViewport({ width: layout.width, height: layout.height })
       }
     >
-      <DemoNotice>map images and location types</DemoNotice>
+      <DemoNotice>location types</DemoNotice>
       {renderBody()}
     </View>
   );

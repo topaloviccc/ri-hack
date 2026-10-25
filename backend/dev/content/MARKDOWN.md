@@ -12,10 +12,11 @@ UTF-8 `.md` files; the seed copies their contents into the existing JSONB column
 }
 ```
 
-Use `lesson.content_json.markdown` for future generated material. The backend
+Use `lesson.content_json.markdown` for generated material. The backend
 returns the source unchanged in the existing lesson response's `text` field.
 Legacy `content_json.text` remains readable, so existing content is compatible.
-No bucket, upload service or LLM integration is involved.
+The sample seed needs no model calls. On-demand LLM generation uses this same
+lesson format; see [the full generation contract](../../GENERATION.md).
 
 ## Supported writing tools
 

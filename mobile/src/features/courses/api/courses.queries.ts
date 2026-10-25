@@ -22,16 +22,20 @@ export const countryKeys = {
 };
 
 export const courseListQueryOptions = (f: CourseFilters = {}) =>
-  queryOptions({ queryKey: courseKeys.list(f), queryFn: () => coursesApi.list(f) });
+  queryOptions({ queryKey: courseKeys.list(f), queryFn: () => coursesApi.list(f),
+    refetchInterval: ({ state }) => state.data?.some((item) => item.coverImagePending) ? 5000 : false });
 
 export const courseQueryOptions = (id: string) =>
-  queryOptions({ queryKey: courseKeys.detail(id), queryFn: () => coursesApi.getById(id) });
+  queryOptions({ queryKey: courseKeys.detail(id), queryFn: () => coursesApi.getById(id),
+    refetchInterval: ({ state }) => state.data?.coverImagePending ? 3000 : false });
 
 export const locationListQueryOptions = (f: LocationFilters = {}) =>
-  queryOptions({ queryKey: locationKeys.list(f), queryFn: () => locationsApi.list(f) });
+  queryOptions({ queryKey: locationKeys.list(f), queryFn: () => locationsApi.list(f),
+    refetchInterval: ({ state }) => state.data?.some((item) => item.coverImagePending) ? 5000 : false });
 
 export const locationQueryOptions = (id: string) =>
-  queryOptions({ queryKey: locationKeys.detail(id), queryFn: () => locationsApi.getById(id) });
+  queryOptions({ queryKey: locationKeys.detail(id), queryFn: () => locationsApi.getById(id),
+    refetchInterval: ({ state }) => state.data?.coverImagePending ? 3000 : false });
 
 export const countryListQueryOptions = () =>
   queryOptions({ queryKey: countryKeys.list(), queryFn: () => countriesApi.list() });

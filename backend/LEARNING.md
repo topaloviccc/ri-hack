@@ -27,7 +27,8 @@ each lesson's estimate. The target is **20–40 minutes for an entire course**,
 including its lessons, reflection and quizzes, not 20–40 minutes per lesson.
 Future imported content can omit `demo` or set it false. Questions use ordered
 prompts and `answer_option` rows with `is_correct`; explanations appear after
-submission. No generation/import endpoint or authoring UI is included yet.
+submission. On-demand course generation populates the same structure through the
+Courses search flow; see [generation setup and contracts](GENERATION.md).
 
 The player supports `SINGLE_CHOICE`, `MULTIPLE_CHOICE` and `TRUE_FALSE`.
 Multiple choice requires the exact correct option set, with no partial credit.

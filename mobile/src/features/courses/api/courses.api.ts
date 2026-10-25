@@ -1,9 +1,10 @@
-import { demoCountryBlurb, demoCourseImage, demoLocationDetails } from './courses.demo';
+import { demoCountryBlurb, demoLocationDetails } from './courses.demo';
 import type { CountryResponse, CourseResponse, LocationResponse } from './courses.dto';
 import type {
   Country,
   Course,
   CourseFilters,
+  CourseGeneration,
   Location,
   LocationFilters,
 } from '@/features/courses/types';
@@ -12,10 +13,11 @@ import { apiRequest } from '@/lib/api-client';
 const toLocation = (row: LocationResponse): Location => ({
   ...demoLocationDetails(row.id),
   ...row,
+  imageUrl: row.coverImage?.url ?? '',
 });
 const toCourse = (row: CourseResponse): Course => ({
   ...row,
-  imageUrl: demoCourseImage(row.id),
+  imageUrl: row.coverImage?.url ?? '',
   subject: row.subject ?? 'Uncategorized',
   countryCode: row.countryCode ?? '',
   countryName: row.countryName ?? 'Country not specified',
@@ -29,6 +31,10 @@ const toCountry = (row: CountryResponse): Country => ({
 });
 
 export const coursesApi = {
+  generate: (query: string): Promise<CourseGeneration> =>
+    apiRequest('/course-generations', { method: 'POST', body: { query } }),
+  generation: async (query: string): Promise<CourseGeneration | null> =>
+    (await apiRequest<CourseGeneration | null>('/course-generations', { query: { query } })) ?? null,
   list: async (filters: CourseFilters = {}): Promise<Course[]> => {
     const rows = await apiRequest<CourseResponse[]>('/courses', { query: filters });
     return rows.map(toCourse);

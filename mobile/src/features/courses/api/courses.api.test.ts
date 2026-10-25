@@ -46,7 +46,8 @@ describe('course HTTP mapping', () => {
       progress: undefined,
     });
     expect(result.locations[0]).toMatchObject({ name: 'A real place', lat: null, lng: null });
-    expect(result.imageUrl).toBeTruthy();
+    expect(result.imageUrl).toBe('');
+    expect(result.locations[0].imageUrl).toBe('');
   });
 
   it('fetches actual country counts and does not substitute missing resources', async () => {
@@ -68,5 +69,21 @@ describe('course HTTP mapping', () => {
     });
     fetchMock.mockResolvedValueOnce(httpResponse({ detail: 'Location not found' }, 404));
     await expect(locationsApi.getById('missing')).rejects.toMatchObject({ status: 404 });
+  });
+
+  it('uses retrieved image URLs and preserves attribution for courses and places', async () => {
+    const coverImage = {
+      url: 'https://upload.wikimedia.org/castle.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Castle.jpg',
+      author: 'A real photographer', license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', caption: 'A real castle', width: 1280, height: 850,
+    };
+    fetchMock.mockResolvedValue(httpResponse({ ...row, coverImage, coverImagePending: false,
+      locations: [{ ...row.locations[0], coverImage, coverImagePending: false }] }));
+    const course = await coursesApi.getById(row.id);
+    expect(course.imageUrl).toBe(coverImage.url);
+    expect(course.coverImage).toEqual(coverImage);
+    expect(course.locations[0].imageUrl).toBe(coverImage.url);
+    expect(course.locations[0].coverImage?.author).toBe('A real photographer');
   });
 });

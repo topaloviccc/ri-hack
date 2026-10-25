@@ -21,7 +21,10 @@ origins with the backend `CORS_ALLOWED_ORIGINS` environment variable.
 | --- | --- | --- |
 | POST | `/auth/signup` | `{firstName,lastName,username,email,password,timezone}`; 201 `{token,user: User}`. New users have role `USER` and a wallet holding the 500-coin signup bonus (`app.auth.signup-bonus-coins`) |
 | POST | `/auth/login` | `{email,password}`; `{token,user: User}`. Wrong email or password: 401 `Invalid email or password` |
-| GET | `/courses` | `collection=continue\|popular\|recommended\|feed`, `countryCode`, `locationId`, `ids`; `Course[]` |
+| GET | `/courses` | `query` (title/topic, max 200 chars), `collection=continue\|popular\|recommended\|feed`, `countryCode`, `locationId`, `ids`; `Course[]` |
+| POST | `/course-generations` | `{query}`; 202 saved generation job; explicit creation after an empty search |
+| GET | `/course-generations` | Required `query`; current user's saved job, or empty body |
+| GET | `/course-generations/{id}` | Owned job `{id,query,state,message,courseId}`; see [generation setup and contracts](GENERATION.md) |
 | GET | `/courses/{id}` | `Course` |
 | POST | `/courses/{id}/unlock` | Required `Idempotency-Key` header, no body; `Wallet` |
 | POST | `/courses/{id}/dismiss` | No body; 204; persists the reel's "less like this" action |
@@ -61,9 +64,9 @@ use `application/problem+json` with `status` and `detail`.
 
 | Type | Fields |
 | --- | --- |
-| Course | `id`, `title`, `subject`, `countryCode`, `countryName`, `locations: Location[]`, `description`, `learnerCount`, `estimatedMinutes`, `difficulty`, `progress`, `unlockCost`, `isUnlocked` |
+| Course | `id`, `title`, `subject`, `countryCode`, `countryName`, `locations: Location[]`, `description`, `learnerCount`, `estimatedMinutes`, `difficulty`, `progress`, `unlockCost`, `isUnlocked`, `coverImage`, `coverImagePending` |
 | Country | `code`, `name`, `flagUrl`, `courseCount`, `locationCount` |
-| Location | `id`, `name`, `countryCode`, `countryName`, `lat`, `lng` |
+| Location | `id`, `name`, `countryCode`, `countryName`, `lat`, `lng`, `geocoderAttribution` (nullable), `coverImage`, `coverImagePending` |
 | User | `id`, `name`, `handle`, `avatarUrl`, `countryCode`, `stats: {completedCount,streakDays,countriesCount}`, `badgeCountryCodes`, `inProgressCourseIds`, `completedCourseIds`, `relation` (`me`, `friend`, `requested` = viewer sent a pending request, `incoming` = viewer received one, `none`), `mutualFriendsCount` |
 | FeedItem | `id`, `userId`, `userName`, `userAvatarUrl`, `courseId`, `courseTitle`, `completedAt` |
 | LeaderboardEntry | `rank`, `userId`, `userName`, `userAvatarUrl`, `completedThisWeek`, `isMe` |
