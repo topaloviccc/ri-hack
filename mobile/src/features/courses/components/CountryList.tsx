@@ -24,7 +24,8 @@ export function CountryList() {
 
   return (
     <FlatList
-      data={data ?? []}
+      // Countries with nothing to open (no courses, no places) are left out.
+      data={(data ?? []).filter((c) => c.courseCount > 0 || c.locationCount > 0)}
       keyExtractor={(c) => c.code}
       contentContainerClassName="gap-3 px-4 pb-8"
       ListEmptyComponent={renderEmpty}
