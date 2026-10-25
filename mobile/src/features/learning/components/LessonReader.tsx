@@ -39,7 +39,7 @@ export function LessonReader({ course, lesson }: LessonReaderProps) {
               {lesson.title}
             </Text>
             {lesson.estimatedMinutes ? (
-              <Text variant="caption" className="text-text/80">
+              <Text variant="caption">
                 About {lesson.estimatedMinutes} min · reading and reflection
               </Text>
             ) : null}
@@ -57,7 +57,7 @@ export function LessonReader({ course, lesson }: LessonReaderProps) {
             )}
           >
             {item.activity ? (
-              <Text variant="mono" className="text-xs text-text/80">
+              <Text variant="mono" className="text-xs">
                 PAUSE & THINK
               </Text>
             ) : null}
@@ -71,7 +71,7 @@ export function LessonReader({ course, lesson }: LessonReaderProps) {
                 <Text accessibilityRole="alert">{complete.error.message}</Text>
               ) : null}
               <Text variant="label">Ready to check what you learned?</Text>
-              <Text variant="caption" className="text-text/80">
+              <Text variant="caption">
                 {lesson.quiz.questionCount} questions · Unlimited retries
               </Text>
               <LearningAction

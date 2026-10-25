@@ -23,7 +23,7 @@ export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
             Quiz results
           </Text>
           <View className="gap-3 rounded-card border border-border bg-surface p-4">
-            <Text variant="mono" className="text-xs text-text/80">
+            <Text variant="mono" className="text-xs">
               ATTEMPT {result.attemptNumber}
             </Text>
             <Text variant="heading" className="text-2xl">
@@ -35,7 +35,7 @@ export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
               accessibilityLabel="Quiz attempt score"
               className="h-2"
             />
-            <Text variant="caption" className="text-text/80">
+            <Text variant="caption">
               {result.learning.completed && result.learning.percentage < 80
                 ? 'Your previous course completion is saved.'
                 : `Course score: ${Math.floor(result.learning.percentage * 10) / 10}% · 80% overall to pass`}
@@ -46,7 +46,7 @@ export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
               Course passed! {result.learning.awardedCoins} coins awarded.
             </Text>
           ) : (
-            <Text variant="caption" className="text-text/80">
+            <Text variant="caption">
               Your best score is saved. Submit every quiz and reach 80% overall to pass.
             </Text>
           )}
@@ -64,7 +64,7 @@ export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
               {question?.prompt}
             </Text>
             {!item.correct ? (
-              <Text variant="caption" className="text-text/80">
+              <Text variant="caption">
                 You chose:{' '}
                 {question?.options
                   .filter((option) => item.selectedOptionIds.includes(option.id))
@@ -80,7 +80,7 @@ export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
                 .join('; ')}
             </Text>
             {item.explanation ? (
-              <Text variant="body" className="leading-6 text-text/80">
+              <Text variant="body" className="leading-6 text-muted">
                 {item.explanation}
               </Text>
             ) : null}

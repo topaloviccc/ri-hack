@@ -79,7 +79,7 @@ export function QuizPlayer({ learning, quizId }: QuizPlayerProps) {
               accessibilityLabel="Quiz answer progress"
               className="h-2"
             />
-            <Text variant="caption" className="text-text/80">
+            <Text variant="caption">
               Take your time. Only your best attempt counts.
             </Text>
           </View>

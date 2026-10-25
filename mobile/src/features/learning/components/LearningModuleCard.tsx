@@ -52,7 +52,7 @@ export function LearningModuleCard({
           <Text variant="heading" className="text-base">
             {lesson.title}
           </Text>
-          <Text variant="caption" className="text-xs text-text/80">
+          <Text variant="caption" className="text-xs">
             {lesson.estimatedMinutes ? `${lesson.estimatedMinutes} min + ` : 'Lesson + '}
             {lesson.quiz.questionCount}-question quiz
           </Text>
@@ -61,7 +61,7 @@ export function LearningModuleCard({
       <View className="gap-3 px-4 pb-3">
         <ProgressBar value={done / 2} accessibilityLabel={`Part ${index + 1} progress`} />
         {locked ? (
-          <Text variant="caption" className="text-xs text-text/80">
+          <Text variant="caption" className="text-xs">
             {index === 0
               ? 'Start learning to unlock this part.'
               : `Submit the quiz in part ${index} to unlock.`}
@@ -91,7 +91,7 @@ export function LearningModuleCard({
           <Text variant="label" className="flex-1">
             {reading === 'completed' ? 'Lesson read' : 'Read lesson'}
           </Text>
-          <Text variant="caption" className="text-xs text-text/80">
+          <Text variant="caption" className="text-xs">
             {locked ? 'Locked' : reading === 'completed' ? 'Review' : 'Read'}
           </Text>
           {!locked ? <Ionicons name="chevron-forward" size={16} color={colors.text} /> : null}
@@ -118,7 +118,7 @@ export function LearningModuleCard({
           <Text variant="label" className="flex-1">
             Lesson quiz
           </Text>
-          <Text variant="caption" className="text-xs text-text/80">
+          <Text variant="caption" className="text-xs">
             {quiz === 'locked'
               ? 'Locked'
               : lesson.quiz.attempts

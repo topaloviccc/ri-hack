@@ -27,12 +27,12 @@ export function LearningProgressCard({ learning }: LearningProgressCardProps) {
         className="h-2"
         accessibilityLabel="Course content progress"
       />
-      <Text variant="caption" className="text-text/80">
+      <Text variant="caption">
         {progress.done} of {progress.total} steps completed · lessons and quizzes
       </Text>
       <View className="flex-row border-t border-border pt-3">
         <View className="flex-1 gap-1">
-          <Text variant="caption" className="text-text/80">
+          <Text variant="caption">
             Quiz score
           </Text>
           <Text variant="heading">
@@ -42,7 +42,7 @@ export function LearningProgressCard({ learning }: LearningProgressCardProps) {
                 ? 'Passed'
                 : 'Not graded yet'}
           </Text>
-          <Text variant="caption" className="text-xs text-text/80">
+          <Text variant="caption" className="text-xs">
             {showScore
               ? `${learning.correctCount}/${learning.questionCount} correct · best attempts`
               : learning.completed
@@ -51,7 +51,7 @@ export function LearningProgressCard({ learning }: LearningProgressCardProps) {
           </Text>
         </View>
         <View className="flex-1 gap-1 border-l border-border pl-4">
-          <Text variant="caption" className="text-text/80">
+          <Text variant="caption">
             {learning.completed ? 'Reward earned' : 'Completion reward'}
           </Text>
           <View className="flex-row items-center gap-2">
@@ -60,7 +60,7 @@ export function LearningProgressCard({ learning }: LearningProgressCardProps) {
               {learning.completed ? learning.awardedCoins : learning.rewardCoins} coins
             </Text>
           </View>
-          <Text variant="caption" className="text-xs text-text/80">
+          <Text variant="caption" className="text-xs">
             Once per course
           </Text>
         </View>

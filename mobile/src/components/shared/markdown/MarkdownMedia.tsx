@@ -15,7 +15,7 @@ export function MarkdownImage({ node }: { node: MarkdownNode }) {
         className="aspect-video w-full rounded-xl bg-secondary/15"
       />
       {alt ? (
-        <Text variant="caption" className="text-center text-xs text-text/80">
+        <Text variant="caption" className="text-center text-xs">
           {alt}
         </Text>
       ) : null}

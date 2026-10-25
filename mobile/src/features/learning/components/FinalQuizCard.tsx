@@ -35,7 +35,7 @@ export function FinalQuizCard({ quiz, completed, onOpen }: FinalQuizCardProps) {
         <StepStatus state={state} />
       </View>
       <Text variant="heading">Final summary quiz</Text>
-      <Text variant="caption" className="text-text/80">
+      <Text variant="caption">
         {quiz.questionCount} questions to bring everything together.
       </Text>
       <View className="flex-row items-center justify-between border-t border-border pt-3">

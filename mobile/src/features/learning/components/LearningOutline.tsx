@@ -51,7 +51,7 @@ export function LearningOutline({ learning }: LearningOutlineProps) {
           {start.isError ? <Text accessibilityRole="alert">{start.error.message}</Text> : null}
           <View className="mt-2 flex-row items-center justify-between">
             <Text variant="heading">Course path</Text>
-            <Text variant="caption" className="text-text/80">
+            <Text variant="caption">
               Learn at your own pace
             </Text>
           </View>
@@ -72,7 +72,7 @@ export function LearningOutline({ learning }: LearningOutlineProps) {
             completed={learning.completed}
             onOpen={() => open({ quiz: learning.finalQuiz.id })}
           />
-          <Text variant="caption" className="text-center text-xs leading-5 text-text/80">
+          <Text variant="caption" className="text-center text-xs leading-5">
             Read a lesson, then submit its quiz to unlock the next part. Best attempts count. Retry
             as often as you need.
           </Text>
