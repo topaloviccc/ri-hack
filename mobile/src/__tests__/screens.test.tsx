@@ -23,7 +23,7 @@ describe('screens', () => {
   it('Home shows the three course rows', async () => {
     await renderAt('/');
     expect(await screen.findByText('Continue with…')).toBeOnTheScreen();
-    expect(screen.getByText('Most Popular')).toBeOnTheScreen();
+    expect(screen.getByText('Most popular')).toBeOnTheScreen();
     expect(screen.getByText('Recommended for you')).toBeOnTheScreen();
     expect((await screen.findAllByLabelText(/^Open course /)).length).toBeGreaterThan(0);
   });

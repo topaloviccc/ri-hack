@@ -14,7 +14,7 @@ export default function BenefitsLayout() {
         name="offer/[id]/confirm"
         options={{ title: 'Redeem coupon', presentation: 'modal' }}
       />
-      <Stack.Screen name="coupons/index" options={{ title: 'My Coupons' }} />
+      <Stack.Screen name="coupons/index" options={{ title: 'My coupons' }} />
       <Stack.Screen name="coupons/[id]" options={{ title: 'Coupon' }} />
     </Stack>
   );

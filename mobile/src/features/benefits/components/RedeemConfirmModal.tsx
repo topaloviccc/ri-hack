@@ -26,7 +26,7 @@ export function RedeemConfirmModal({ offerId }: { offerId: string }) {
         <Text className="text-center">{offer.data.priceCoins} coins will be used now.</Text>
         {!available ? <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">{offer.data.reasonIfIneligible ?? offer.data.availability.replace(/_/g, ' ')}</Text> : null}
         {activate.isError ? (
-          <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">{activate.error.message} Activation could not be confirmed. Check My Coupons to see whether the coupon was created.</Text>
+          <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">{activate.error.message} Activation could not be confirmed. Check My coupons to see whether the coupon was created.</Text>
         ) : null}
         <Button
           label={activate.isPending ? 'Activating…' : `Activate for ${offer.data.priceCoins} coins`}
@@ -37,7 +37,7 @@ export function RedeemConfirmModal({ offerId }: { offerId: string }) {
             onSuccess: ({ coupon }) => router.replace({ pathname: '/benefits/coupons/[id]', params: { id: coupon.id } }),
           })}
         />
-        <Button label={activate.isError ? 'Check My Coupons' : 'Cancel'} className="self-stretch" variant="soft"
+        <Button label={activate.isError ? 'Check My coupons' : 'Cancel'} className="self-stretch" variant="soft"
           disabled={activate.isPending} onPress={() => activate.isError ? router.replace('/benefits/coupons') : router.back()} />
       </View>
     </ScrollView>

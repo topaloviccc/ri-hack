@@ -184,7 +184,7 @@ export function BenefitsList() {
               </View>
             </View>
             <Button
-              label="My Coupons"
+              label="My coupons"
               className="mx-4 self-end"
               variant="soft"
               onPress={() => router.push('/benefits/coupons')}

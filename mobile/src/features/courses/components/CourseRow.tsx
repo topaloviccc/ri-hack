@@ -11,7 +11,7 @@ import type { Course, HomeSection } from '@/features/courses/types';
 
 const SECTION_TITLES: Record<HomeSection, string> = {
   continue: 'Continue with…',
-  popular: 'Most Popular',
+  popular: 'Most popular',
   recommended: 'Recommended for you',
 };
 
