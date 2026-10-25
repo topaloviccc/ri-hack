@@ -32,7 +32,7 @@ export function RedeemConfirmModal({ offerId }: { offerId: string }) {
           label={activate.isPending ? 'Activating…' : `Activate for ${offer.data.priceCoins} coins`}
           disabled={!available || activate.isPending || activate.isError}
           accessibilityState={{ disabled: !available || activate.isPending || activate.isError, busy: activate.isPending }}
-          className="self-stretch disabled:opacity-50"
+          className="self-stretch"
           onPress={() => activate.mutate({ offerId }, {
             onSuccess: ({ coupon }) => router.replace({ pathname: '/benefits/coupons/[id]', params: { id: coupon.id } }),
           })}

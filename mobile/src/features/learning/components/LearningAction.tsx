@@ -12,7 +12,7 @@ export function LearningAction({
       {...props}
       variant={variant}
       disabled={disabled}
-      className={cn('min-h-12 self-stretch', disabled && 'opacity-60', className)}
+      className={cn('min-h-12 self-stretch', className)}
       labelClassName={variant === 'primary' ? 'text-on-secondary' : undefined}
     />
   );

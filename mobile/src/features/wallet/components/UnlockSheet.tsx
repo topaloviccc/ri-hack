@@ -114,7 +114,7 @@ export function UnlockSheet({ courseId }: UnlockSheetProps) {
         disabled={!canAfford || unlock.isPending}
         accessibilityState={{ disabled: !canAfford || unlock.isPending, busy: unlock.isPending }}
         onPress={handleUnlock}
-        className={cn('self-stretch', !canAfford && 'opacity-50')}
+        className="self-stretch"
       />
       <Pressable
         accessibilityRole="button"

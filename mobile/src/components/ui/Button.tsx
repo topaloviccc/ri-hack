@@ -23,15 +23,18 @@ export function Button({
   icon,
   className,
   labelClassName,
+  disabled,
   ...props
 }: ButtonProps) {
   const styles = VARIANTS[variant];
   return (
     <Pressable
       accessibilityRole="button"
+      disabled={disabled}
       className={cn(
         'min-h-11 flex-row items-center justify-center gap-1.5 self-start rounded-full active:opacity-70',
         styles.container,
+        disabled && 'opacity-50',
         className,
       )}
       {...props}

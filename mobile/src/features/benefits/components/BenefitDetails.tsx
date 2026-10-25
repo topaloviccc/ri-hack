@@ -33,7 +33,7 @@ export function BenefitDetails({ offerId }: { offerId: string }) {
       <Button
         label={`Redeem for ${offer.data.priceCoins} coins`}
         disabled={!available}
-        className="self-stretch disabled:opacity-50"
+        className="self-stretch"
         onPress={() =>
           router.push({ pathname: '/benefits/offer/[id]/confirm', params: { id: offerId } })
         }
