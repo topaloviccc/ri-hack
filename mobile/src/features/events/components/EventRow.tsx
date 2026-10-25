@@ -2,7 +2,6 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { memo } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Image } from '@/components/ui/Image';
 import { Text } from '@/components/ui/Text';
@@ -62,15 +61,6 @@ export const EventRow = memo(function EventRow({ event, onPress, onOpenMap }: Ev
             </Text>
             , {event.venue}
           </Text>
-          {hasCoordinates(event) ? (
-            <Button
-              variant="soft"
-              label="Map"
-              accessibilityLabel={`Open ${event.venue} in maps`}
-              icon={<Ionicons name="location-outline" size={16} color={colors.text} />}
-              onPress={() => onOpenMap(event)}
-            />
-          ) : null}
         </View>
         <Image uri={event.imageUrl} className="h-16 w-16 rounded-lg bg-border" />
       </Card>

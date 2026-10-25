@@ -46,7 +46,7 @@ describe('screens', () => {
     await renderAt('/events');
     expect(await screen.findByRole('header', { name: 'Events' })).toBeOnTheScreen();
     expect(screen.getByLabelText('Use my location')).toBeOnTheScreen();
-    expect((await screen.findAllByLabelText(/ in maps$/)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByLabelText(/^Open event /)).length).toBeGreaterThan(0);
   });
 
   it('Network shows friends, feed and suggestions', async () => {
