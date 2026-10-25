@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "Out There",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -34,9 +34,9 @@
           "imageWidth": 76
         }
       ],
+      "expo-secure-store",
       "react-native-nfc-manager",
       "expo-app-blocker",
-      "expo-build-properties",
       [
         "expo-build-properties",
         {

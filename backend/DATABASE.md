@@ -63,7 +63,7 @@ Get-Content -Raw backend/dev/demo-learner.sql | docker exec -i outthere-postgres
 
 This script is outside Liquibase, adds no courses or events, and preserves the
 existing balance on subsequent runs. It creates the opening ledger credit once.
-Set that UUID in the frontend's `EXPO_PUBLIC_USER_ID` for local use.
+Load `dev/demo-passwords.sql` to log in as `demo.learner@example.test` / `demo1234`.
 
 For the full catalogue, geography, learning history, friends and events dataset,
 see [dev/README.md](dev/README.md). The optional seed is additive and separate

@@ -29,7 +29,12 @@ export const httpResponse = (body: unknown, status = 200) =>
 export function installApiFixture(options: { balance?: number; heldBalance?: number } = {}) {
   owned = new Set(initialOwned);
   let balance = options.balance ?? 250;
-  const benefits = createBenefitsFixture({ getBalance: () => balance, spendCoins: (amount) => { balance -= amount; } });
+  const benefits = createBenefitsFixture({
+    getBalance: () => balance,
+    spendCoins: (amount) => {
+      balance -= amount;
+    },
+  });
   const wallet = () => {
     const heldBalance = options.heldBalance ?? 0;
     return { balance, heldBalance, availableBalance: balance - heldBalance };
@@ -37,6 +42,9 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
   const processed = new Set<string>();
   const dismissed = new Set<string>();
   const users = MOCK_USERS.map(({ bio: _bio, ...user }) => ({ ...user }));
+  // Sara has sent the signed-in user a friend request.
+  const sara = users.find((u) => u.id === 'u9');
+  if (sara) sara.relation = 'incoming';
   const countryName = (code: string) => MOCK_COUNTRIES.find((n) => n.code === code)?.name ?? code;
   const locations = MOCK_LOCATIONS.map(
     ({ kind: _kind, city: _city, imageUrl: _image, ...site }) => ({
@@ -65,12 +73,19 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
     const params = url.searchParams;
     const method = init?.method ?? 'GET';
     if (path.startsWith('/benefits/')) return benefits.handle(url, init, wallet());
+    if (path === '/auth/login' && method === 'POST') {
+      const { password } = JSON.parse(String(init?.body)) as { password: string };
+      return password === 'demo1234'
+        ? httpResponse({ token: 'fixture-token', user: { id: ME_ID } })
+        : httpResponse({ detail: 'Invalid email or password' }, 401);
+    }
     if (path === '/wallet') return httpResponse(wallet());
     if (/^\/courses\/[^/]+\/unlock$/.test(path) && method === 'POST') {
       const id = path.split('/')[2];
       const key = new Headers(init?.headers).get('Idempotency-Key') ?? '';
       if (!processed.has(key) && !owned.has(id)) {
-        if (wallet().availableBalance < 40) return httpResponse({ detail: 'Not enough coins' }, 402);
+        if (wallet().availableBalance < 40)
+          return httpResponse({ detail: 'Not enough coins' }, 402);
         balance -= 40;
         owned.add(id);
         processed.add(key);
@@ -122,6 +137,22 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
       if (params.get('suggested') === 'true')
         rows = rows.filter((u) => u.relation === 'none' || u.relation === 'requested');
       return httpResponse(rows);
+    }
+    // Each friendship action is valid from one relation and leads to another.
+    const transitions = {
+      accept: ['incoming', 'friend'],
+      decline: ['incoming', 'none'],
+      cancel: ['requested', 'none'],
+      unfriend: ['friend', 'none'],
+    } as const;
+    const change =
+      /^\/users\/([^/]+)\/(?:friend-requests\/)?(accept|decline|cancel|unfriend)$/.exec(path);
+    if (change && method === 'POST') {
+      const user = users.find((u) => u.id === change[1]);
+      const [from, to] = transitions[change[2] as keyof typeof transitions];
+      if (user?.relation !== from) return httpResponse({ detail: 'Conflict' }, 409);
+      user.relation = to;
+      return httpResponse(user);
     }
     if (path.endsWith('/friend-requests') && method === 'POST') {
       const user = users.find((u) => u.id === path.split('/')[2]);

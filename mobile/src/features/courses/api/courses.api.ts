@@ -30,15 +30,15 @@ const toCountry = (row: CountryResponse): Country => ({
 
 export const coursesApi = {
   list: async (filters: CourseFilters = {}): Promise<Course[]> => {
-    const rows = await apiRequest<CourseResponse[]>('/courses', { query: filters, viewer: true });
+    const rows = await apiRequest<CourseResponse[]>('/courses', { query: filters });
     return rows.map(toCourse);
   },
   getById: async (id: string): Promise<Course> =>
     toCourse(
-      await apiRequest<CourseResponse>(`/courses/${encodeURIComponent(id)}`, { viewer: true }),
+      await apiRequest<CourseResponse>(`/courses/${encodeURIComponent(id)}`),
     ),
   dismiss: (id: string): Promise<void> =>
-    apiRequest(`/courses/${encodeURIComponent(id)}/dismiss`, { method: 'POST', viewer: true }),
+    apiRequest(`/courses/${encodeURIComponent(id)}/dismiss`, { method: 'POST' }),
 };
 
 export const locationsApi = {

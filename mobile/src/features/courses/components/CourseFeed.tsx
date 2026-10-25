@@ -28,6 +28,7 @@ export function CourseFeed() {
   const dismiss = useDismissCourse();
   const hints = useFeedHints();
   const [isToastVisible, setIsToastVisible] = useState(false);
+  const feedRef = useRef<FlatList<FeedItem>>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(toastTimer.current), []);
@@ -58,15 +59,17 @@ export function CourseFeed() {
     >
       {height > 0 ? (
         <FlatList
+          ref={feedRef}
           data={items}
           keyExtractor={(item) => item.id}
           // While the gesture hints are up, screen readers should only reach them.
           accessibilityElementsHidden={hints.isVisible}
           importantForAccessibility={hints.isVisible ? 'no-hide-descendants' : 'auto'}
           pagingEnabled
+          scrollEnabled={false}
           showsVerticalScrollIndicator={false}
           getItemLayout={(_, index) => ({ length: height, offset: height * index, index })}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <View
               style={{ height, paddingTop: insets.top + REEL_GAP, padding: REEL_GAP }}
               className="bg-background"
@@ -77,6 +80,13 @@ export function CourseFeed() {
                   onDismiss={() => handleLessLikeThis(item.id)}
                   onOpen={() => openCourse(item.id)}
                   onSwipeStart={() => prefetchCourse(item.id)}
+                  onNext={() => {
+                    feedRef.current?.scrollToIndex({ index: index + 1, animated: true });
+                  }}
+                  onPrevious={() => {
+                    if (index > 0)
+                      feedRef.current?.scrollToIndex({ index: index - 1, animated: true });
+                  }}
                 >
                   <ReelCard course={item} />
                 </SwipeableReel>

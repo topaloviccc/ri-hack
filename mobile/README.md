@@ -3,7 +3,7 @@
 Expo SDK 58 · Expo Router · TypeScript · NativeWind · TanStack Query. Rules: `CLAUDE.md`. Product: `PROJECT.md`. Deferred work: `BACKLOG.md`.
 
 ## Run on your phone
-Configure the backend URL and viewer UUID in `.env.local` first; see
+Configure the backend URL in `.env.local` first; see
 [API.md](API.md) and [.env.example](.env.example). Core screens use the backend;
 unsupported details remain visibly labelled demo content.
 

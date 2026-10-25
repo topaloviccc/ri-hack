@@ -42,7 +42,8 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **Localized country names** — current country names are English ISO reference display names from the backend; image flags are implemented. Translated names remain deferred.
 
 ## Platform / infra
-- [ ] **Auth** — excluded from this integration; "me" comes from `/users/me` using the configured `EXPO_PUBLIC_USER_ID`. Tokens → `expo-secure-store` when authentication is added.
+- [ ] **Persistent web sessions** — `expo-secure-store` has no web implementation, so the web build keeps its token in memory and signs out on reload.
+- [ ] **Account recovery** — no password reset, email verification or profile/password editing.
 - [ ] **Development builds** — NFC needs a development build (`npx expo run:android` or `eas build --profile development`); Expo Go still runs everything else, just without NFC. MapLibre will need one too.
 - [ ] **App blocking in the course flow** — Settings › "Simulate course in progress" is a stand-in; the course flow (other branch) should call `focusApi.setActive(true/false)` and the switch row be deleted.
 - [ ] **App blocking extras** — no temporary unlock (`temporaryUnlock` exists in expo-app-blocker), no picture on the block screen (`android.overlay.icon` plugin option, build-time PNG), Android only (iOS needs Screen Time/Family Controls approval). After a reboot Android restarts the blocker's service with an empty list, so its notification may show even when focus is off.

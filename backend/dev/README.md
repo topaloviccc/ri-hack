@@ -10,7 +10,7 @@ are production reference data supplied automatically by Liquibase. Flag images
 load directly from FlagCDN; only their URLs are stored. The demo script references those countries by ISO alpha-2 code and never
 inserts or replaces them. See [../reference/README.md](../reference/README.md).
 
-The configured viewer is **Demo Learner**,
+The demo viewer is **Demo Learner**,
 `11111111-1111-4111-8111-111111111111`, with an initial 250 coins. Opening credit is
 recorded once in the ledger. Re-running preserves purchases, balances, friendships,
 dismissals and learning progress; it does not reset your testing session.
@@ -43,7 +43,15 @@ For an existing seeded database, restart the backend and load `demo-learning.sql
 separately; see [../LEARNING.md](../LEARNING.md) for exact commands.
 It preserves balances, existing learning history and edited content.
 
-Open the app as Demo Learner. Exact UUIDs are in [demo-scenarios.json](demo-scenarios.json).
+Seeded users have no password. To log in as them, load the demo passwords after the
+demo data; every `@example.test` user without a password gets `demo1234`:
+
+```powershell
+docker cp backend/dev/demo-passwords.sql outthere-postgres:/tmp/outthere-demo-passwords.sql
+docker exec outthere-postgres psql -U outthere -d outthere -v ON_ERROR_STOP=1 -f /tmp/outthere-demo-passwords.sql
+```
+
+Log in as `demo.learner@example.test` / `demo1234`. Exact UUIDs are in [demo-scenarios.json](demo-scenarios.json).
 
 | Area | What to try |
 | --- | --- |
@@ -70,12 +78,11 @@ Course grants/completion history are seeded examples, not earned quiz rewards.
 ## Still outside the implemented backend
 
 Short-answer/matching questions, spaced revision, course authoring/LLM generation,
-friend accept/decline, profile editing and event registration storage remain unavailable. Expert requests
+profile editing and event registration storage remain unavailable. Expert requests
 and the weekly challenge remain labelled frontend demos. Course/place/event images, city filters and
 other unsupported presentation details remain labelled demos as previously chosen.
 
-Reload Expo Go after seeding. `mobile/.env.local` selects the demo viewer and the
-computer's LAN API URL; update that URL if the computer's Wi-Fi address changes.
+Reload Expo Go after seeding. `mobile/.env.local` holds the computer's LAN API URL; update that URL if the computer's Wi-Fi address changes.
 
 ## Optional Benefits samples
 

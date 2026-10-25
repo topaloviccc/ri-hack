@@ -1,4 +1,4 @@
-import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
 
 import {
   MOCK_COUNTRIES,
@@ -58,6 +58,38 @@ describe('screens', () => {
     expect(await screen.findByText('My feed')).toBeOnTheScreen();
     expect(await screen.findByText('Weekly challenge')).toBeOnTheScreen();
     expect(await screen.findByText('Suggested friends')).toBeOnTheScreen();
+  });
+
+  it('Network lists a received friend request and accepting it makes a friend', async () => {
+    await renderAt('/network');
+    expect(await screen.findByText('Friend requests')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByLabelText("Accept Sara Conti's friend request"));
+    // The section disappears once nothing is pending; Sara now appears among friends.
+    await waitFor(() => expect(screen.queryByText('Friend requests')).toBeNull());
+    expect(await screen.findByText('Sara')).toBeOnTheScreen();
+  });
+
+  it("A requester's profile offers accept and decline", async () => {
+    await renderAt('/user/u9');
+    await fireEvent.press(await screen.findByLabelText("Decline Sara Conti's friend request"));
+    expect(await screen.findByLabelText('Add Sara Conti as a friend')).toBeOnTheScreen();
+  });
+
+  it('A sent friend request can be cancelled', async () => {
+    await renderAt('/user/u8');
+    await fireEvent.press(await screen.findByLabelText('Add Ivan Perović as a friend'));
+    await fireEvent.press(
+      await screen.findByLabelText('Cancel your friend request to Ivan Perović'),
+    );
+    expect(await screen.findByLabelText('Add Ivan Perović as a friend')).toBeOnTheScreen();
+  });
+
+  it('Removing a friend asks for a second tap', async () => {
+    await renderAt('/user/u1');
+    await fireEvent.press(await screen.findByLabelText('Remove Ana Pejović as a friend'));
+    expect(screen.getByText('Tap again to remove Ana')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByLabelText('Confirm removing Ana Pejović as a friend'));
+    expect(await screen.findByLabelText('Add Ana Pejović as a friend')).toBeOnTheScreen();
   });
 
   it('Network leaderboard marks your own row', async () => {
@@ -152,11 +184,11 @@ describe('screens', () => {
     expect(await screen.findByText('Start course')).toBeOnTheScreen();
   });
 
-  it('Another user: adding a friend moves to Requested, with no In progress section', async () => {
+  it('Another user: adding a friend offers to cancel the request, with no In progress section', async () => {
     await renderAt('/user/u8');
     const add = await screen.findByLabelText('Add Ivan Perović as a friend');
     await fireEvent.press(add);
-    expect(await screen.findByText('Requested')).toBeOnTheScreen();
+    expect(await screen.findByText('Cancel request')).toBeOnTheScreen();
     expect(screen.queryByText('In progress')).not.toBeOnTheScreen();
   });
 

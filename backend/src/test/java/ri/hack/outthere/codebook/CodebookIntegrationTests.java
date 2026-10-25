@@ -24,6 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({CodebookIntegrationTests.Levels.class, CodebookIntegrationTests.Empty.class})
 @Transactional
 class CodebookIntegrationTests extends PostgresTestSupport {
+    // Endpoints only need an authenticated caller; this user need not exist.
+    private static final String ANY_USER = "00000000-0000-0000-0000-0000000000aa";
 
     @Autowired MockMvc mvc;
     @Autowired JdbcClient jdbc;
@@ -49,32 +51,32 @@ class CodebookIntegrationTests extends PostgresTestSupport {
 
     @Test
     void discoversDefinitionsAndOrdersOnlyTheirEntries() throws Exception {
-        mvc.perform(get("/api/codebooks")).andExpect(status().isOk())
+        mvc.perform(get("/api/codebooks").with(viewer(ANY_USER))).andExpect(status().isOk())
                 .andExpect(content().json("[\"course-levels\",\"difficulties\",\"empty\",\"fields\",\"question-types\"]"));
-        mvc.perform(get("/api/codebooks/course-levels")).andExpect(status().isOk())
+        mvc.perform(get("/api/codebooks/course-levels").with(viewer(ANY_USER))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3))
                 .andExpect(jsonPath("$[0].id").value(10))
                 .andExpect(jsonPath("$[1].id").value(20))
                 .andExpect(jsonPath("$[2].id").value(30))
                 .andExpect(jsonPath("$[0].code").doesNotExist())
                 .andExpect(jsonPath("$[0].sortOrder").doesNotExist());
-        mvc.perform(get("/api/codebooks/empty")).andExpect(status().isOk())
+        mvc.perform(get("/api/codebooks/empty").with(viewer(ANY_USER))).andExpect(status().isOk())
                 .andExpect(content().json("[]"));
     }
 
     @Test
     void scopesItemLookupAndReturnsProblemDetailsForMissingData() throws Exception {
-        mvc.perform(get("/api/codebooks/course-levels/10")).andExpect(status().isOk())
+        mvc.perform(get("/api/codebooks/course-levels/10").with(viewer(ANY_USER))).andExpect(status().isOk())
                 .andExpect(content().json("""
                         {"id":10,"label":"First"}
                         """));
         for (String path : new String[] {"hidden", "hidden/10", "course-levels/99", "empty/10"}) {
-            mvc.perform(get("/api/codebooks/" + path)).andExpect(status().isNotFound())
+            mvc.perform(get("/api/codebooks/" + path).with(viewer(ANY_USER))).andExpect(status().isNotFound())
                     .andExpect(content().contentTypeCompatibleWith("application/problem+json"))
                     .andExpect(jsonPath("$.status").value(404));
         }
-        mvc.perform(get("/api/codebooks/course-levels/invalid")).andExpect(status().isBadRequest());
-        mvc.perform(post("/api/codebooks/course-levels")).andExpect(status().isMethodNotAllowed());
+        mvc.perform(get("/api/codebooks/course-levels/invalid").with(viewer(ANY_USER))).andExpect(status().isBadRequest());
+        mvc.perform(post("/api/codebooks/course-levels").with(viewer(ANY_USER))).andExpect(status().isMethodNotAllowed());
     }
 
     @Test

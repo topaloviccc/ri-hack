@@ -26,6 +26,9 @@ public class WalletService {
     }
 
     @Transactional
+    public void open(UUID user, long signupBonusCoins) { repository.open(user, signupBonusCoins); }
+
+    @Transactional
     public WalletResponse unlock(UUID viewer, UUID course, String idempotencyKey) {
         users.requireUser(viewer);
         var wallet = repository.wallet(viewer, true).orElseThrow(() -> ApiException.notFound("Wallet"));

@@ -38,9 +38,9 @@ The learning/scoring policy is detailed in [LEARNING.md](LEARNING.md).
 
 ## Schema-only features not implemented
 
-- Learner accounts/authentication, identity providers, email verification, general
-  roles/privacy/blocking. `X-User-Id` is an untrusted caller choice, not an identity
-  mechanism. Benefits owner checks use that declared context.
+- Identity providers, email verification, password reset, roles other than `USER`,
+  privacy/blocking. Email/password signup and login with bearer JWTs are implemented
+  (`005-auth.sql` adds `app_user.password_hash` and `role`).
 - AI course generation, durable generation jobs, extraction, source grants/chunks,
   provenance, embeddings/pgvector, model integrations and workers.
 - Uploads/media assets, buckets, private file delivery and presigned URLs.
@@ -57,8 +57,9 @@ The learning/scoring policy is detailed in [LEARNING.md](LEARNING.md).
   the `BENEFIT_ACTIVATION` transaction type; other lookup labels do not imply
   implemented flows. Merchant self-service, payouts, real partner agreements,
   offline acceptance, geofencing and badge/visit eligibility remain deferred.
-- Friend accept/decline/cancel/remove actions and incoming request inbox. The frontend
-  only sends requests. Declined/cancelled pair rows can be reused for a new request.
+- Friend blocking. Requests can be sent, cancelled, accepted and declined, and friends
+  removed; the Network tab lists incoming requests. Declined, cancelled and removed pair
+  rows are reused for a new request.
 - Event save/registration/participant storage and capacity enforcement. The frontend
   opens an external registration link; the backend simply returns that stored link.
 
@@ -100,8 +101,7 @@ copied into new numeric `codebook_*` tables. Existing numeric codebooks still wo
 
 ## Frontend integration
 
-The mobile app now uses the backend for shared data and mutations, with viewer context
-from `EXPO_PUBLIC_USER_ID`. The user chose to keep unsupported details explicitly
+The mobile app now uses the backend for shared data and mutations, as the signed-in user. The user chose to keep unsupported details explicitly
 labelled as demo content, including images, bios, country introductions, location
 types/cities, event categories/cities/languages/numeric paid prices, expert applications
 and weekly challenges. These details do not create backend tables or integrations.

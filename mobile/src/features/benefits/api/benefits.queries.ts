@@ -2,11 +2,11 @@ import { infiniteQueryOptions, queryOptions, useInfiniteQuery, useQuery } from '
 
 import { benefitsApi } from '@/features/benefits/api/benefits.api';
 import type { CouponSegment, OfferFilters } from '@/features/benefits/types';
-import { env } from '@/lib/env';
+import { authSession } from '@/lib/auth-session';
 
 export const benefitsKeys = {
   all: ['benefits'] as const,
-  viewer: () => [...benefitsKeys.all, env.userId] as const,
+  viewer: () => [...benefitsKeys.all, authSession.get()?.userId] as const,
   offerLists: () => [...benefitsKeys.viewer(), 'offers'] as const,
   offerDetails: () => [...benefitsKeys.viewer(), 'offer'] as const,
   partners: (countryCode?: string) => [...benefitsKeys.viewer(), 'partners', countryCode] as const,

@@ -7,9 +7,10 @@ import { Text } from '@/components/ui/Text';
 import { useThemeColors } from '@/lib/theme';
 
 const HINTS = [
-  { icon: 'swap-vertical', label: 'Swipe up or down', action: 'Next course' },
-  { icon: 'arrow-back', label: 'Swipe left', action: 'Open the details' },
-  { icon: 'arrow-forward', label: 'Swipe right', action: 'Show less like this' },
+  { icon: 'arrow-down', label: 'Swipe down', action: 'Next course' },
+  { icon: 'arrow-up', label: 'Swipe up', action: 'Previous course' },
+  { icon: 'arrow-back', label: 'Swipe left', action: 'Show less like this' },
+  { icon: 'arrow-forward', label: 'Swipe right', action: 'Open the details' },
 ] as const;
 
 export type FeedGestureHintsProps = { onDismiss: () => void };

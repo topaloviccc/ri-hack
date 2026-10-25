@@ -30,7 +30,8 @@ public class UserRepository {
                 SELECT u.id, concat_ws(' ',u.first_name,u.last_name) AS name, u.username AS handle,
                   u.avatar_url, n.iso_code AS country_code,
                   CASE WHEN u.id=:viewer THEN 'me' WHEN fs.label='ACCEPTED' THEN 'friend'
-                       WHEN fs.label='PENDING' THEN 'requested' ELSE 'none' END AS relation,
+                       WHEN fs.label='PENDING' AND f.requester_id=:viewer THEN 'requested'
+                       WHEN fs.label='PENDING' THEN 'incoming' ELSE 'none' END AS relation,
                   (SELECT count(*) FROM friends a JOIN friends b ON a.friend_id=b.friend_id
                    WHERE a.user_id=:viewer AND b.user_id=u.id) AS mutual_friends_count
                 FROM app_user u LEFT JOIN country n ON n.id=u.country_id
@@ -87,6 +88,22 @@ public class UserRepository {
 
     public void lock(UUID user) {
         jdbc.sql("SELECT id FROM app_user WHERE id=:id FOR UPDATE").param("id", user).query(UUID.class).single();
+    }
+
+    /**
+     * Moves the pair's friendship from {@code from} to {@code to}; false when no such row exists.
+     * With {@code eitherDirection} the pair matches whoever sent the original request.
+     */
+    public boolean updateFriendship(UUID requester, UUID addressee, boolean eitherDirection, String from, String to) {
+        var pair = eitherDirection
+                ? "((requester_id=:requester AND addressee_id=:addressee) OR (requester_id=:addressee AND addressee_id=:requester))"
+                : "requester_id=:requester AND addressee_id=:addressee";
+        return jdbc.sql("""
+                UPDATE friendship SET friendship_status_id=(SELECT id FROM friendship_status WHERE label=:to),
+                       responded_at=now()
+                WHERE %s AND friendship_status_id=(SELECT id FROM friendship_status WHERE label=:from)
+                """.formatted(pair)).param("requester", requester).param("addressee", addressee)
+                .param("from", from).param("to", to).update() == 1;
     }
 
     public void requestFriend(UUID viewer, UUID other) {

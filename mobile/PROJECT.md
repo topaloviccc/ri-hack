@@ -51,6 +51,6 @@ F11–F13 AI generation/assistant · F14 expert review · F15 friends/leaderboar
 
 ## Backend
 Spring Boot modular monolith with PostgreSQL, JDBC and Liquibase. The frontend now
-connects its schema-backed reads and mutations to that API. Authentication, AI,
-bucket integration and other features outside the schema/frontend intersection are
-excluded. Viewer context is configured with `EXPO_PUBLIC_USER_ID`; see `API.md`.
+connects its schema-backed reads and mutations to that API as the signed-in user
+(email/password, bearer token; see `API.md`). AI, bucket integration and other features
+outside the schema/frontend intersection are excluded.
