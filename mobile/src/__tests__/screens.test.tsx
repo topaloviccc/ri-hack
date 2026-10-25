@@ -148,7 +148,7 @@ describe('screens', () => {
     expect(screen.getByText('Register')).toBeOnTheScreen();
   });
 
-  it('Location sheet shows the site and its courses', async () => {
+  it('Location page shows the site and its courses', async () => {
     const location = MOCK_LOCATIONS[0];
     await renderAt(`/location/${location.id}`);
     expect(await screen.findByText(location.name)).toBeOnTheScreen();

@@ -19,7 +19,7 @@ import { useThemeVars } from '@/lib/theme';
 
 export { ErrorBoundary } from 'expo-router';
 
-// Deep links straight to a sheet (e.g. /location/x) still get the tabs underneath.
+// Deep links straight to a detail page (e.g. /location/x) still get the tabs underneath.
 export const unstable_settings = { anchor: '(tabs)' };
 
 SplashScreen.preventAutoHideAsync();
@@ -87,18 +87,8 @@ function AppShell() {
             />
             <Stack.Screen name="event/[id]" options={{ title: '' }} />
             <Stack.Screen name="country/[code]" options={{ title: '' }} />
-            <Stack.Screen
-              name="location/[id]"
-              options={{
-                title: '',
-                presentation: 'formSheet',
-                // One height: resizing between detents on iOS blanked the sheet content mid-drag.
-                // Content scrolls inside instead.
-                sheetAllowedDetents: [0.6],
-                sheetGrabberVisible: true,
-                headerShown: false,
-              }}
-            />
+            {/* A full page like the Country page; the former form sheet blanked when resized on iOS. */}
+            <Stack.Screen name="location/[id]" options={{ title: '' }} />
           </Stack.Protected>
         </Stack>
         {!hasEnteredApp ? <WelcomeScreen onContinue={() => setHasEnteredApp(true)} /> : null}

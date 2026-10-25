@@ -26,7 +26,7 @@ see [API.md](API.md) for the current source of each field and run configuration.
 | Scroll: full-screen reels; swipe right = less like this (local), swipe left = details | ✅ mock data |
 | Events: city picker + "my location", calendar with event dots, day list, event details + Register link | ✅ mock data |
 | Network: friends strip, feed, suggested friends; Leaderboard (friends, weekly); People search; send friend request | ✅ mock data |
-| Courses: Map (SVG world, tap country → site pins + country card, clustering, location sheet) · Countries (A–Z → Country page) · Fields (by subject) | ✅ mock data |
+| Courses: Map (SVG world, tap country → site pins + country card, clustering, location page) · Countries (A–Z → Country page) · Fields (by subject) | ✅ mock data |
 | Course details, Profile (own + others, one view), Settings (System/Light/Dark, persisted) | ✅ mock data |
 | Shared coins: posted/held/available balances and course unlocks with a celebration | Connected backend |
 | Benefits: server search/filters/sort, offer details, direct coupon activation with random code, and My Coupons | Connected backend; sample partners labelled Demo |

@@ -20,7 +20,7 @@ import { openInMaps } from '@/utils/open-in-maps';
 
 export type LocationDetailsProps = { id: string };
 
-/** Location sheet: the site and every course connected to it. */
+/** Location page: the site and every course connected to it. */
 export function LocationDetails({ id }: LocationDetailsProps) {
   const colors = useThemeColors();
   const location = useLocationQuery(id);
@@ -40,9 +40,7 @@ export function LocationDetails({ id }: LocationDetailsProps) {
   }
 
   const site = location.data;
-  // A plain ScrollView, not a FlatList: the sheet is one fixed height (see the root layout) and
-  // scrolls inside; a virtualized list could keep rows clipped against a stale sheet size.
-  // A site has only a handful of courses.
+  // A site has only a handful of courses, so a plain column in the ScrollView is fine.
   return (
     <ScrollView contentContainerClassName="gap-3 pb-8">
       <View className="gap-3">
