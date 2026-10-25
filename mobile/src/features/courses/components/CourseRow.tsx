@@ -5,6 +5,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Text } from '@/components/ui/Text';
 import { useCoursesQuery } from '@/features/courses/api/courses.queries';
+import { ContinuePlaceholder } from '@/features/courses/components/ContinuePlaceholder';
 import { CourseCard } from '@/features/courses/components/CourseCard';
 import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
 import type { Course, HomeSection } from '@/features/courses/types';
@@ -15,8 +16,7 @@ const SECTION_TITLES: Record<HomeSection, string> = {
   recommended: 'Recommended for you',
 };
 
-const EMPTY_MESSAGES: Record<HomeSection, string> = {
-  continue: 'Start a course and it will show up here.',
+const EMPTY_MESSAGES: Record<Exclude<HomeSection, 'continue'>, string> = {
   popular: 'Nothing popular yet.',
   recommended: 'No recommendations yet.',
 };
@@ -34,7 +34,15 @@ export function CourseRow({ section }: CourseRowProps) {
     if (isPending) return <LoadingState className={ROW_PLACEHOLDER_CLASS} />;
     if (isError) return <ErrorState onRetry={refetch} className={ROW_PLACEHOLDER_CLASS} />;
     if (data.length === 0) {
-      return <EmptyState title="Nothing here yet" message={EMPTY_MESSAGES[section]} />;
+      if (section === 'continue') return <ContinuePlaceholder />;
+      // flex-none: the default flex-1 collapses inside the Home ScrollView.
+      return (
+        <EmptyState
+          title="Nothing here yet"
+          message={EMPTY_MESSAGES[section]}
+          className="flex-none"
+        />
+      );
     }
     return (
       <FlatList
