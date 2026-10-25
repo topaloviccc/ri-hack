@@ -61,6 +61,18 @@ public class WalletRepository {
         return transaction;
     }
 
+    public void open(UUID user, long openingCoins) {
+        var wallet = jdbc.sql("INSERT INTO wallet(user_id,balance) VALUES (:user,:coins) RETURNING id")
+                .param("user", user).param("coins", openingCoins).query(UUID.class).single();
+        if (openingCoins == 0) return;
+        // Balance and its ledger credit are written together, as in debit().
+        jdbc.sql("""
+                INSERT INTO wallet_transaction(wallet_id,type_id,amount,idempotency_key,metadata_json)
+                VALUES (:wallet,(SELECT id FROM wallet_transaction_type WHERE label='ADJUSTMENT'),
+                        :coins,'signup-bonus','{"reason":"signup_bonus"}'::jsonb)
+                """).param("wallet", wallet).param("coins", openingCoins).update();
+    }
+
     public void grant(UUID user, PriceRow course, UUID transaction) {
         jdbc.sql("""
                 INSERT INTO course_entitlement(user_id,course_id,acquisition_kind,acquisition_transaction_id,

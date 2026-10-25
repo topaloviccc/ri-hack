@@ -2,8 +2,8 @@
 
 An Expo mobile learning app connected to a Spring Boot backend and PostgreSQL.
 The current implementation covers the intersection of `worldlearn.sql` and the
-existing frontend. It is a local demo with no authentication, AI integration or
-bucket integration.
+existing frontend. It is a local demo with email/password accounts and no AI
+integration or bucket integration.
 
 ## Current state
 
@@ -14,7 +14,7 @@ bucket integration.
 | Geography | Full ISO country catalogue, English names, image flags, places, coordinates, map counts and course links | Country introductions and location types/cities/images are labelled demos |
 | Wallet | Stored balance, paid/free unlocks and once-per-course completion rewards with retry protection | Demo opening credit is seeded; no top-up API |
 | Benefits | Offer catalogue, coupon activation, codes, history and shared wallet debit | Optional sample partners are labelled Demo; public partner onboarding is deferred |
-| People / network | Profiles, people search, suggestions, friend requests, friends' completion feed and weekly leaderboard | Bios are demos; no accept/decline/remove-friend UI |
+| People / network | Profiles, people search, suggestions, friend requests, friends' completion feed and weekly leaderboard | Bios are demos |
 | Events | Stored titles, dates, descriptions, venues, coordinates, organizers, free/paid status and external registration URLs | Categories, cities/filters, languages, images and numeric paid prices are labelled demos; registration opens a sample external link |
 | Experts / challenges | No backend implementation | Entire flows remain explicitly labelled frontend demos; expert requests are kept in memory only |
 | Settings | Theme preference persists on the device | Profile editing is unavailable |
@@ -137,7 +137,6 @@ Edit `mobile/.env.local`:
 
 ```dotenv
 EXPO_PUBLIC_API_URL=http://YOUR_COMPUTER_WIFI_IP:8080/api
-EXPO_PUBLIC_USER_ID=11111111-1111-4111-8111-111111111111
 ```
 
 Replace `YOUR_COMPUTER_WIFI_IP` with the computer's LAN IPv4 address (find it using
@@ -146,9 +145,9 @@ points to the phone, so use the computer's Wi-Fi address. An Android emulator ca
 use `http://10.0.2.2:8080/api`; an iOS simulator or web browser on the computer can
 use `http://localhost:8080/api`.
 
-The UUID above selects the seeded Demo Learner. It supplies `X-User-Id` and is
-**not authentication**. Missing URL/UUID settings stop affected requests before
-the network; development builds show a setup notice.
+Sign up in the app, or load `backend/dev/demo-passwords.sql` and log in as
+`demo.learner@example.test` / `demo1234` (see [backend/dev/README.md](backend/dev/README.md)).
+A missing URL stops requests before the network; development builds show a setup notice.
 
 `.env.local` is ignored by Git. Each teammate must create their own file and use
 the address of the computer running their backend. Do not copy another developer's

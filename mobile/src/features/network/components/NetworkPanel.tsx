@@ -5,7 +5,7 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { ChallengeCard } from '@/features/network/components/ChallengeCard';
 import { FeedCard } from '@/features/network/components/FeedCard';
 import { Leaderboard } from '@/features/network/components/Leaderboard';
-import { FriendStrip, SuggestedFriends } from '@/features/users';
+import { FriendRequests, FriendStrip, SuggestedFriends } from '@/features/users';
 
 const MODES = [
   { value: 'network', label: 'Network' },
@@ -23,6 +23,7 @@ export function NetworkPanel() {
         <Leaderboard />
       ) : (
         <ScrollView contentContainerClassName="gap-6 pb-8">
+          <FriendRequests />
           <FriendStrip />
           <FeedCard />
           <ChallengeCard />

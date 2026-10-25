@@ -5,8 +5,15 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { DemoNotice } from '@/components/shared/DemoNotice';
 import { AddFriendButton } from '@/features/users/components/AddFriendButton';
+import { RemoveFriendButton } from '@/features/users/components/RemoveFriendButton';
 import type { User } from '@/features/users/types';
 import { CountryFlag } from '@/components/shared/CountryFlag';
+
+// Only the full profile offers unfriending; list rows just show "Friends".
+function FriendshipButton({ user }: { user: User }) {
+  if (user.relation === 'friend') return <RemoveFriendButton user={user} className="self-center" />;
+  return <AddFriendButton user={user} className="self-center" />;
+}
 
 export type ProfileHeaderProps = {
   user: User;
@@ -48,7 +55,7 @@ export function ProfileHeader({ user, coins }: ProfileHeaderProps) {
             className="self-center"
           />
         ) : (
-          <AddFriendButton user={user} className="self-center" />
+          <FriendshipButton user={user} />
         )}
       </View>
 

@@ -57,21 +57,21 @@ class LearningIntegrationTests extends PostgresTestSupport {
     long count(String table) { return jdbc.sql("SELECT count(*) FROM "+table).query(Long.class).single(); }
 
     @Test void requiresOwnershipStartAndOrderedContentAndDoesNotExposeAnswerKeys() throws Exception {
-        mvc.perform(get(BASE).header("X-User-Id",ME)).andExpect(status().isConflict());
+        mvc.perform(get(BASE).with(viewer(ME))).andExpect(status().isConflict());
         wallets.unlock(ME,COURSE,"purchase");
-        mvc.perform(get(BASE).header("X-User-Id",ME)).andExpect(status().isOk())
+        mvc.perform(get(BASE).with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.started").value(false)).andExpect(jsonPath("$.lessons[0].text").doesNotExist());
-        mvc.perform(get(BASE+"/quizzes/"+Q1).header("X-User-Id",ME)).andExpect(status().isConflict());
+        mvc.perform(get(BASE+"/quizzes/"+Q1).with(viewer(ME))).andExpect(status().isConflict());
         var started=learning.start(ME,COURSE);
         assertThat(learning.start(ME,COURSE).enrollmentId()).isEqualTo(started.enrollmentId());
         assertThat(started.lessons().getFirst().text()).isEqualTo("First lesson text");
         assertThatThrownBy(() -> learning.completeLesson(ME,COURSE,SECOND)).hasMessageContaining("preceding quiz");
         learning.completeLesson(ME,COURSE,FIRST);
-        mvc.perform(get(BASE+"/quizzes/"+Q1).header("X-User-Id",ME)).andExpect(status().isOk())
+        mvc.perform(get(BASE+"/quizzes/"+Q1).with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.questions[0].options[0].correct").doesNotExist())
                 .andExpect(jsonPath("$.questions[0].explanation").doesNotExist())
                 .andExpect(jsonPath("$.questions[0].gradingJson").doesNotExist());
-        mvc.perform(post(BASE+"/quizzes/"+Q1+"/attempts").header("X-User-Id",ME).header("Idempotency-Key","bad")
+        mvc.perform(post(BASE+"/quizzes/"+Q1+"/attempts").with(viewer(ME)).header("Idempotency-Key","bad")
                         .contentType("application/json").content("{\"answers\":[]}"))
                 .andExpect(status().isBadRequest());
         assertThat(count("quiz_attempt")).isZero();
@@ -169,7 +169,7 @@ class LearningIntegrationTests extends PostgresTestSupport {
         jdbc.sql("UPDATE lesson SET content_json=content_json || jsonb_build_object('markdown',:markdown,'format','markdown') WHERE id=:id")
                 .param("markdown","## Landscape\n\n**Observe** the rock.\n\n- [ ] Record a feature")
                 .param("id",FIRST).update();
-        mvc.perform(get(BASE).header("X-User-Id",ME)).andExpect(status().isOk())
+        mvc.perform(get(BASE).with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.lessons[0].text").value("## Landscape\n\n**Observe** the rock.\n\n- [ ] Record a feature"));
         learning.completeLesson(ME,COURSE,FIRST);
         quizzes.submit(ME,COURSE,Q1,"first",answers(Q1,true));

@@ -21,7 +21,7 @@ describe('wallet HTTP adapter', () => {
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
-          'X-User-Id': process.env.EXPO_PUBLIC_USER_ID,
+          Authorization: 'Bearer test-token',
           'Idempotency-Key': 'purchase-1',
         }),
       }),

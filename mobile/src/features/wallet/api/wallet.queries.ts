@@ -1,11 +1,11 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 
 import { walletApi } from '@/features/wallet/api/wallet.api';
-import { env } from '@/lib/env';
+import { authSession } from '@/lib/auth-session';
 
 export const walletKeys = {
   all: ['wallet'] as const,
-  detail: () => [...walletKeys.all, 'detail', env.userId] as const,
+  detail: () => [...walletKeys.all, 'detail', authSession.get()?.userId] as const,
 };
 
 export const walletQueryOptions = () =>

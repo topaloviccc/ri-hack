@@ -76,7 +76,7 @@ form state and are lost on exit/reload; submitted attempts and step progress per
 ## HTTP contracts
 
 All paths below start with `/api/courses/{courseId}/learning` and require the
-existing `X-User-Id` viewer UUID. This remains caller-supplied context, not auth.
+signed-in user's bearer token.
 
 | Method | Suffix | Result |
 | --- | --- | --- |

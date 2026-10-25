@@ -9,10 +9,9 @@ describe('API setup notice', () => {
 
   it('explains missing settings instead of leaving only generic query errors', async () => {
     env.apiUrl = undefined;
-    env.userId = undefined;
     await render(<ApiConfigurationNotice />);
     expect(screen.getByText('Backend setup required')).toBeOnTheScreen();
-    expect(screen.getByText(/EXPO_PUBLIC_API_URL and EXPO_PUBLIC_USER_ID/)).toBeOnTheScreen();
+    expect(screen.getByText(/EXPO_PUBLIC_API_URL in mobile/)).toBeOnTheScreen();
     expect(screen.getByText(/stop before reaching the network/)).toBeOnTheScreen();
   });
 

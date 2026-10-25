@@ -1,7 +1,6 @@
 import 'react-native-gesture-handler/jestSetup';
 
 process.env.EXPO_PUBLIC_API_URL ??= 'http://backend.test/api';
-process.env.EXPO_PUBLIC_USER_ID ??= '00000000-0000-0000-0000-000000000001';
 
 // shortcut: Reanimated 4's own mock crashes under jest, and expo-router's testing-library
 // silently falls back to `{}` when it does. Stub the mock path it loads with only the APIs the
@@ -81,4 +80,19 @@ require('@testing-library/react-native').configure({ asyncUtilTimeout: 3000 });
 // The app's QueryClient is a module singleton; clear it so tests don't share cached data.
 afterEach(() => {
   require('@/lib/query-client').queryClient.clear();
+});
+
+// expo-secure-store is native-only; keep sessions in memory. Tests start signed in, as the
+// demo user, so screens render; sign-in tests clear the session first.
+jest.mock('expo-secure-store', () => {
+  const items = new Map<string, string>();
+  return {
+    getItemAsync: async (key: string) => items.get(key) ?? null,
+    setItemAsync: async (key: string, value: string) => void items.set(key, value),
+    deleteItemAsync: async (key: string) => void items.delete(key),
+  };
+});
+beforeEach(async () => {
+  const { ME_ID } = require('@/features/users/api/users.mock');
+  await require('@/lib/auth-session').authSession.set({ token: 'test-token', userId: ME_ID });
 });

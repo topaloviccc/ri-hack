@@ -3,20 +3,18 @@ import { apiRequest } from '@/lib/api-client';
 
 const base = (id: string) => `/courses/${encodeURIComponent(id)}/learning`;
 export const learningApi = {
-  get: (course: string): Promise<LearningResponse> => apiRequest(base(course), { viewer: true }),
+  get: (course: string): Promise<LearningResponse> => apiRequest(base(course)),
   start: (course: string): Promise<LearningResponse> =>
-    apiRequest(`${base(course)}/start`, { method: 'POST', viewer: true }),
+    apiRequest(`${base(course)}/start`, { method: 'POST' }),
   completeLesson: (course: string, lesson: string): Promise<LearningResponse> =>
     apiRequest(`${base(course)}/lessons/${encodeURIComponent(lesson)}/complete`, {
       method: 'POST',
-      viewer: true,
     }),
   quiz: (course: string, quiz: string): Promise<QuizResponse> =>
-    apiRequest(`${base(course)}/quizzes/${encodeURIComponent(quiz)}`, { viewer: true }),
+    apiRequest(`${base(course)}/quizzes/${encodeURIComponent(quiz)}`),
   submit: (course: string, quiz: string, answers: QuizAnswer[], key: string): Promise<QuizResult> =>
     apiRequest(`${base(course)}/quizzes/${encodeURIComponent(quiz)}/attempts`, {
       method: 'POST',
-      viewer: true,
       body: { answers },
       headers: { 'Idempotency-Key': key },
     }),

@@ -1,4 +1,5 @@
 import { apiRequest } from '@/lib/api-client';
+import { authSession } from '@/lib/auth-session';
 import { env } from '@/lib/env';
 import { httpResponse } from '@/test-support/api-fixture';
 
@@ -14,23 +15,21 @@ describe('HTTP client', () => {
     jest.useRealTimers();
   });
 
-  it('encodes filters, empty ID selections and viewer context', async () => {
+  it('encodes filters, empty ID selections and the bearer token', async () => {
     fetchMock.mockResolvedValue(httpResponse([]));
     await apiRequest('/courses', {
-      viewer: true,
       query: { ids: [], countryCode: 'ME', unused: undefined },
     });
     const [url, init] = fetchMock.mock.calls[0];
     expect(String(url)).toContain('/courses?ids=&countryCode=ME');
-    expect(init?.headers).toEqual(expect.objectContaining({ 'X-User-Id': env.userId }));
+    expect(init?.headers).toEqual(expect.objectContaining({ Authorization: 'Bearer test-token' }));
   });
 
-  it('sends quiz answers as JSON with viewer and idempotency headers', async () => {
+  it('sends quiz answers as JSON with auth and idempotency headers', async () => {
     fetchMock.mockResolvedValue(httpResponse({ attemptId: 'attempt' }));
     const body = { answers: [{ questionId: 'question', optionIds: ['a', 'b'] }] };
     await apiRequest('/courses/course/learning/quizzes/quiz/attempts', {
       method: 'POST',
-      viewer: true,
       body,
       headers: { 'Idempotency-Key': 'retry-key' },
     });
@@ -39,7 +38,7 @@ describe('HTTP client', () => {
       method: 'POST',
       headers: expect.objectContaining({
         'Content-Type': 'application/json',
-        'X-User-Id': env.userId,
+        Authorization: 'Bearer test-token',
         'Idempotency-Key': 'retry-key',
       }),
     });
@@ -76,7 +75,7 @@ describe('HTTP client', () => {
   it('serializes JSON bodies and preserves bodyless POST requests', async () => {
     fetchMock.mockResolvedValue(httpResponse({}));
     await apiRequest('/benefits/offers/id/activate', {
-      method: 'POST', viewer: true, body: { quoteId: 'quote-id', termsVersion: 2 },
+      method: 'POST', body: { quoteId: 'quote-id', termsVersion: 2 },
       headers: { 'Idempotency-Key': 'activation-1' },
     });
     expect(fetchMock).toHaveBeenLastCalledWith(expect.any(String), expect.objectContaining({
@@ -88,13 +87,18 @@ describe('HTTP client', () => {
     expect(fetchMock.mock.calls[1][1]?.headers).not.toHaveProperty('Content-Type');
   });
 
-  it('requires explicit server and viewer configuration', async () => {
+  it('requires explicit server configuration', async () => {
     env.apiUrl = undefined;
     await expect(apiRequest('/courses')).rejects.toMatchObject({ status: 400 });
-    env.apiUrl = initialEnv.apiUrl;
-    env.userId = undefined;
-    await expect(apiRequest('/courses', { viewer: true })).rejects.toMatchObject({ status: 400 });
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('signs out on a rejected token and then omits it', async () => {
+    fetchMock.mockResolvedValue(httpResponse({ detail: 'Unauthorized' }, 401));
+    await expect(apiRequest('/users/me')).rejects.toMatchObject({ status: 401 });
+    expect(authSession.get()).toBeNull();
+    await expect(apiRequest('/users/me')).rejects.toMatchObject({ status: 401 });
+    expect(fetchMock.mock.calls[1][1]?.headers).not.toHaveProperty('Authorization');
   });
 
   it('aborts timed-out requests and reports a retryable transport error', async () => {

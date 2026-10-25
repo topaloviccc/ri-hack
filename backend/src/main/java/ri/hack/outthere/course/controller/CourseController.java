@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ri.hack.outthere.auth.controller.Viewer;
 import ri.hack.outthere.course.dto.*;
 import ri.hack.outthere.course.service.CourseService;
 
@@ -18,7 +19,7 @@ public class CourseController {
     public CourseController(CourseService service) { this.service = service; }
 
     @GetMapping("/courses")
-    public List<CourseResponse> courses(@RequestHeader("X-User-Id") UUID viewer,
+    public List<CourseResponse> courses(@Viewer UUID viewer,
             @RequestParam(required = false) String collection, @RequestParam(required = false) String countryCode,
             @RequestParam(required = false) UUID locationId, @RequestParam(required = false) List<UUID> ids) {
         CourseService.Collection selected = null;
@@ -32,13 +33,13 @@ public class CourseController {
     }
 
     @GetMapping("/courses/{id}")
-    public CourseResponse course(@RequestHeader("X-User-Id") UUID viewer, @PathVariable UUID id) {
+    public CourseResponse course(@Viewer UUID viewer, @PathVariable UUID id) {
         return service.get(viewer, id);
     }
 
     @PostMapping("/courses/{id}/dismiss")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void dismiss(@RequestHeader("X-User-Id") UUID viewer, @PathVariable UUID id) { service.dismiss(viewer, id); }
+    public void dismiss(@Viewer UUID viewer, @PathVariable UUID id) { service.dismiss(viewer, id); }
 
     @GetMapping("/countries")
     public List<CountryResponse> countries() { return service.countries(); }
