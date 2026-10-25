@@ -9,19 +9,22 @@ import Animated, {
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-// Fraction of screen width a swipe must travel to count.
-const SWIPE_THRESHOLD = 0.25;
-// Horizontal travel before the pan claims the touch; vertical travel first lets the list page.
-const ACTIVE_OFFSET_X = 20;
-const FAIL_OFFSET_Y = 15;
+// Fraction of screen size a swipe must travel to count.
+const HORIZONTAL_SWIPE_THRESHOLD = 0.25;
+const VERTICAL_SWIPE_THRESHOLD = 0.16;
+const ACTIVE_OFFSET = 20;
 const DISMISS_DURATION_MS = 200;
 
 export type SwipeableReelProps = {
   children: ReactNode;
-  /** Swipe right: the reel flies off ("less like this"). */
+  /** Swipe left: the reel flies off ("less like this"). */
   onDismiss: () => void;
-  /** Swipe left: open the course; the reel springs back. */
+  /** Swipe right: open the course; the reel springs back. */
   onOpen: () => void;
+  /** Swipe down to see the next course. */
+  onNext: () => void;
+  /** Swipe up to return to the previous course. */
+  onPrevious: () => void;
   disabled?: boolean;
 };
 
@@ -29,31 +32,42 @@ export function SwipeableReel({
   children,
   onDismiss,
   onOpen,
+  onNext,
+  onPrevious,
   disabled = false,
 }: SwipeableReelProps) {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const translateX = useSharedValue(0);
 
   const pan = usePanGesture({
     enabled: !disabled,
-    activeOffsetX: [-ACTIVE_OFFSET_X, ACTIVE_OFFSET_X],
-    failOffsetY: [-FAIL_OFFSET_Y, FAIL_OFFSET_Y],
+    activeOffsetX: [-ACTIVE_OFFSET, ACTIVE_OFFSET],
+    activeOffsetY: [-ACTIVE_OFFSET, ACTIVE_OFFSET],
     onUpdate: (e) => {
       'worklet';
-      translateX.value = e.translationX;
+      translateX.value = Math.abs(e.translationX) > Math.abs(e.translationY) ? e.translationX : 0;
     },
     onDeactivate: (e) => {
       'worklet';
-      const threshold = width * SWIPE_THRESHOLD;
-      if (e.translationX > threshold) {
-        translateX.value = withTiming(width, { duration: DISMISS_DURATION_MS }, (finished) => {
+      const isVertical = Math.abs(e.translationY) > Math.abs(e.translationX);
+      if (isVertical) {
+        const threshold = height * VERTICAL_SWIPE_THRESHOLD;
+        if (e.translationY > threshold) scheduleOnRN(onNext);
+        if (e.translationY < -threshold) scheduleOnRN(onPrevious);
+        translateX.value = withSpring(0);
+        return;
+      }
+
+      const threshold = width * HORIZONTAL_SWIPE_THRESHOLD;
+      if (e.translationX < -threshold) {
+        translateX.value = withTiming(-width, { duration: DISMISS_DURATION_MS }, (finished) => {
           if (finished) scheduleOnRN(onDismiss);
           // The HTTP save may fail; keep the keyed row visible until server data removes it.
           translateX.value = withSpring(0);
         });
         return;
       }
-      if (e.translationX < -threshold) scheduleOnRN(onOpen);
+      if (e.translationX > threshold) scheduleOnRN(onOpen);
       translateX.value = withSpring(0);
     },
   });
@@ -66,10 +80,10 @@ export function SwipeableReel({
     <GestureDetector gesture={pan}>
       <Animated.View
         style={[styles.fill, animatedStyle]}
-        accessibilityHint="Swipe left for details, swipe right to see less like this"
+        accessibilityHint="Swipe left to recommend less, swipe right to open the course, and swipe down for the next course"
         accessibilityState={{ disabled }}
         accessibilityActions={[
-          { name: 'decrement', label: 'Show less like this' },
+          { name: 'decrement', label: 'Recommend less like this' },
           { name: 'activate', label: 'Open details' },
         ]}
         onAccessibilityAction={(e) =>
