@@ -22,7 +22,7 @@ export function ActiveCoupon({ couponId }: { couponId: string }) {
   return (
     <ScrollView contentContainerClassName="gap-4 p-4">
       <Stack.Screen options={{ title: data.status === 'ACTIVE' ? 'Active coupon' : 'Coupon' }} />
-      <View className="overflow-hidden rounded-3xl bg-surface">
+      <View className="overflow-hidden rounded-card border border-border bg-surface">
         <BenefitArtwork offer={data.offer} className="h-44 w-full" />
         <View className="items-center gap-4 px-5 pb-6">
           <View className="-mt-8 rounded-full border-4 border-surface">

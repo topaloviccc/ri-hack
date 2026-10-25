@@ -12,8 +12,8 @@ export function OfferInformation({ offer, compact = false }: { offer: Offer; com
     <View
       className={
         compact
-          ? 'flex-row items-center gap-3 rounded-2xl bg-primary/10 p-3'
-          : 'overflow-hidden rounded-3xl bg-surface'
+          ? 'flex-row items-center gap-3 rounded-xl bg-primary/10 p-3'
+          : 'overflow-hidden rounded-card border border-border bg-surface'
       }
     >
       <BenefitArtwork

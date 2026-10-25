@@ -8,7 +8,7 @@ import { Text } from '@/components/ui/Text';
 export function RedemptionCode({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <View className="w-full items-center gap-3 rounded-2xl border border-border bg-background p-4">
+    <View className="w-full items-center gap-3 rounded-xl border border-border bg-background p-4">
       <Text variant="label" className="text-center">Your coupon code</Text>
       <View className="w-full flex-row items-center justify-center gap-3">
         <Text variant="title" className="text-center tracking-widest" selectable

@@ -21,7 +21,7 @@ export function AllPartners() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={`Browse benefits from ${item.name}`}
-            className="flex-row items-center gap-3 rounded-2xl border border-border bg-surface p-4 active:opacity-70"
+            className="flex-row items-center gap-3 rounded-card border border-border bg-surface p-4 active:opacity-70"
             onPress={() => router.replace({ pathname: '/benefits', params: { partnerId: item.id } })}
           >
             <PartnerAvatar partner={item} />

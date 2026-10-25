@@ -20,7 +20,7 @@ export function RedeemConfirmModal({ offerId }: { offerId: string }) {
   return (
     <ScrollView keyboardShouldPersistTaps="handled" contentContainerClassName="grow justify-center p-5">
       <Stack.Screen options={{ gestureEnabled: !activate.isPending, headerBackVisible: !activate.isPending }} />
-      <View className="w-full max-w-lg gap-5 self-center rounded-3xl bg-surface p-5">
+      <View className="w-full max-w-lg gap-5 self-center rounded-card border border-border bg-surface p-5">
         <Text variant="heading" className="text-center" accessibilityRole="header">Activate this coupon?</Text>
         <OfferInformation offer={offer.data} compact />
         <Text className="text-center">{offer.data.priceCoins} coins will be used now.</Text>

@@ -29,7 +29,7 @@ export function BenefitCouponCard({
       accessibilityHint="Opens redemption confirmation"
       onPress={onPress}
       onPressIn={onPressIn}
-      className="relative mx-4 mb-3 flex-row items-center gap-3 rounded-3xl border border-primary/20 bg-primary/10 p-3 active:opacity-70"
+      className="relative mx-4 mb-3 flex-row items-center gap-3 rounded-card border border-primary/20 bg-primary/10 p-3 active:opacity-70"
     >
       <BenefitArtwork offer={offer} className="h-28 w-20 shrink-0 rounded-2xl" />
       <View className="flex-1 gap-1.5">
