@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
@@ -74,13 +74,8 @@ function Form({ requests }: FormProps) {
     create.mutate(
       { subject, title, certificate },
       {
-        onSuccess: () => {
-          router.replace('/expert/requests');
-          Alert.alert(
-            'Demo request saved',
-            'This example is kept in memory only. No certificate was uploaded or request sent for review.',
-          );
-        },
+        // The requests list shows the new request; its demo notice explains nothing was sent.
+        onSuccess: () => router.replace('/expert/requests'),
       },
     );
   };
