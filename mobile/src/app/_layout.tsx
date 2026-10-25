@@ -92,7 +92,9 @@ function AppShell() {
               options={{
                 title: '',
                 presentation: 'formSheet',
-                sheetAllowedDetents: [0.6, 1],
+                // One height: resizing between detents on iOS blanked the sheet content mid-drag.
+                // Content scrolls inside instead.
+                sheetAllowedDetents: [0.6],
                 sheetGrabberVisible: true,
                 headerShown: false,
               }}

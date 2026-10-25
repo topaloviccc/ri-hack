@@ -40,9 +40,9 @@ export function LocationDetails({ id }: LocationDetailsProps) {
   }
 
   const site = location.data;
-  // A plain ScrollView, not a FlatList: when the sheet is dragged from its half-height detent to
-  // full height, the virtualized list (removeClippedSubviews on Android) could keep its rows
-  // clipped against the old size and stay blank. A site has only a handful of courses.
+  // A plain ScrollView, not a FlatList: the sheet is one fixed height (see the root layout) and
+  // scrolls inside; a virtualized list could keep rows clipped against a stale sheet size.
+  // A site has only a handful of courses.
   return (
     <ScrollView contentContainerClassName="gap-3 pb-8">
       <View className="gap-3">
