@@ -34,7 +34,7 @@ export const CourseCard = memo(function CourseCard({
         <Image uri={course.imageUrl} className="absolute inset-0" />
         <Scrim />
         <View className="flex-row items-start justify-between">
-          <Chip label="COURSE" variant="onImage" />
+          <Chip label="Course" variant="onImage" />
           {course.isUnlocked ? null : <LockBadge cost={course.unlockCost} />}
         </View>
         <Text variant="heading" className="text-on-image" numberOfLines={2}>

@@ -23,9 +23,7 @@ export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
             Quiz results
           </Text>
           <View className="gap-3 rounded-card border border-border bg-surface p-4">
-            <Text variant="mono" className="text-xs">
-              ATTEMPT {result.attemptNumber}
-            </Text>
+            <Text variant="caption">Attempt {result.attemptNumber}</Text>
             <Text variant="heading" className="text-2xl">
               {result.correctCount}/{result.questionCount} correct (
               {Math.floor(result.percentage * 10) / 10}%)

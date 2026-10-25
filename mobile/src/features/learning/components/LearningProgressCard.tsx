@@ -32,9 +32,7 @@ export function LearningProgressCard({ learning }: LearningProgressCardProps) {
       </Text>
       <View className="flex-row border-t border-border pt-3">
         <View className="flex-1 gap-1">
-          <Text variant="caption">
-            Quiz score
-          </Text>
+          <Text variant="caption">Quiz score</Text>
           <Text variant="heading">
             {showScore
               ? `${Math.floor(learning.percentage * 10) / 10}%`

@@ -27,9 +27,7 @@ export function LessonReader({ course, lesson }: LessonReaderProps) {
           <View className="gap-4">
             <LearningBackLink disabled={complete.isPending} />
             <View className="flex-row items-center justify-between">
-              <Text variant="mono" className="text-xs text-text">
-                LESSON {String(lesson.position + 1).padStart(2, '0')}
-              </Text>
+              <Text variant="caption">Lesson {String(lesson.position + 1).padStart(2, '0')}</Text>
               <StepStatus
                 state={!lesson.unlocked ? 'locked' : lesson.completed ? 'completed' : 'ready'}
                 label={lesson.completed ? 'Read' : undefined}
@@ -56,11 +54,7 @@ export function LessonReader({ course, lesson }: LessonReaderProps) {
               item.activity && 'bg-secondary/15',
             )}
           >
-            {item.activity ? (
-              <Text variant="mono" className="text-xs">
-                PAUSE & THINK
-              </Text>
-            ) : null}
+            {item.activity ? <Text variant="caption">Pause & think</Text> : null}
             <MarkdownBlocks nodes={item.nodes} />
           </View>
         )}

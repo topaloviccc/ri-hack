@@ -61,9 +61,7 @@ export function QuizPlayer({ learning, quizId }: QuizPlayerProps) {
       ListHeaderComponent={
         <View className="gap-3">
           <LearningBackLink disabled={submit.isPending} />
-          <Text variant="mono" className="text-xs text-text">
-            {quiz.finalQuiz ? 'FINAL SUMMARY' : 'LESSON QUIZ'}
-          </Text>
+          <Text variant="caption">{quiz.finalQuiz ? 'Final summary' : 'Lesson quiz'}</Text>
           <Text variant="title" className="text-2xl" accessibilityRole="header">
             {quiz.title}
           </Text>

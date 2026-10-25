@@ -26,15 +26,13 @@ export function QuizQuestionCard({
   return (
     <View className="gap-4 rounded-card border border-border bg-surface p-4">
       <View className="gap-2">
-        <Text variant="mono" className="text-xs">
-          QUESTION {index + 1} OF {total}
+        <Text variant="caption">
+          Question {index + 1} of {total}
         </Text>
         <Text variant="heading" className="leading-7">
           {question.prompt}
         </Text>
-        <Text variant="caption">
-          {multiple ? 'Select all that apply' : 'Choose one answer'}
-        </Text>
+        <Text variant="caption">{multiple ? 'Select all that apply' : 'Choose one answer'}</Text>
       </View>
       <View className="gap-2">
         {question.options.map((option) => {

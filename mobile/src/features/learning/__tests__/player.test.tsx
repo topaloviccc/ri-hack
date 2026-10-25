@@ -270,7 +270,7 @@ describe('database-backed course player', () => {
     await mount({ lesson: 'lesson' });
     expect(await screen.findByRole('header', { name: 'A landscape' })).toBeOnTheScreen();
     expect(screen.getByText('A readable paragraph.')).toBeOnTheScreen();
-    expect(screen.getByText('PAUSE & THINK')).toBeOnTheScreen();
+    expect(screen.getByText('Pause & think')).toBeOnTheScreen();
     expect(screen.getByText(/About 6 min/)).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Continue to quiz' }));
     await waitFor(() =>

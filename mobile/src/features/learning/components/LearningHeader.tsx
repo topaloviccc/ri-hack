@@ -25,7 +25,7 @@ export function LearningHeader({ learning }: LearningHeaderProps) {
         <View className="flex-1 justify-between p-4">
           <View className="flex-row items-center justify-between">
             <Chip
-              label={course?.subject ?? 'YOUR COURSE'}
+              label={course?.subject ?? 'Your course'}
               variant={course?.imageUrl ? 'onImage' : 'secondary'}
             />
             {course?.imageUrl ? (
