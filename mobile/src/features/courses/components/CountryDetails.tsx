@@ -64,27 +64,29 @@ export function CountryDetails({ code }: CountryDetailsProps) {
               {country.data.blurb}
             </Text>
           </View>
-          {locations.data.length > 0 ? (
-            <View className="gap-2">
-              <Text variant="heading" className="px-4">
-                Places
-              </Text>
-              <FlatList
-                horizontal
-                data={locations.data}
-                keyExtractor={(l) => l.id}
-                showsHorizontalScrollIndicator={false}
-                contentContainerClassName="gap-3 px-4"
-                renderItem={({ item }) => <LocationCard location={item} />}
-              />
-            </View>
-          ) : null}
           <Text variant="heading" className="px-4">
             Courses
           </Text>
         </View>
       }
       ListEmptyComponent={<EmptyState title="No courses yet" />}
+      ListFooterComponent={
+        locations.data.length > 0 ? (
+          <View className="gap-2 pt-4">
+            <Text variant="heading" className="px-4">
+              Places
+            </Text>
+            <FlatList
+              horizontal
+              data={locations.data}
+              keyExtractor={(l) => l.id}
+              showsHorizontalScrollIndicator={false}
+              contentContainerClassName="gap-3 px-4"
+              renderItem={({ item }) => <LocationCard location={item} />}
+            />
+          </View>
+        ) : undefined
+      }
       renderItem={({ item }) => (
         <View className="px-4">
           <CourseListItem course={item} onPress={openCourse} onPressIn={prefetchCourse} />
