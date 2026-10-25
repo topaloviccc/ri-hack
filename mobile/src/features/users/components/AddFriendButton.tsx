@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import { useSendFriendRequest, useUpdateFriendship } from '@/features/users/api/users.mutations';
 import { FriendRequestActions } from '@/features/users/components/FriendRequestActions';
 import type { User } from '@/features/users/types';
@@ -16,7 +17,7 @@ export function AddFriendButton({ user, className }: AddFriendButtonProps) {
   if (user.relation === 'requested')
     return <CancelRequestButton user={user} className={className} />;
   if (user.relation === 'friend')
-    return <Button variant="soft" label="Friends" disabled className={className} />;
+    return <Chip label="Friends" className={className} />;
   return <SendRequestButton user={user} className={className} />;
 }
 
