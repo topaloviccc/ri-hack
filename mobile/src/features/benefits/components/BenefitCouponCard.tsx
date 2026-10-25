@@ -31,7 +31,7 @@ export function BenefitCouponCard({
       onPressIn={onPressIn}
       className="relative mx-4 mb-3 flex-row items-center gap-3 rounded-card border border-primary/20 bg-primary/10 p-3 active:opacity-70"
     >
-      <BenefitArtwork offer={offer} className="h-28 w-20 shrink-0 rounded-2xl" />
+      <BenefitArtwork offer={offer} className="h-28 w-20 shrink-0 rounded-lg" />
       <View className="flex-1 gap-1.5">
         <Text variant="label" className="font-sans-bold text-base" numberOfLines={2}>
           {offer.title}
@@ -59,7 +59,7 @@ export function BenefitCouponCard({
           <Text variant="caption">Need {offer.priceCoins - availableBalance} more coins</Text>
         ) : null}
       </View>
-      <View className="items-center gap-1 rounded-2xl bg-primary/25 px-2.5 py-3">
+      <View className="items-center gap-1 rounded-xl bg-primary/25 px-2.5 py-3">
         <CoinIcon />
         <Text variant="label" className="font-sans-bold">
           {offer.priceCoins}

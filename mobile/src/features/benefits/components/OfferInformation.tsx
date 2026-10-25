@@ -18,7 +18,7 @@ export function OfferInformation({ offer, compact = false }: { offer: Offer; com
     >
       <BenefitArtwork
         offer={offer}
-        className={compact ? 'h-28 w-24 shrink-0 rounded-xl' : 'h-48 w-full'}
+        className={compact ? 'h-28 w-24 shrink-0 rounded-lg' : 'h-48 w-full'}
       />
       <View className={compact ? 'flex-1 gap-1.5' : 'gap-3 p-5'}>
         <Text variant="caption">{offer.partner.name}</Text>
