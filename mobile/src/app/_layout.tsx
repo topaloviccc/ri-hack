@@ -12,9 +12,10 @@ import { ApiConfigurationNotice } from '@/components/shared/ApiConfigurationNoti
 import { WelcomeScreen } from '@/components/layout/WelcomeScreen';
 import { AuthProvider, useAuth } from '@/features/auth';
 import { useThemePreferenceQuery } from '@/features/settings';
+import { useStackScreenOptions } from '@/hooks/useStackScreenOptions';
 import { useAppFonts } from '@/lib/fonts';
 import { queryClient } from '@/lib/query-client';
-import { useThemeColors, useThemeVars } from '@/lib/theme';
+import { useThemeVars } from '@/lib/theme';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -29,7 +30,7 @@ function AppShell() {
   const themePreference = useThemePreferenceQuery();
   const scheme = useColorScheme();
   const themeVars = useThemeVars();
-  const colors = useThemeColors();
+  const stackScreenOptions = useStackScreenOptions();
   // Keeps the splash up until a saved session has been read, so signed-in users never see sign-in.
   const auth = useAuth();
   const [hasEnteredApp, setHasEnteredApp] = useState(false);
@@ -48,15 +49,7 @@ function AppShell() {
       <View style={themeVars} className="flex-1">
         <StatusBar style="auto" />
         <ApiConfigurationNotice />
-        <Stack
-          screenOptions={{
-            headerTintColor: colors.primary,
-            headerStyle: { backgroundColor: colors.background },
-            headerTitleStyle: { fontFamily: 'PlusJakartaSans_700Bold', color: colors.text },
-            headerBackButtonDisplayMode: 'minimal',
-            contentStyle: { backgroundColor: colors.background },
-          }}
-        >
+        <Stack screenOptions={stackScreenOptions}>
           {/* Signed-out users can only reach sign-in; signing in or out swaps the available screens. */}
           <Stack.Protected guard={auth.status !== 'signedIn'}>
             <Stack.Screen name="(auth)/sign-in" options={{ headerShown: false }} />

@@ -1,21 +1,12 @@
 import { Stack } from 'expo-router';
 
-import { useThemeColors } from '@/lib/theme';
+import { useStackScreenOptions } from '@/hooks/useStackScreenOptions';
 
 export { ErrorBoundary } from 'expo-router';
 
 export default function BenefitsLayout() {
-  const colors = useThemeColors();
   return (
-    <Stack
-      screenOptions={{
-        headerTintColor: colors.text,
-        headerStyle: { backgroundColor: colors.background },
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: colors.background },
-        headerBackButtonDisplayMode: 'minimal',
-      }}
-    >
+    <Stack screenOptions={useStackScreenOptions()}>
       <Stack.Screen name="index" options={{ title: 'Benefits' }} />
       <Stack.Screen name="partners" options={{ title: 'All partners' }} />
       <Stack.Screen name="offer/[id]/index" options={{ title: 'Offer details' }} />
