@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { FlatList, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
@@ -40,46 +40,44 @@ export function LocationDetails({ id }: LocationDetailsProps) {
   }
 
   const site = location.data;
+  // A plain ScrollView, not a FlatList: when the sheet is dragged from its half-height detent to
+  // full height, the virtualized list (removeClippedSubviews on Android) could keep its rows
+  // clipped against the old size and stay blank. A site has only a handful of courses.
   return (
-    <FlatList
-      data={courses.data}
-      keyExtractor={(c) => c.id}
-      contentContainerClassName="gap-3 pb-8"
-      ListHeaderComponent={
-        <View className="gap-3">
-          <Image uri={site.imageUrl} className="h-44 w-full bg-border" />
-          <View className="gap-2 px-4">
-            <DemoNotice>image, location type and city</DemoNotice>
-            <Chip label={LOCATION_KIND_LABELS[site.kind]} />
-            <Text variant="title" accessibilityRole="header">
-              {site.name}
-            </Text>
-            <View className="flex-row items-center gap-2">
-              <CountryFlag code={site.countryCode} name={site.countryName} />
-              <Text variant="caption">
-                {site.city}, {site.countryName}
-              </Text>
-            </View>
-            {hasCoordinates(site) ? (
-              <Button
-                variant="soft"
-                label="Open in maps"
-                icon={<Ionicons name="navigate-outline" size={16} color={colors.text} />}
-                onPress={() => openInMaps(site.lat, site.lng, site.name)}
-              />
-            ) : null}
-            <Text variant="heading" className="mt-2">
-              Courses here
+    <ScrollView contentContainerClassName="gap-3 pb-8">
+      <View className="gap-3">
+        <Image uri={site.imageUrl} className="h-44 w-full bg-border" />
+        <View className="gap-2 px-4">
+          <DemoNotice>image, location type and city</DemoNotice>
+          <Chip label={LOCATION_KIND_LABELS[site.kind]} />
+          <Text variant="title" accessibilityRole="header">
+            {site.name}
+          </Text>
+          <View className="flex-row items-center gap-2">
+            <CountryFlag code={site.countryCode} name={site.countryName} />
+            <Text variant="caption">
+              {site.city}, {site.countryName}
             </Text>
           </View>
+          {hasCoordinates(site) ? (
+            <Button
+              variant="soft"
+              label="Open in maps"
+              icon={<Ionicons name="navigate-outline" size={16} color={colors.text} />}
+              onPress={() => openInMaps(site.lat, site.lng, site.name)}
+            />
+          ) : null}
+          <Text variant="heading" className="mt-2">
+            Courses here
+          </Text>
         </View>
-      }
-      ListEmptyComponent={<EmptyState title="No courses here yet" />}
-      renderItem={({ item }) => (
-        <View className="px-4">
-          <CourseListItem course={item} onPress={openCourse} onPressIn={prefetchCourse} />
+      </View>
+      {courses.data.length === 0 ? <EmptyState title="No courses here yet" /> : null}
+      {courses.data.map((course) => (
+        <View key={course.id} className="px-4">
+          <CourseListItem course={course} onPress={openCourse} onPressIn={prefetchCourse} />
         </View>
-      )}
-    />
+      ))}
+    </ScrollView>
   );
 }
