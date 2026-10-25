@@ -11,8 +11,10 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Text } from '@/components/ui/Text';
 import { benefitsKeys, useCouponsQuery } from '@/features/benefits/api/benefits.queries';
 import { BenefitArtwork } from '@/features/benefits/components/BenefitArtwork';
+import { COUPON_STATUS_LABELS } from '@/features/benefits/labels';
 import type { CouponSegment } from '@/features/benefits/types';
 import { walletKeys } from '@/features/wallet';
+import { formatDateTime } from '@/utils/date';
 
 const SEGMENTS: { value: CouponSegment; label: string }[] = [
   { value: 'ACTIVE', label: 'Active' },
@@ -60,7 +62,7 @@ export function MyCoupons() {
       renderItem={({ item }) => (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Open coupon ${item.offer.title}, ${item.status}`}
+          accessibilityLabel={`Open coupon ${item.offer.title}, ${COUPON_STATUS_LABELS[item.status]}`}
           className="mx-4 mb-3 gap-2 rounded-card border border-border bg-surface p-4 active:opacity-80"
           onPress={() =>
             router.push({ pathname: '/benefits/coupons/[id]', params: { id: item.id } })
@@ -77,12 +79,12 @@ export function MyCoupons() {
             <Text variant="caption">Demo partner offer</Text>
           ) : null}
           <Text variant="label">
-            {item.status === 'REDEEMED' ? 'Used' : item.status.replace(/_/g, ' ')} ·{' '}
+            {COUPON_STATUS_LABELS[item.status]} ·{' '}
             {item.priceCoins} coins used
           </Text>
           <Text variant="caption">
-            Issued {new Date(item.issuedAt).toLocaleString()}
-            {'\n'}Expires {new Date(item.expiresAt).toLocaleString()}
+            Issued {formatDateTime(item.issuedAt)}
+            {'\n'}Expires {formatDateTime(item.expiresAt)}
           </Text>
         </Pressable>
       )}

@@ -9,6 +9,7 @@ import { Text } from '@/components/ui/Text';
 import { useActivateCoupon } from '@/features/benefits/api/benefits.mutations';
 import { offerQueryOptions } from '@/features/benefits/api/benefits.queries';
 import { OfferInformation } from '@/features/benefits/components/OfferInformation';
+import { unavailableReason } from '@/features/benefits/labels';
 
 /** Last step before spending coins; the header ("Redeem coupon") is the question. */
 export function RedeemConfirmModal({ offerId }: { offerId: string }) {
@@ -36,7 +37,7 @@ export function RedeemConfirmModal({ offerId }: { offerId: string }) {
       <Text className="text-center">{offer.data.priceCoins} coins will be used now.</Text>
       {!available ? (
         <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
-          {offer.data.reasonIfIneligible ?? offer.data.availability.replace(/_/g, ' ')}
+          {unavailableReason(offer.data)}
         </Text>
       ) : null}
       {redeem.isError ? (

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { offerQueryOptions } from '@/features/benefits/api/benefits.queries';
 import { OfferInformation } from '@/features/benefits/components/OfferInformation';
+import { unavailableReason } from '@/features/benefits/labels';
 
 export function BenefitDetails({ offerId }: { offerId: string }) {
   const offer = useQuery(offerQueryOptions(offerId));
@@ -27,7 +28,7 @@ export function BenefitDetails({ offerId }: { offerId: string }) {
       <OfferInformation offer={offer.data} />
       {!available ? (
         <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
-          {offer.data.reasonIfIneligible ?? offer.data.availability.replace(/_/g, ' ')}
+          {unavailableReason(offer.data)}
         </Text>
       ) : null}
       <Button

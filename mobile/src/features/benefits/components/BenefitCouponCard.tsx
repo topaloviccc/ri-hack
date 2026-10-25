@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 import { CoinIcon } from '@/components/ui/CoinIcon';
 import { Text } from '@/components/ui/Text';
 import { BenefitArtwork } from '@/features/benefits/components/BenefitArtwork';
+import { availabilityLabel, unavailableReason } from '@/features/benefits/labels';
 import type { Offer } from '@/features/benefits/types';
 import { useThemeColors } from '@/lib/theme';
 
@@ -25,7 +26,7 @@ export function BenefitCouponCard({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`View offer ${offer.title}, ${offer.partner.name}, ${scope}, ${offer.priceCoins} coins, ${offer.availability}`}
+      accessibilityLabel={`View offer ${offer.title}, ${offer.partner.name}, ${scope}, ${offer.priceCoins} coins, ${availabilityLabel(offer.availability)}`}
       accessibilityHint="Opens offer details"
       onPress={onPress}
       onPressIn={onPressIn}
@@ -52,7 +53,7 @@ export function BenefitCouponCard({
         ) : null}
         {!offer.eligible || offer.availability !== 'AVAILABLE' ? (
           <Text variant="caption">
-            {offer.reasonIfIneligible ?? offer.availability.replace(/_/g, ' ')}
+            {unavailableReason(offer)}
           </Text>
         ) : null}
         {availableBalance !== undefined && availableBalance < offer.priceCoins ? (

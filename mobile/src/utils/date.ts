@@ -10,6 +10,10 @@ export const formatTime = (iso: string) => {
   return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
+/** ISO -> 'Saturday, 24 October, 14:05' in local time. */
+export const formatDateTime = (iso: string) =>
+  `${formatDayHeading(toDateKey(new Date(iso)))}, ${formatTime(iso)}`;
+
 /** '2026-10-24' -> 'Saturday, 24 October' */
 export const formatDayHeading = (dateKey: string) => {
   const [year, month, day] = dateKey.split('-').map(Number);
