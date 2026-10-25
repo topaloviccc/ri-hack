@@ -61,7 +61,7 @@ export function MyCoupons() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`Open coupon ${item.offer.title}, ${item.status}`}
-          className="mx-4 mb-3 gap-2 rounded-card border border-border bg-surface p-4 active:opacity-70"
+          className="mx-4 mb-3 gap-2 rounded-card border border-border bg-surface p-4 active:opacity-80"
           onPress={() =>
             router.push({ pathname: '/benefits/coupons/[id]', params: { id: item.id } })
           }
