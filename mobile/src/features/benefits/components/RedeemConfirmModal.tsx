@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { router, Stack } from 'expo-router';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
@@ -10,36 +10,63 @@ import { useActivateCoupon } from '@/features/benefits/api/benefits.mutations';
 import { offerQueryOptions } from '@/features/benefits/api/benefits.queries';
 import { OfferInformation } from '@/features/benefits/components/OfferInformation';
 
+/** Last step before spending coins; the header ("Redeem coupon") is the question. */
 export function RedeemConfirmModal({ offerId }: { offerId: string }) {
   const offer = useQuery(offerQueryOptions(offerId));
-  const activate = useActivateCoupon();
+  const redeem = useActivateCoupon();
   if (offer.isPending) return <LoadingState />;
-  if (offer.isError) return <ErrorState message={offer.error.message} onRetry={() => { void offer.refetch(); }} />;
+  if (offer.isError)
+    return (
+      <ErrorState
+        message={offer.error.message}
+        onRetry={() => {
+          void offer.refetch();
+        }}
+      />
+    );
   const available = offer.data.eligible && offer.data.availability === 'AVAILABLE';
+  const isBlocked = !available || redeem.isPending || redeem.isError;
 
   return (
-    <ScrollView keyboardShouldPersistTaps="handled" contentContainerClassName="grow justify-center p-5">
-      <Stack.Screen options={{ gestureEnabled: !activate.isPending, headerBackVisible: !activate.isPending }} />
-      <View className="w-full max-w-lg gap-5 self-center rounded-card border border-border bg-surface p-5">
-        <Text variant="heading" className="text-center" accessibilityRole="header">Activate this coupon?</Text>
-        <OfferInformation offer={offer.data} compact />
-        <Text className="text-center">{offer.data.priceCoins} coins will be used now.</Text>
-        {!available ? <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">{offer.data.reasonIfIneligible ?? offer.data.availability.replace(/_/g, ' ')}</Text> : null}
-        {activate.isError ? (
-          <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">{activate.error.message} Activation could not be confirmed. Check My coupons to see whether the coupon was created.</Text>
-        ) : null}
-        <Button
-          label={activate.isPending ? 'Activating…' : `Activate for ${offer.data.priceCoins} coins`}
-          disabled={!available || activate.isPending || activate.isError}
-          accessibilityState={{ disabled: !available || activate.isPending || activate.isError, busy: activate.isPending }}
-          className="self-stretch"
-          onPress={() => activate.mutate({ offerId }, {
-            onSuccess: ({ coupon }) => router.replace({ pathname: '/benefits/coupons/[id]', params: { id: coupon.id } }),
-          })}
-        />
-        <Button label={activate.isError ? 'Check My coupons' : 'Cancel'} className="self-stretch" variant="soft"
-          disabled={activate.isPending} onPress={() => activate.isError ? router.replace('/benefits/coupons') : router.back()} />
-      </View>
+    <ScrollView contentContainerClassName="w-full max-w-lg gap-5 self-center p-4">
+      <Stack.Screen
+        options={{ gestureEnabled: !redeem.isPending, headerBackVisible: !redeem.isPending }}
+      />
+      <OfferInformation offer={offer.data} compact />
+      <Text className="text-center">{offer.data.priceCoins} coins will be used now.</Text>
+      {!available ? (
+        <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
+          {offer.data.reasonIfIneligible ?? offer.data.availability.replace(/_/g, ' ')}
+        </Text>
+      ) : null}
+      {redeem.isError ? (
+        <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
+          {redeem.error.message} Redemption could not be confirmed. Check My coupons to see
+          whether the coupon was created.
+        </Text>
+      ) : null}
+      <Button
+        label={redeem.isPending ? 'Redeeming…' : `Redeem for ${offer.data.priceCoins} coins`}
+        disabled={isBlocked}
+        accessibilityState={{ disabled: isBlocked, busy: redeem.isPending }}
+        className="self-stretch"
+        onPress={() =>
+          redeem.mutate(
+            { offerId },
+            {
+              onSuccess: ({ coupon }) =>
+                router.replace({ pathname: '/benefits/coupons/[id]', params: { id: coupon.id } }),
+            },
+          )
+        }
+      />
+      <Button
+        label={redeem.isError ? 'Check My coupons' : 'Cancel'}
+        className="self-stretch"
+        variant="soft"
+        disabled={redeem.isPending}
+        onPress={() => (redeem.isError ? router.replace('/benefits/coupons') : router.back())}
+      />
     </ScrollView>
   );
 }

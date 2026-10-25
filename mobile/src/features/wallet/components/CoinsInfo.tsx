@@ -25,7 +25,7 @@ export function CoinsInfo() {
         {data.availableBalance} available coins
       </Text>
       <Text variant="body" className="text-center">
-        Use coins to unlock courses or activate Benefits. Submit every quiz and score at least 80%
+        Use coins to unlock courses or redeem Benefits. Submit every quiz and score at least 80%
         overall to earn the course completion reward, paid once per course.
       </Text>
       <Text>Posted balance: {data.balance} coins</Text>
