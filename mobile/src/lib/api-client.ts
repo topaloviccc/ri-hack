@@ -18,6 +18,7 @@ type RequestOptions = {
   query?: Record<string, QueryValue>;
   headers?: Record<string, string>;
   viewer?: boolean;
+  body?: unknown;
 };
 
 const errorMessage = (body: unknown, fallback: string) => {
@@ -47,10 +48,12 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       method: options.method ?? 'GET',
       headers: {
         Accept: 'application/json',
+        ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
         ...(options.viewer && env.userId ? { 'X-User-Id': env.userId } : {}),
         ...options.headers,
       },
       signal: abort.signal,
+      ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
     });
     const raw = await response.text();
     let body: unknown;

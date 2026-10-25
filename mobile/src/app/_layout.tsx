@@ -59,6 +59,7 @@ function AppShell() {
           <Stack.Screen name="expert/apply" options={{ title: 'Become an expert' }} />
           <Stack.Screen name="expert/requests" options={{ title: 'Your requests' }} />
           <Stack.Screen name="course/[id]/index" options={{ title: '' }} />
+          <Stack.Screen name="course/[id]/learn" options={{ title: 'Learn' }} />
           <Stack.Screen
             name="course/[id]/unlock"
             options={{

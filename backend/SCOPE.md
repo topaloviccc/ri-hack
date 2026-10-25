@@ -1,16 +1,18 @@
-# Schema/frontend intersection and gaps
+# Schema/frontend coverage and gaps
 
 Sources: `../worldlearn.sql`, `../mobile/src/features/*/types.ts`, mock API adapters,
 and the current screens. The product specification is not used to expand this scope.
-The reference SQL is unchanged. This backend implements only shared
-behaviors and the relational dependencies needed to read or write them.
+The reference SQL is unchanged. The initial integration covered shared behaviors;
+explicitly requested country reference data and the lesson/quiz player extend it.
+The learning/scoring policy is detailed in [LEARNING.md](LEARNING.md).
 
 ## Implemented overlap
 
 | Frontend behavior | Schema backing |
 | --- | --- |
 | Home rows, course cards/details, reel feed, country/location filters, map coordinates | `course`, `course_version`, `difficulty`, `visibility`, `publication_status`, `course_field`, `field`, `course_place`, `place`, `country` |
-| Continue/progress and profile course lists | `course_entitlement`, `enrollment`, `enrollment_status`, `lesson`, `lesson_progress`, `course_completion`; read only for learning history |
+| Lesson/quiz player, progress, grading and course completion | `course_entitlement`, `enrollment`, `enrollment_status`, `lesson`, `lesson_progress`, `quiz`, `question_type`, `question`, `answer_option`, `quiz_attempt`, `question_response`, `course_completion`, `course_completion_quiz_result`; transactional writes |
+| Once-per-course promised completion reward | `course_completion_reward`, entitlement promise, wallet and ledger; atomic with completion |
 | Wallet balance and unlock | `wallet`, `wallet_transaction`, `wallet_transaction_type`, `course_entitlement`; transactional writes |
 | Less like this on reels | `user_course_preference.is_dismissed`; persistent write |
 | Profiles, people search, suggested friends, send request | `app_user`, `friendship`, `friendship_status` |
@@ -41,16 +43,16 @@ behaviors and the relational dependencies needed to read or write them.
 - AI course generation, durable generation jobs, extraction, source grants/chunks,
   provenance, embeddings/pgvector, model integrations and workers.
 - Uploads/media assets, buckets, private file delivery and presigned URLs.
-- Lesson player/content writes, quizzes/questions/options, grading, attempts,
-  completion/reward writes, spaced revision and scheduling. Minimal lesson/history
-  tables are present only to supply the progress and completion data already displayed.
+- Course authoring/generation/import APIs, short-answer and matching question
+  rendering/grading, spaced revision and scheduling. Choice/true-false quizzes,
+  lesson progress, answer submission, completion and promised coin rewards are implemented.
 - Course authoring/publication/version editing, prerequisites and concepts; no CRUD
   APIs beyond the actual frontend mutations. Existing version/status columns remain
   part of the selected schema but have no administration endpoints.
 - Focus sessions, NFC tags/verified visits/rewards and explicit badge award workflows.
 - Expert grants, course reviews, contribution rewards, content reports and audit events.
 - Merchant offers/redemptions, cosmetics, wallet reservations, refunds, adjustments,
-  credit/top-up APIs and reward payments. The existing transaction-type lookup values
+  credit/top-up APIs and rewards other than course completion. The existing transaction-type lookup values
   are retained verbatim; their presence does not imply those flows are implemented.
 - Friend accept/decline/cancel/remove actions and incoming request inbox. The frontend
   only sends requests. Declined/cancelled pair rows can be reused for a new request.
@@ -73,8 +75,10 @@ columns (for example event capacity and version objectives) have no extra APIs.
 All source CHECK constraints and stored functions/triggers are omitted, including
 validation, immutability, scoring, publication guards, financial link checks and
 automatic wallet/reward creation. Primary keys, NOT NULL, unique keys and foreign
-keys remain as the structural relational model. No equivalent range/format/state
-validation was recreated in services. HTTP binding, missing-resource handling,
+keys remain as the structural relational model. Exhaustive source validation
+was not recreated. The player enforces its answer/progression contracts and grades
+questions in application code, including the explicitly chosen equal-question
+80% rule (different from the reference's equal-quiz mean). HTTP binding, missing-resource handling,
 insufficient-balance behavior and idempotent unlocks implement the existing frontend
 contract. The wallet use case updates balance and ledger itself because its trigger
 was omitted. Do not assume direct SQL ledger inserts update a balance.

@@ -11,7 +11,10 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **Verify mock content** — location coordinates and course facts were written from memory. Least certain: Ronda bullring, Las Ventas, Giverny, Camargue, Krka, St John Fortress, Our Lady of the Rocks, Skadar/Virpazar, Path of Philosophy, Jigokudani, Al-Muizz Street, Ranthambore, Sacsayhuaman, Qorikancha, Heron Island, Port Arthur, MCG, Strokkur, Thingvellir, Jökulsárlón, Etna, Blue Lagoon, Abu Simbel. Event coordinates are approximate too.
 
 ## Screens / features
-- [ ] **Lesson player** — "Start course"/"Continue" on course details shows a "coming soon" alert (spec F3).
+- [ ] **More question types** - single choice, multiple choice and true/false are implemented; short-answer and matching rendering/grading remain deferred.
+- [ ] **Quiz drafts** - unsubmitted selections are local form state and are lost on exit/reload; submitted attempts and reading progress persist.
+- [ ] **Course content authoring and generation** - current lesson/quiz text comes from an optional database seed; no LLM/import/authoring APIs.
+- [ ] **Spaced revision** - incorrect-answer revision scheduling is not part of the course player.
 - [ ] **Edit profile** — button on your own profile shows "coming soon".
 - [ ] **Profile privacy** — other people's profiles show completed courses to everyone; rules come with the backend.
 - [ ] **Friend requests: accept/decline, unfriend, incoming requests** — only "send request" exists; it now persists in the backend.
@@ -25,7 +28,6 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **What an approved expert can do** — approval changes nothing yet (no profile badge, no course review; spec F14 `expert_field_grants`).
 - [ ] **Expert requests: real upload, withdraw/edit, camera capture, several files** — the certificate is only picked locally; requests live in memory (`features/experts/api/experts.api.ts`).
 
-- [ ] **Earning coins** — no credit/reward API yet; the displayed balance and unlock charges come from the backend. The coins sheet says "coming soon".
 
 ## Behaviour
 - [ ] **Infinite feed** — Scroll feed is a finite list ending in "all caught up". Move to `useInfiniteQuery` with the real API.

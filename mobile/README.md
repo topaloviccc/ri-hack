@@ -7,6 +7,28 @@ Configure the backend URL and viewer UUID in `.env.local` first; see
 [API.md](API.md) and [.env.example](.env.example). Core screens use the backend;
 unsupported details remain visibly labelled demo content.
 
+Course details now open a lesson/quiz player with saved progress, a final summary
+quiz, unlimited retries and server grading. Every question counts equally; the
+best attempt per quiz counts and 80% overall passes after all steps are complete.
+The backend pays the promised completion reward once per course. Lesson and quiz
+text comes from optional database sample content, visibly labelled Demo; no LLM
+is called. Existing databases need the new learning migration and
+`backend/dev/demo-learning.sql`; see [the learning guide](../backend/LEARNING.md).
+
+The course path uses photo covers, clear locked/ready/completed cards, and one
+Start/Continue action. Content progress includes the final quiz and is separate
+from the overall quiz score. Completed history remains visibly completed.
+Course durations target **20–40 minutes total**. The one full-length mock is
+**Mount Etna: life on a living volcano**: 30 minutes across four sectioned lessons,
+reflection activities and 18 questions. It is already granted to Demo Learner.
+Other courses retain short placeholder text; their estimates are target metadata.
+
+Lesson material is interpreted as Markdown using a pure JavaScript parser and
+native components. Headings, emphasis, lists, tables, callouts, links/images and
+code blocks render directly in the reader. Reflection checklists are tappable;
+worked examples expand on demand. Quiz grading is unchanged. See the
+[Markdown authoring guide](../backend/dev/content/MARKDOWN.md) for future content.
+
 Countries now use the full production catalogue of 249 ISO 3166-1 alpha-2 countries
 and territories. The backend supplies English display names, ISO codes, counts
 and image flag URLs. Flags load directly from FlagCDN and are shown throughout

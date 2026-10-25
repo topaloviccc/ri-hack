@@ -31,6 +31,10 @@ see [API.md](API.md) for the current source of each field and run configuration.
 | Coins (display only) and unlocking locked courses via an unlock sheet with a celebration | ✅ mock data |
 | Expert requests: Settings › Become an expert (field, title, certificate upload) and request status list | ✅ mock data |
 
+The course player now reads real database lessons/quizzes, saves attempts and progress,
+grades every question equally and passes at 80% overall using best attempts. Promised
+completion coins are paid once per course. Content is seeded; LLM generation is deferred.
+
 ## Domain (as used in the app today)
 - **Course**: a concept tied to one country — title, image, subject (Nature & Wildlife, Culture & Traditions, Monuments & Architecture, History, Food & Drink, Arts & Music, Sport & Games), description, learner count, estimated minutes, difficulty, 0–n locations, progress for owned in-progress courses. No ratings or reviews. The UI still says "course".
 - **Location**: a real site (monument, nature, museum, venue, historic site) with town, country, coordinates and photo; shared between courses. These are the map waypoints.
@@ -40,8 +44,8 @@ see [API.md](API.md) for the current source of each field and run configuration.
 - **Network**: feed of friends' completions, one weekly challenge, weekly friends leaderboard.
 
 ## Spec features not started (pick from here when asked)
-F1 accounts/onboarding · F2 search · F3 lesson player · F4 quizzes (pass > 80%) · F5 completion timing ·
-F6 coins/unlocks · F7 spaced repetition, streaks · F8 knowledge map · F9 NFC visits/badges · F10 local stories ·
+F1 accounts/onboarding · F2 search · F5 completion timing ·
+F7 spaced repetition, streaks · F8 knowledge map · F9 NFC visits/badges · F10 local stories ·
 F11–F13 AI generation/assistant · F14 expert review · F15 friends/leaderboards · F16 merchant rewards · F17 full event model.
 
 ## Backend

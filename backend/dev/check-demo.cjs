@@ -33,6 +33,16 @@ async function main() {
   const wallet = await get('/wallet');
   console.log(`Demo Learner: ${wallet.balance} coins, ${profile.stats.completedCount} completed, ${profile.stats.streakDays}-day streak`);
   const s = seed.scenarios;
+  const learning = await get(`/courses/${s.ownedNotStarted.id}/learning`);
+  assert.equal(learning.lessons.length, 4);
+  assert.equal(learning.questionCount, 13);
+  assert.equal(learning.finalQuiz.questionCount, 5);
+  const longer = await get(`/courses/${s.longCourse.id}/learning`);
+  assert.equal(longer.estimatedMinutes, 30);
+  assert.equal(longer.lessons.length, 4);
+  assert.equal(longer.questionCount, 18);
+  assert.equal(longer.lessons.reduce((sum,lesson)=>sum+lesson.estimatedMinutes,0),22);
+  console.log('Course player: 4 lessons, 4 lesson quizzes and a 5-question summary quiz.');
   assert.equal((await get(`/courses/${s.freeUnlock.id}`)).unlockCost, 0);
   assert.equal((await get(`/courses/${s.paidUnlock.id}`)).unlockCost, 100);
   assert.equal((await get(`/courses/${s.insufficientCoins.id}`)).unlockCost, 1000);

@@ -4,7 +4,8 @@ The application uses PostgreSQL through Spring JDBC. Liquibase runs the configur
 master changelog at startup and records applied changes in its own tracking tables.
 The master changelog includes `001-worldlearn.sql`, the frontend-backed subset of
 `../worldlearn.sql`, followed by `002-iso-countries.sql` for production country
-reference data and `003-hosted-country-flags.sql` for hosted flag image URLs.
+reference data, `003-hosted-country-flags.sql` for hosted flag image URLs and
+`004-course-learning.sql` for quizzes, answers, attempts and completion rewards.
 See [SCOPE.md](SCOPE.md) for the included tables and intentional
 omissions. UUIDs, defaults, keys and relationships follow the source schema;
 CHECK constraints, stored functions and triggers are intentionally omitted.
@@ -62,6 +63,12 @@ Set that UUID in the frontend's `EXPO_PUBLIC_USER_ID` for local use.
 For the full catalogue, geography, learning history, friends and events dataset,
 see [dev/README.md](dev/README.md). The optional seed is additive and separate
 from application migrations. Its scenario guide lists what can be tested in the app.
+
+The full demo seed now includes answerable lesson/quiz content. Existing demo
+databases can load `dev/demo-learning.sql` separately after the new migration,
+without resetting learner history or balances. Learning content is optional demo
+data, not production reference data. See [LEARNING.md](LEARNING.md) for commands,
+the content shape, scoring policy and transactional completion/reward behavior.
 
 Run `.\mvnw.cmd test` on Windows (or `./mvnw test` on Unix) from `backend`
 with Java 21 and Docker available. Tests use

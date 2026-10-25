@@ -5,10 +5,13 @@
     "countries": 249,
     "fields": 7,
     "users": 16,
-    "courses": 48,
+    "courses": 49,
     "places": 94,
     "events": 32,
-    "learningHistories": 83
+    "learningHistories": 83,
+    "lessons": 196,
+    "quizzes": 245,
+    "questions": 642
   },
   "scenarios": {
     "paidUnlock": {
@@ -35,6 +38,12 @@
       "id": "7babf7a6-8cb1-f669-ea13-3da800aba052",
       "title": "Mount Etna volcanic ecosystems",
       "price": 70
+    },
+    "longCourse": {
+      "id": "96e951cd-3367-ed8d-021a-118a68d366de",
+      "title": "Mount Etna: life on a living volcano",
+      "price": 0,
+      "estimatedMinutes": 30
     },
     "ownedArchived": {
       "id": "30265040-709b-d212-2e03-16ea3ea3332b",

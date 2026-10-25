@@ -4,7 +4,6 @@ import { CoinIcon } from '@/components/ui/CoinIcon';
 import { Text } from '@/components/ui/Text';
 import { useWalletQuery } from '@/features/wallet/api/wallet.queries';
 
-// TODO(hack): earning coins arrives with the backend. See BACKLOG.md.
 export function CoinsInfo() {
   const { data } = useWalletQuery();
   return (
@@ -14,7 +13,8 @@ export function CoinsInfo() {
         {data ? `${data.balance} coins` : 'Your coins'}
       </Text>
       <Text variant="body" className="text-center">
-        Use coins to unlock courses. Ways to earn coins are coming soon.
+        Use coins to unlock courses. Submit every quiz and score at least 80% overall to earn the
+        course completion reward, paid once per course.
       </Text>
     </View>
   );

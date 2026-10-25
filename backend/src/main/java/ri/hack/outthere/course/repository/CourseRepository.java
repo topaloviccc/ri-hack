@@ -27,9 +27,12 @@ public class CourseRepository {
                   c.estimated_minutes, lower(d.label) AS difficulty,
                   CASE WHEN e.first_opened_at IS NULL THEN NULL
                        WHEN e.completed_at IS NOT NULL THEN 1.0
-                       ELSE (SELECT count(*) FROM lesson_progress lp
-                             WHERE lp.enrollment_id=e.id AND lp.completed_at IS NOT NULL)::float8
-                            / nullif((SELECT count(*) FROM lesson l WHERE l.course_version_id=e.course_version_id),0)
+                       ELSE ((SELECT count(*) FROM lesson_progress lp
+                              WHERE lp.enrollment_id=e.id AND lp.completed_at IS NOT NULL)
+                            + (SELECT count(DISTINCT qa.quiz_id) FROM quiz_attempt qa
+                               WHERE qa.enrollment_id=e.id AND qa.submitted_at IS NOT NULL))::float8
+                            / nullif((SELECT count(*) FROM lesson l WHERE l.course_version_id=e.course_version_id)
+                              + (SELECT count(*) FROM quiz q WHERE q.course_version_id=e.course_version_id),0)
                        END AS progress,
                   c.price_coins AS unlock_cost, (ce.id IS NOT NULL) AS unlocked
                 FROM course c LEFT JOIN country n ON n.id=c.country_id

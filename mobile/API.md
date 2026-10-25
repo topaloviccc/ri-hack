@@ -40,6 +40,7 @@ Set backend `CORS_ALLOWED_ORIGINS` to a comma-separated list for other web origi
 | Courses, subjects, prices, learner counts, country/place identity and coordinates, progress and ownership | Backend |
 | All 249 ISO alpha-2 countries/territories, English display names and image flag URLs | Production Liquibase reference data; images load directly from FlagCDN; no demo seed required |
 | Wallet/unlocks, profiles/statistics, friendships, completion feed and leaderboard | Backend |
+| Lessons/quizzes, submitted answers, best scores, reading progress, completion and coin rewards | Backend; optional sample lesson/quiz content is stored in PostgreSQL and labelled Demo |
 | Event identity, start time, venue/coordinates, organizer, description, free/paid status and registration link | Backend |
 | Course/place/event images, location kinds/cities, country introductions and profile bios | Stable demo supplements, labelled in the UI |
 | Event city/category/language and numeric paid-price examples | Stable demo supplements, labelled in list and details |
@@ -80,6 +81,23 @@ Dismissals persist and refresh course queries; failures show an error and keep t
 reel available. The viewer comes from `/users/me`, never the old mock `u0` ID.
 
 ## Verification
+
+Lesson response `text` is Markdown source. The backend prefers
+`lesson.content_json.markdown` and falls back to legacy JSON `text`. Native
+rendering and local checklist/reveal interactions do not submit quiz answers or
+change completion. Source files and supported extensions are documented in
+[the Markdown contract](../backend/dev/content/MARKDOWN.md).
+
+The player lives at `/course/[id]/learn`. Its adapters call
+`/courses/{id}/learning` for outline/start, lesson completion, quiz reads and
+answer submissions. JSON bodies go through the shared HTTP client. Answer keys
+are returned only as feedback after submission. See
+[backend/LEARNING.md](../backend/LEARNING.md) for the complete contract.
+Mutation responses update the learning cache and invalidate course, user, wallet
+and network queries. The UI uses the server's course completion and reward
+result, including when an individual quiz scores 100% but the course still fails.
+Unsubmitted answer selections are local form state; completed steps and attempts
+survive leaving/reloading. No LLM calls or frontend grading mocks are involved.
 
 Run `npm run typecheck`, `npm run lint`, and `npm test -- --runInBand`.
 Screen tests mock backend-shaped HTTP responses while running actual adapters and
