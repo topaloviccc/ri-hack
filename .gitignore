@@ -1,3 +1,4 @@
 # Local IDE project settings
 .idea/
 *.iml
+node_modules

@@ -11,6 +11,8 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **Verify mock content** — location coordinates and course facts were written from memory. Least certain: Ronda bullring, Las Ventas, Giverny, Camargue, Krka, St John Fortress, Our Lady of the Rocks, Skadar/Virpazar, Path of Philosophy, Jigokudani, Al-Muizz Street, Ranthambore, Sacsayhuaman, Qorikancha, Heron Island, Port Arthur, MCG, Strokkur, Thingvellir, Jökulsárlón, Etna, Blue Lagoon, Abu Simbel. Event coordinates are approximate too.
 
 ## Screens / features
+- [ ] **Benefits device acceptance** — verify merchant PIN/reference entry, narrow layouts, large font sizes, Android back and iOS modal/keyboard behavior on physical devices. Automated checks do not establish device acceptance.
+- [ ] **Benefits beyond the current slice** — public commercial partner onboarding, push expiry reminders, offline merchant acceptance and merchant administration are deliberately deferred. Merchant validation/capture runs through the backend operator workflow, outside the learner app.
 - [ ] **Lesson player** — "Start course"/"Continue" on course details shows a "coming soon" alert (spec F3).
 - [ ] **Edit profile** — button on your own profile shows "coming soon".
 - [ ] **Profile privacy** — other people's profiles show completed courses to everyone; rules come with the backend.

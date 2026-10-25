@@ -54,7 +54,7 @@ export function UnlockSheet({ courseId }: UnlockSheetProps) {
   }
 
   const cost = course.data.unlockCost;
-  const balance = wallet.data.balance;
+  const balance = wallet.data.availableBalance;
   const shortfall = cost - balance;
   const canAfford = shortfall <= 0;
 
@@ -83,7 +83,7 @@ export function UnlockSheet({ courseId }: UnlockSheetProps) {
 
       <View className="gap-2 rounded-card bg-background p-4">
         <AmountRow label="Cost" amount={cost} />
-        <AmountRow label="Your balance" amount={balance} />
+        <AmountRow label="Available balance" amount={balance} />
         {canAfford ? (
           <AmountRow label="After unlocking" amount={balance - cost} isEmphasized />
         ) : (

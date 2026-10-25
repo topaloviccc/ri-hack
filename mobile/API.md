@@ -22,6 +22,10 @@ See [backend/API.md](../backend/API.md) for endpoints and DTOs, and
 
 4. Run `npm ci`, then `npm start`. Reload after changing environment values.
 
+Expo does not load `.env.example`; the values must be in `.env.local` (or another
+supported `.env` file). Use the current Wi-Fi IPv4 address shown by `ipconfig`
+on Windows, and update it if the computer changes networks.
+
 Use the computer's LAN address for a phone, `http://10.0.2.2:8080/api` for an Android
 emulator, or `http://localhost:8080/api` for a simulator/web on that computer.
 The URL includes `/api`. See [Expo environment variables](https://docs.expo.dev/guides/environment-variables/).
@@ -32,6 +36,10 @@ those failures occur before `fetch` and therefore produce no network traffic.
 
 Web CORS defaults allow `http://localhost:8081` and `http://127.0.0.1:8081`.
 Set backend `CORS_ALLOWED_ORIGINS` to a comma-separated list for other web origins.
+Expo Go's native requests are not subject to browser CORS. For a phone connection
+failure, open `http://<computer-LAN-IP>:8080/api/countries` in the phone's browser
+to check reachability. Keep both devices on the same network and allow the backend
+through the computer's firewall if that URL cannot be reached.
 
 ## Live and demo data
 
@@ -40,6 +48,7 @@ Set backend `CORS_ALLOWED_ORIGINS` to a comma-separated list for other web origi
 | Courses, subjects, prices, learner counts, country/place identity and coordinates, progress and ownership | Backend |
 | All 249 ISO alpha-2 countries/territories, English display names and image flag URLs | Production Liquibase reference data; images load directly from FlagCDN; no demo seed required |
 | Wallet/unlocks, profiles/statistics, friendships, completion feed and leaderboard | Backend |
+| Benefits partners/countries/offers, coupon activation and history | Backend; demo partners are explicitly labelled |
 | Event identity, start time, venue/coordinates, organizer, description, free/paid status and registration link | Backend |
 | Course/place/event images, location kinds/cities, country introductions and profile bios | Stable demo supplements, labelled in the UI |
 | Event city/category/language and numeric paid-price examples | Stable demo supplements, labelled in list and details |
@@ -67,6 +76,48 @@ Registration always uses the server URL and is hidden if absent. Map pins/action
 use actual coordinates and are omitted when absent. Null durations display
 "Not specified"; null progress hides the progress bar. Database subject labels
 define Fields sections dynamically instead of the demo expert form's fixed list.
+
+## Benefits and shared wallet
+
+Open the gift button in the Home header. The original five tabs are preserved.
+Routes are `/benefits`, `/benefits/offer/{id}`, `/benefits/offer/{id}/confirm`,
+`/benefits/coupons`, and `/benefits/coupons/{id}`. Configure the same API URL and
+viewer as the other connected screens; there are no runtime fallback offers.
+
+Coupon cards open a simple confirmation: choose `Activate`, the server deducts
+the offer's coin cost immediately and returns the coupon with a random code to
+show at the counter. There are no quote, reservation, PIN/QR, or activation
+recovery steps. Failed requests do not automatically retry; check My Coupons to
+see whether an activation completed before leaving the screen.
+
+The backend offer records provide public Unsplash image URLs for the six seeded
+demo offers. The frontend loads those URLs directly; it has no bundled benefit
+artwork fallback.
+
+`GET /wallet` and course-unlock responses return
+`{ balance, heldBalance, availableBalance }`. Benefit activations debit the
+wallet immediately, so `heldBalance` remains zero and `availableBalance` equals
+`balance` for this flow.
+
+Benefits requests use `/benefits/partners?countryCode`,
+`/benefits/countries?partnerId`, and `/benefits/offers` with AND-combined `q`,
+`partnerId`, `countryCode`, `sort`, `page` and `size`. Sort values are `POPULAR`,
+`PRICE_ASC`, `PRICE_DESC`, `NEWEST`. Lists consume `{ items, page, size, total }`.
+Offer detail is `/benefits/offers/{id}`. Activation is an empty-body POST to
+`/benefits/offers/{id}/activate`; the server validates the current offer and
+balance and creates the coupon in one transaction. No activation request key
+or local retry state is stored.
+
+History is `/benefits/coupons?status=...&page=...&size=...` with `ACTIVE`,
+`REDEEMED` legacy history, and `EXPIRED` entries. Details are
+`/benefits/coupons/{id}`. Activation returns `{ coupon, wallet, serverNow }` and
+refreshes the shared wallet and benefit caches. The app displays the random code
+while the coupon is active; coupons expire after 15 minutes and their activation
+cost is not refunded. Marking an active coupon as used moves it into the Used
+history without another debit. “See all” opens the complete active partner list;
+choosing a partner filters the benefits list. The configured learner viewer
+header is untrusted context, not production authentication. Commercial partner
+onboarding and authenticated public deployment remain prerequisites outside this UI.
 
 ## Requests and caching
 

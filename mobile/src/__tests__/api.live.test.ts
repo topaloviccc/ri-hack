@@ -27,12 +27,16 @@ live('frontend adapters against Spring Boot and PostgreSQL', () => {
     expect((await eventsApi.list({}))[0].title).toBe('Museum lecture');
     expect((await networkApi.listFeed())[0].userName).toBe('Alex Friend');
     expect((await networkApi.listLeaderboard())[0].completedThisWeek).toBe(1);
-    expect(await walletApi.get()).toEqual({ balance: 100 });
+    expect(await walletApi.get()).toEqual({ balance: 100, heldBalance: 0, availableBalance: 100 });
     expect(await walletApi.unlockCourse({ courseId: paid, idempotencyKey: 'live-check' })).toEqual({
       balance: 60,
+      heldBalance: 0,
+      availableBalance: 60,
     });
     expect(await walletApi.unlockCourse({ courseId: paid, idempotencyKey: 'live-check' })).toEqual({
       balance: 60,
+      heldBalance: 0,
+      availableBalance: 60,
     });
     expect((await coursesApi.getById(paid)).isUnlocked).toBe(true);
     expect(
