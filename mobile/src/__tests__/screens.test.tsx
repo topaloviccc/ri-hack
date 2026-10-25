@@ -59,7 +59,7 @@ describe('screens', () => {
     expect(await screen.findByText(courseTitle(MOCK_FEED_IDS[0]))).toBeOnTheScreen();
     expect(screen.queryByText('How the feed works')).toBeNull();
     const gestureHint =
-      'Swipe left to open the course, swipe right to recommend less, and swipe down for the next course';
+      'Swipe left to open the course, swipe right to recommend less, and swipe up for the next course';
     const activeReel = () =>
       screen.getAllByHintText(gestureHint).find((node) => !node.props.accessibilityState.disabled)!;
     await fireEvent(activeReel(), 'accessibilityAction', {

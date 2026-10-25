@@ -7,8 +7,8 @@ import { Text } from '@/components/ui/Text';
 import { useThemeColors } from '@/lib/theme';
 
 const HINTS = [
-  { icon: 'arrow-down', label: 'Swipe down', action: 'Next course' },
-  { icon: 'arrow-up', label: 'Swipe up', action: 'Previous course' },
+  { icon: 'arrow-up', label: 'Swipe up', action: 'Next course' },
+  { icon: 'arrow-down', label: 'Swipe down', action: 'Previous course' },
   { icon: 'arrow-back', label: 'Swipe left', action: 'Open the details' },
   { icon: 'arrow-forward', label: 'Swipe right', action: 'Show less like this' },
 ] as const;

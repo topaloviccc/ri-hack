@@ -26,9 +26,9 @@ export type SwipeableReelProps = {
   onDismiss: () => void;
   /** Swipe left: the reel slides out and the course opens. */
   onOpen: () => void;
-  /** Swipe down to see the next course. */
+  /** Swipe up to see the next course. */
   onNext: () => void;
-  /** Swipe up to return to the previous course. */
+  /** Swipe down to return to the previous course. */
   onPrevious: () => void;
   /** A swipe has started: a chance to load what `onOpen` will show. */
   onSwipeStart?: () => void;
@@ -64,8 +64,8 @@ export function SwipeableReel({
       const isVertical = Math.abs(e.translationY) > Math.abs(e.translationX);
       if (isVertical) {
         const threshold = height * VERTICAL_SWIPE_THRESHOLD;
-        if (e.translationY > threshold) scheduleOnRN(onNext);
-        if (e.translationY < -threshold) scheduleOnRN(onPrevious);
+        if (e.translationY < -threshold) scheduleOnRN(onNext);
+        if (e.translationY > threshold) scheduleOnRN(onPrevious);
         translateX.value = withSpring(0);
         return;
       }
@@ -100,7 +100,7 @@ export function SwipeableReel({
     <GestureDetector gesture={pan}>
       <Animated.View
         style={[styles.fill, animatedStyle]}
-        accessibilityHint="Swipe left to open the course, swipe right to recommend less, and swipe down for the next course"
+        accessibilityHint="Swipe left to open the course, swipe right to recommend less, and swipe up for the next course"
         accessibilityState={{ disabled }}
         accessibilityActions={[
           { name: 'decrement', label: 'Recommend less like this' },
