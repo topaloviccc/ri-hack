@@ -37,18 +37,20 @@ export const EventRow = memo(function EventRow({ event, onPress, onOpenMap }: Ev
       className="active:opacity-80"
     >
       <Card className="flex-row items-center gap-3 p-3">
-        <View className="rounded-lg bg-background px-2 py-1.5">
-          <Text variant="mono" className="font-mono-medium">
-            {formatTime(event.startsAt)}
-          </Text>
-        </View>
-        <View className="h-9 w-9 items-center justify-center rounded-lg bg-background">
-          <Ionicons
-            name={CATEGORY_ICONS[event.category]}
-            size={ICON_SIZE}
-            color={colors.muted}
-            accessibilityLabel={event.category}
-          />
+        <View className="items-center gap-1.5">
+          <View className="rounded-lg bg-background px-2 py-1.5">
+            <Text variant="mono" className="font-mono-medium">
+              {formatTime(event.startsAt)}
+            </Text>
+          </View>
+          <View className="h-9 w-9 items-center justify-center rounded-lg bg-background">
+            <Ionicons
+              name={CATEGORY_ICONS[event.category]}
+              size={ICON_SIZE}
+              color={colors.muted}
+              accessibilityLabel={event.category}
+            />
+          </View>
         </View>
         <View className="flex-1 gap-1">
           <DemoNotice>city, category and image</DemoNotice>
