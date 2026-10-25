@@ -1,4 +1,4 @@
-# OutThere / WorldLearn
+# OutThere 
 
 An Expo mobile learning app connected to a Spring Boot backend and PostgreSQL.
 The current implementation covers the intersection of `worldlearn.sql` and the
