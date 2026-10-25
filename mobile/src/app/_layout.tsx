@@ -9,6 +9,7 @@ import { useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ApiConfigurationNotice } from '@/components/shared/ApiConfigurationNotice';
+import { NfcTagListener } from '@/features/nfc';
 import { useThemePreferenceQuery } from '@/features/settings';
 import { useAppFonts } from '@/lib/fonts';
 import { queryClient } from '@/lib/query-client';
@@ -42,6 +43,7 @@ function AppShell() {
       <View style={themeVars} className="flex-1">
         <StatusBar style="auto" />
         <ApiConfigurationNotice />
+        <NfcTagListener />
         <Stack
           screenOptions={{
             headerTintColor: colors.primary,
