@@ -83,9 +83,9 @@ export function BenefitsList() {
                 accessibilityRole="button"
                 accessibilityLabel="Filter benefits"
                 onPress={() => setShowFilters(true)}
-                className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/20 active:opacity-70"
+                className="h-11 w-11 items-center justify-center rounded-full bg-secondary/20 active:opacity-70"
               >
-                <Ionicons name="options-outline" size={24} color={colors.text} />
+                <Ionicons name="options-outline" size={22} color={colors.text} />
               </Pressable>
             </View>
             <View className="flex-row flex-wrap gap-2 px-4">
