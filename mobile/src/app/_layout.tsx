@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ApiConfigurationNotice } from '@/components/shared/ApiConfigurationNotice';
 import { WelcomeScreen } from '@/components/layout/WelcomeScreen';
 import { AuthProvider, useAuth } from '@/features/auth';
+import { NfcTagListener } from '@/features/nfc';
 import { useThemePreferenceQuery } from '@/features/settings';
 import { useAppFonts } from '@/lib/fonts';
 import { queryClient } from '@/lib/query-client';
@@ -48,6 +49,7 @@ function AppShell() {
       <View style={themeVars} className="flex-1">
         <StatusBar style="auto" />
         <ApiConfigurationNotice />
+        <NfcTagListener />
         <Stack
           screenOptions={{
             headerTintColor: colors.primary,
@@ -67,10 +69,14 @@ function AppShell() {
             <Stack.Screen name="profile" options={{ title: 'Profile' }} />
             <Stack.Screen name="user/[id]" options={{ title: 'Profile' }} />
             <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+            <Stack.Screen name="focus-apps" options={{ title: 'Blocked apps' }} />
             <Stack.Screen name="people" options={{ title: 'People' }} />
             <Stack.Screen name="expert/apply" options={{ title: 'Become an expert' }} />
             <Stack.Screen name="expert/requests" options={{ title: 'Your requests' }} />
-            <Stack.Screen name="course/[id]/index" options={{ title: '' }} />
+            <Stack.Screen
+              name="course/[id]/index"
+              options={{ title: '', animation: 'slide_from_left' }}
+            />
             <Stack.Screen name="course/[id]/learn" options={{ title: 'Learn' }} />
             <Stack.Screen
               name="course/[id]/unlock"

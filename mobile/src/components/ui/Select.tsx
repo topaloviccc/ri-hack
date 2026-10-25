@@ -1,8 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
-import { FlatList, Modal, Pressable, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FlatList, Pressable } from 'react-native';
 
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/cn';
 import { useThemeColors } from '@/lib/theme';
@@ -33,7 +33,6 @@ export function Select<T extends string>({
   hasError = false,
 }: SelectProps<T>) {
   const colors = useThemeColors();
-  const insets = useSafeAreaInsets();
   const [isOpen, setIsOpen] = useState(false);
   const selected = options.find((o) => o.value === value);
 
@@ -60,52 +59,31 @@ export function Select<T extends string>({
         <Ionicons name="chevron-down" size={18} color={colors.muted} />
       </Pressable>
 
-      <Modal
-        visible={isOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setIsOpen(false)}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Close"
-          onPress={() => setIsOpen(false)}
-          className="flex-1 bg-overlay/40"
+      <BottomSheet visible={isOpen} title={label} onClose={() => setIsOpen(false)}>
+        <FlatList
+          data={options}
+          keyExtractor={(o) => o.value}
+          renderItem={({ item }) => {
+            const isSelected = item.value === value;
+            const isDisabled = !!item.disabledReason;
+            return (
+              <Pressable
+                accessibilityRole="radio"
+                accessibilityState={{ selected: isSelected, disabled: isDisabled }}
+                disabled={isDisabled}
+                onPress={() => handlePick(item)}
+                className="min-h-12 flex-row items-center justify-between px-4 active:bg-background"
+              >
+                <Text variant="body" className={cn(isDisabled && 'text-muted')}>
+                  {item.label}
+                </Text>
+                {isDisabled ? <Text variant="caption">{item.disabledReason}</Text> : null}
+                {isSelected ? <Ionicons name="checkmark" size={20} color={colors.primary} /> : null}
+              </Pressable>
+            );
+          }}
         />
-        <View
-          className="rounded-t-card bg-surface pt-4"
-          style={{ paddingBottom: insets.bottom + 8 }}
-        >
-          <Text variant="heading" className="px-4 pb-2" accessibilityRole="header">
-            {label}
-          </Text>
-          <FlatList
-            data={options}
-            keyExtractor={(o) => o.value}
-            renderItem={({ item }) => {
-              const isSelected = item.value === value;
-              const isDisabled = !!item.disabledReason;
-              return (
-                <Pressable
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: isSelected, disabled: isDisabled }}
-                  disabled={isDisabled}
-                  onPress={() => handlePick(item)}
-                  className="min-h-12 flex-row items-center justify-between px-4 active:bg-background"
-                >
-                  <Text variant="body" className={cn(isDisabled && 'text-muted')}>
-                    {item.label}
-                  </Text>
-                  {isDisabled ? <Text variant="caption">{item.disabledReason}</Text> : null}
-                  {isSelected ? (
-                    <Ionicons name="checkmark" size={20} color={colors.primary} />
-                  ) : null}
-                </Pressable>
-              );
-            }}
-          />
-        </View>
-      </Modal>
+      </BottomSheet>
     </>
   );
 }

@@ -8,8 +8,10 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { Text } from '@/components/ui/Text';
 import { useCoursesQuery } from '@/features/courses/api/courses.queries';
 import { useDismissCourse } from '@/features/courses/api/courses.mutations';
+import { FeedGestureHints } from '@/features/courses/components/FeedGestureHints';
 import { ReelCard } from '@/features/courses/components/ReelCard';
 import { SwipeableReel } from '@/features/courses/components/SwipeableReel';
+import { useFeedHints } from '@/features/courses/hooks/useFeedHints';
 import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
 import type { Course } from '@/features/courses/types';
 
@@ -20,10 +22,11 @@ type FeedItem = Course | { id: 'end' };
 
 export function CourseFeed() {
   const { data, isPending, isError, refetch } = useCoursesQuery({ collection: 'feed' });
-  const { openCourse } = useOpenCourse();
+  const { openCourse, prefetchCourse } = useOpenCourse();
   const insets = useSafeAreaInsets();
   const [height, setHeight] = useState(0);
   const dismiss = useDismissCourse();
+  const hints = useFeedHints();
   const [isToastVisible, setIsToastVisible] = useState(false);
   const feedRef = useRef<FlatList<FeedItem>>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -59,6 +62,9 @@ export function CourseFeed() {
           ref={feedRef}
           data={items}
           keyExtractor={(item) => item.id}
+          // While the gesture hints are up, screen readers should only reach them.
+          accessibilityElementsHidden={hints.isVisible}
+          importantForAccessibility={hints.isVisible ? 'no-hide-descendants' : 'auto'}
           pagingEnabled
           scrollEnabled={false}
           showsVerticalScrollIndicator={false}
@@ -73,11 +79,13 @@ export function CourseFeed() {
                   disabled={dismiss.isPending}
                   onDismiss={() => handleLessLikeThis(item.id)}
                   onOpen={() => openCourse(item.id)}
+                  onSwipeStart={() => prefetchCourse(item.id)}
                   onNext={() => {
                     feedRef.current?.scrollToIndex({ index: index + 1, animated: true });
                   }}
                   onPrevious={() => {
-                    if (index > 0) feedRef.current?.scrollToIndex({ index: index - 1, animated: true });
+                    if (index > 0)
+                      feedRef.current?.scrollToIndex({ index: index - 1, animated: true });
                   }}
                 >
                   <ReelCard course={item} />
@@ -99,6 +107,7 @@ export function CourseFeed() {
           </Text>
         </View>
       ) : null}
+      {hints.isVisible ? <FeedGestureHints onDismiss={hints.dismiss} /> : null}
     </View>
   );
 }

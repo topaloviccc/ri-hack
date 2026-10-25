@@ -44,7 +44,11 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 ## Platform / infra
 - [ ] **Persistent web sessions** — `expo-secure-store` has no web implementation, so the web build keeps its token in memory and signs out on reload.
 - [ ] **Account recovery** — no password reset, email verification or profile/password editing.
-- [ ] **Development builds** — Expo Go is enough today; NFC (spec F9) and MapLibre will need `eas build --profile development`.
+- [ ] **Development builds** — NFC needs a development build (`npx expo run:android` or `eas build --profile development`); Expo Go still runs everything else, just without NFC. MapLibre will need one too.
+- [ ] **App blocking in the course flow** — Settings › "Simulate course in progress" is a stand-in; the course flow (other branch) should call `focusApi.setActive(true/false)` and the switch row be deleted.
+- [ ] **App blocking extras** — no temporary unlock (`temporaryUnlock` exists in expo-app-blocker), no picture on the block screen (`android.overlay.icon` plugin option, build-time PNG), Android only (iOS needs Screen Time/Family Controls approval). After a reboot Android restarts the blocker's service with an empty list, so its notification may show even when focus is off.
+- [ ] **NFC on iOS** — `features/nfc` only listens on Android. iOS needs a paid Apple account (NFC entitlement) and a "Scan tag" button, since iOS can't read tags in the background.
+- [ ] **NFC beyond the popup** — tags are only read and shown (spec F9). No visit check-in/badges/backend call, no "NFC is off" notice, and tapping a tag while the app is closed doesn't open it (needs an Android intent filter).
 - [ ] **i18n** — English only; event languages are a hand-mapped list in `features/events/categories.ts`.
 - [ ] **Map colours as a prop** — the map palette lives in `lib/theme.ts` tokens (`map*`); expose a per-map override if a screen ever needs a different scheme.
 - [ ] **Jest Reanimated/Skia stubs** — `jest.setup.ts` stubs Reanimated because its v4 mock crashes; delete the stub when upstream fixes it.

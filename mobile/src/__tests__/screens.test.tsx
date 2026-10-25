@@ -39,7 +39,10 @@ describe('screens', () => {
     await fireEvent(await screen.findByTestId('course-feed'), 'layout', {
       nativeEvent: { layout: { width: 400, height: 800 } },
     });
+    // First visit: the gesture hints cover the feed until dismissed.
+    await fireEvent.press(await screen.findByText('Got it'));
     expect(await screen.findByText(courseTitle(MOCK_FEED_IDS[0]))).toBeOnTheScreen();
+    expect(screen.queryByText('How the feed works')).toBeNull();
   });
 
   it('Events shows the location picker and today’s events', async () => {

@@ -25,13 +25,30 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+*.log
 
-# macOS
+# OS
 .DS_Store
 *.pem
+Thumbs.db
+desktop.ini
 
-# local env files
+# editors / tools (shared .vscode and .claude/settings.json stay tracked)
+.idea/
+.claude/settings.local.json
+.vscode/
+
+# local env files (EXPO_PUBLIC_API_URL is per-machine: LAN IP or tunnel)
+.env
 .env*.local
+
+# EAS local build artifacts
+*.apk
+*.aab
+*.ipa
+
+# tests
+coverage/
 
 # typescript
 *.tsbuildinfo
@@ -41,3 +58,5 @@ example
 # generated native folders
 /ios
 /android
+# iOS extension templates expo-app-blocker copies on every config read
+/targets

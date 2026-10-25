@@ -1,6 +1,7 @@
 import { Screen } from '@/components/layout/Screen';
 import { AccountSettingsSection } from '@/features/auth';
 import { ExpertSettingsSection } from '@/features/experts';
+import { FocusSettingsSection } from '@/features/focus';
 import { SettingsPanel } from '@/features/settings';
 
 export default function SettingsScreen() {
@@ -8,6 +9,7 @@ export default function SettingsScreen() {
     <Screen edgeToEdge>
       <SettingsPanel>
         <ExpertSettingsSection />
+        <FocusSettingsSection />
         <AccountSettingsSection />
       </SettingsPanel>
     </Screen>

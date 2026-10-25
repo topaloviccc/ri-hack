@@ -4,6 +4,8 @@ import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
+  withSequence,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
@@ -14,17 +16,22 @@ const HORIZONTAL_SWIPE_THRESHOLD = 0.25;
 const VERTICAL_SWIPE_THRESHOLD = 0.16;
 const ACTIVE_OFFSET = 20;
 const DISMISS_DURATION_MS = 200;
+const OPEN_DURATION_MS = 180;
+// Snap the reel back only once the details screen has slid over it.
+const OPEN_RESET_DELAY_MS = 600;
 
 export type SwipeableReelProps = {
   children: ReactNode;
   /** Swipe left: the reel flies off ("less like this"). */
   onDismiss: () => void;
-  /** Swipe right: open the course; the reel springs back. */
+  /** Swipe right: the reel slides out and the course opens. */
   onOpen: () => void;
   /** Swipe down to see the next course. */
   onNext: () => void;
   /** Swipe up to return to the previous course. */
   onPrevious: () => void;
+  /** A swipe has started: a chance to load what `onOpen` will show. */
+  onSwipeStart?: () => void;
   disabled?: boolean;
 };
 
@@ -32,6 +39,7 @@ export function SwipeableReel({
   children,
   onDismiss,
   onOpen,
+  onSwipeStart,
   onNext,
   onPrevious,
   disabled = false,
@@ -43,6 +51,10 @@ export function SwipeableReel({
     enabled: !disabled,
     activeOffsetX: [-ACTIVE_OFFSET, ACTIVE_OFFSET],
     activeOffsetY: [-ACTIVE_OFFSET, ACTIVE_OFFSET],
+    onActivate: () => {
+      'worklet';
+      if (onSwipeStart) scheduleOnRN(onSwipeStart);
+    },
     onUpdate: (e) => {
       'worklet';
       translateX.value = Math.abs(e.translationX) > Math.abs(e.translationY) ? e.translationX : 0;
@@ -67,7 +79,15 @@ export function SwipeableReel({
         });
         return;
       }
-      if (e.translationX > threshold) scheduleOnRN(onOpen);
+      if (e.translationX > threshold) {
+        // Navigate right away and let the reel finish its slide under the incoming screen.
+        scheduleOnRN(onOpen);
+        translateX.value = withSequence(
+          withTiming(width, { duration: OPEN_DURATION_MS }),
+          withDelay(OPEN_RESET_DELAY_MS, withTiming(0, { duration: 0 })),
+        );
+        return;
+      }
       translateX.value = withSpring(0);
     },
   });
