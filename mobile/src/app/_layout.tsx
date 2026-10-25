@@ -4,11 +4,12 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ApiConfigurationNotice } from '@/components/shared/ApiConfigurationNotice';
+import { WelcomeScreen } from '@/components/layout/WelcomeScreen';
 import { useThemePreferenceQuery } from '@/features/settings';
 import { useAppFonts } from '@/lib/fonts';
 import { queryClient } from '@/lib/query-client';
@@ -28,6 +29,7 @@ function AppShell() {
   const scheme = useColorScheme();
   const themeVars = useThemeVars();
   const colors = useThemeColors();
+  const [hasEnteredApp, setHasEnteredApp] = useState(false);
   // Fall back to system fonts rather than hang on the splash if loading fails.
   const isReady = (fontsLoaded || !!fontError) && !themePreference.isPending;
 
@@ -94,6 +96,7 @@ function AppShell() {
             }}
           />
         </Stack>
+        {!hasEnteredApp ? <WelcomeScreen onContinue={() => setHasEnteredApp(true)} /> : null}
       </View>
     </ThemeProvider>
   );
