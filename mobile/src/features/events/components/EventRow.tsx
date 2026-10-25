@@ -65,7 +65,7 @@ export const EventRow = memo(function EventRow({ event, onPress, onOpenMap }: Ev
           {hasCoordinates(event) ? (
             <Button
               variant="soft"
-              label="map"
+              label="Map"
               accessibilityLabel={`Open ${event.venue} in maps`}
               icon={<Ionicons name="location-outline" size={16} color={colors.text} />}
               onPress={() => onOpenMap(event)}

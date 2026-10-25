@@ -77,7 +77,7 @@ export function FriendStrip() {
           className="min-h-11 justify-center active:opacity-70"
         >
           <Text variant="label" className="text-primary">
-            search
+            Search
           </Text>
         </Pressable>
       </View>

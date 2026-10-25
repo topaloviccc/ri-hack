@@ -115,9 +115,11 @@ export function BenefitsList() {
                 accessibilityRole="button"
                 accessibilityLabel="See all partners"
                 onPress={() => router.push('/benefits/partners')}
-                className="min-h-11 justify-center px-2"
+                className="min-h-11 justify-center px-2 active:opacity-70"
               >
-                <Text variant="label">See all</Text>
+                <Text variant="label" className="text-primary">
+                  See all
+                </Text>
               </Pressable>
             </View>
             <ScrollView
