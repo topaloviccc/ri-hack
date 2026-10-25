@@ -156,6 +156,10 @@ Keep each feature's code together, with clear responsibilities inside it:
   cached application context after that class. Otherwise a second class with the
   same Spring configuration reuses a datasource connected to the stopped container.
 
+- Cosine similarity removes vector magnitude. Weighting a lone behavioral vector
+  before taking cosine does not make its evidence weaker; apply a bounded evidence
+  strength separately so implicit dwell/skip signals stay weaker than explicit swipes.
+
 When a user correction or verified mistake reveals a reusable lesson, append a
 short entry here: the mistake, its cause, and the concrete rule that prevents a
 repeat. Keep lessons relevant to this project, avoid duplicates, and reconcile

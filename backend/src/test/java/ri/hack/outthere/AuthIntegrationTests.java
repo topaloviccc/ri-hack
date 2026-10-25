@@ -37,6 +37,10 @@ class AuthIntegrationTests extends PostgresTestSupport {
                 .andReturn().getResponse().getContentAsString();
         String token = JsonPath.read(body, "$.token");
 
+        mvc.perform(get("/api/users/me/interests").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.onboardingComplete").value(false))
+                .andExpect(jsonPath("$.fieldIds.length()").value(0));
+
         mvc.perform(get("/api/wallet").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.balance").value(500));
         assertThat(jdbc.sql("""

@@ -20,6 +20,17 @@ const renderAt = (initialUrl: string) => renderRouter(APP_DIR, { initialUrl });
 
 describe('screens', () => {
   beforeEach(() => installApiFixture());
+  it('edits saved learning interests from Settings', async () => {
+    await renderAt('/settings');
+    await fireEvent.press(await screen.findByRole('button', { name: 'Learning interests' }));
+    await fireEvent.press(await screen.findByRole('checkbox', { name: 'Nature & Wildlife' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Save interests' }));
+    expect(await screen.findByText('Appearance')).toBeOnTheScreen();
+    const saved = (globalThis.fetch as jest.Mock).mock.calls.find(
+      ([url, init]) => String(url).endsWith('/users/me/interests') && init?.method === 'POST',
+    );
+    expect(JSON.parse(saved?.[1].body)).toEqual({ fieldIds: ['nature'] });
+  });
   it('Home shows the three course rows', async () => {
     await renderAt('/');
     expect(await screen.findByText('Continue with…')).toBeOnTheScreen();
@@ -43,6 +54,32 @@ describe('screens', () => {
     await fireEvent.press(await screen.findByText('Got it'));
     expect(await screen.findByText(courseTitle(MOCK_FEED_IDS[0]))).toBeOnTheScreen();
     expect(screen.queryByText('How the feed works')).toBeNull();
+    const gestureHint =
+      'Swipe left to recommend less, swipe right to open the course, and swipe down for the next course';
+    const activeReel = () =>
+      screen.getAllByHintText(gestureHint).find((node) => !node.props.accessibilityState.disabled)!;
+    await fireEvent(activeReel(), 'accessibilityAction', {
+      nativeEvent: { actionName: 'increment' },
+    });
+    await waitFor(() =>
+      expect(
+        (globalThis.fetch as jest.Mock).mock.calls.some(
+          ([url, init]) =>
+            String(url).endsWith(`/courses/${MOCK_FEED_IDS[0]}/feedback`) &&
+            JSON.parse(init?.body).action === 'NEXT',
+        ),
+      ).toBe(true),
+    );
+    await waitFor(() => expect(activeReel()).toBeDefined());
+    await fireEvent(activeReel(), 'accessibilityAction', {
+      nativeEvent: { actionName: 'decrement' },
+    });
+    expect(await screen.findByText('We’ll show less like this')).toBeOnTheScreen();
+    expect(
+      (globalThis.fetch as jest.Mock).mock.calls.some(([url]) =>
+        String(url).endsWith(`/courses/${MOCK_FEED_IDS[1]}/dismiss`),
+      ),
+    ).toBe(true);
   });
 
   it('Events shows the location picker and today’s events', async () => {

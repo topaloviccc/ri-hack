@@ -12,6 +12,7 @@ import { ApiConfigurationNotice } from '@/components/shared/ApiConfigurationNoti
 import { WelcomeScreen } from '@/components/layout/WelcomeScreen';
 import { AuthProvider, useAuth } from '@/features/auth';
 import { NfcTagListener } from '@/features/nfc';
+import { InterestOnboardingGate } from '@/features/interests/InterestOnboardingGate';
 import { useThemePreferenceQuery } from '@/features/settings';
 import { useAppFonts } from '@/lib/fonts';
 import { queryClient } from '@/lib/query-client';
@@ -50,68 +51,71 @@ function AppShell() {
         <StatusBar style="auto" />
         <ApiConfigurationNotice />
         <NfcTagListener />
-        <Stack
-          screenOptions={{
-            headerTintColor: colors.primary,
-            headerStyle: { backgroundColor: colors.background },
-            headerTitleStyle: { fontFamily: 'PlusJakartaSans_700Bold', color: colors.text },
-            headerBackButtonDisplayMode: 'minimal',
-            contentStyle: { backgroundColor: colors.background },
-          }}
-        >
-          {/* Signed-out users can only reach sign-in; signing in or out swaps the available screens. */}
-          <Stack.Protected guard={auth.status !== 'signedIn'}>
-            <Stack.Screen name="(auth)/sign-in" options={{ headerShown: false }} />
-          </Stack.Protected>
-          <Stack.Protected guard={auth.status === 'signedIn'}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="benefits" options={{ headerShown: false }} />
-            <Stack.Screen name="profile" options={{ title: 'Profile' }} />
-            <Stack.Screen name="user/[id]" options={{ title: 'Profile' }} />
-            <Stack.Screen name="settings" options={{ title: 'Settings' }} />
-            <Stack.Screen name="focus-apps" options={{ title: 'Blocked apps' }} />
-            <Stack.Screen name="people" options={{ title: 'People' }} />
-            <Stack.Screen name="expert/apply" options={{ title: 'Become an expert' }} />
-            <Stack.Screen name="expert/requests" options={{ title: 'Your requests' }} />
-            <Stack.Screen
-              name="course/[id]/index"
-              options={{ title: '', animation: 'slide_from_left' }}
-            />
-            <Stack.Screen name="course/[id]/learn" options={{ title: 'Learn' }} />
-            <Stack.Screen
-              name="course/[id]/unlock"
-              options={{
-                title: '',
-                presentation: 'formSheet',
-                sheetAllowedDetents: 'fitToContents',
-                sheetGrabberVisible: true,
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="coins"
-              options={{
-                title: '',
-                presentation: 'formSheet',
-                sheetAllowedDetents: 'fitToContents',
-                sheetGrabberVisible: true,
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen name="event/[id]" options={{ title: '' }} />
-            <Stack.Screen name="country/[code]" options={{ title: '' }} />
-            <Stack.Screen
-              name="location/[id]"
-              options={{
-                title: '',
-                presentation: 'formSheet',
-                sheetAllowedDetents: [0.6, 1],
-                sheetGrabberVisible: true,
-                headerShown: false,
-              }}
-            />
-          </Stack.Protected>
-        </Stack>
+        <InterestOnboardingGate>
+          <Stack
+            screenOptions={{
+              headerTintColor: colors.primary,
+              headerStyle: { backgroundColor: colors.background },
+              headerTitleStyle: { fontFamily: 'PlusJakartaSans_700Bold', color: colors.text },
+              headerBackButtonDisplayMode: 'minimal',
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          >
+            {/* Signed-out users can only reach sign-in; signing in or out swaps the available screens. */}
+            <Stack.Protected guard={auth.status !== 'signedIn'}>
+              <Stack.Screen name="(auth)/sign-in" options={{ headerShown: false }} />
+            </Stack.Protected>
+            <Stack.Protected guard={auth.status === 'signedIn'}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="benefits" options={{ headerShown: false }} />
+              <Stack.Screen name="profile" options={{ title: 'Profile' }} />
+              <Stack.Screen name="user/[id]" options={{ title: 'Profile' }} />
+              <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+              <Stack.Screen name="interests" options={{ title: 'Learning interests' }} />
+              <Stack.Screen name="focus-apps" options={{ title: 'Blocked apps' }} />
+              <Stack.Screen name="people" options={{ title: 'People' }} />
+              <Stack.Screen name="expert/apply" options={{ title: 'Become an expert' }} />
+              <Stack.Screen name="expert/requests" options={{ title: 'Your requests' }} />
+              <Stack.Screen
+                name="course/[id]/index"
+                options={{ title: '', animation: 'slide_from_left' }}
+              />
+              <Stack.Screen name="course/[id]/learn" options={{ title: 'Learn' }} />
+              <Stack.Screen
+                name="course/[id]/unlock"
+                options={{
+                  title: '',
+                  presentation: 'formSheet',
+                  sheetAllowedDetents: 'fitToContents',
+                  sheetGrabberVisible: true,
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="coins"
+                options={{
+                  title: '',
+                  presentation: 'formSheet',
+                  sheetAllowedDetents: 'fitToContents',
+                  sheetGrabberVisible: true,
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen name="event/[id]" options={{ title: '' }} />
+              <Stack.Screen name="country/[code]" options={{ title: '' }} />
+              <Stack.Screen
+                name="location/[id]"
+                options={{
+                  title: '',
+                  presentation: 'formSheet',
+                  sheetAllowedDetents: [0.6, 1],
+                  sheetGrabberVisible: true,
+                  headerShown: false,
+                }}
+              />
+            </Stack.Protected>
+          </Stack>
+        </InterestOnboardingGate>
         {!hasEnteredApp ? <WelcomeScreen onContinue={() => setHasEnteredApp(true)} /> : null}
       </View>
     </ThemeProvider>

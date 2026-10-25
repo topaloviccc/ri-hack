@@ -2,8 +2,14 @@
 
 An Expo mobile learning app connected to a Spring Boot backend and PostgreSQL.
 The current implementation covers the intersection of `worldlearn.sql` and the
-existing frontend. It is a local demo with email/password accounts and no AI
-integration or bucket integration.
+existing frontend. It is a local demo with email/password accounts, optional
+OpenAI course embeddings, and no bucket integration.
+
+Course recommendations use interests selected after signup, swipe feedback and
+learning history. Set `OPENAI_API_KEY` on the backend to enable background course
+embedding with `text-embedding-3-small`; categories and behavior also work while
+embeddings are pending. Interests can be skipped or edited in Settings. See
+[recommendation setup and behavior](backend/RECOMMENDATIONS.md).
 
 ## Current state
 

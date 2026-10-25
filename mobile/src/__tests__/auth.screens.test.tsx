@@ -38,4 +38,40 @@ describe('sign-in gate', () => {
     expect(screen.getByText('Create your account')).toBeOnTheScreen();
     expect(screen.getByLabelText('Username')).toBeOnTheScreen();
   });
+
+  const signUp = async () => {
+    await renderRouter(APP_DIR, { initialUrl: '/' });
+    await fireEvent.press(await screen.findByText('Sign up'));
+    for (const [label, value] of Object.entries({
+      'First name': 'New',
+      'Last name': 'Learner',
+      Username: 'new_learner',
+      Email: 'new@example.test',
+      Password: 'demo1234',
+    }))
+      await fireEvent.changeText(screen.getByLabelText(label), value);
+    await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
+    expect(await screen.findByText('What do you want to explore?')).toBeOnTheScreen();
+  };
+
+  it('collects interests after signup', async () => {
+    await signUp();
+    await fireEvent.press(await screen.findByRole('checkbox', { name: 'History' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Start exploring' }));
+    expect(await screen.findByText('Continue with…')).toBeOnTheScreen();
+    const saved = (globalThis.fetch as jest.Mock).mock.calls.find(
+      ([url, init]) => String(url).endsWith('/users/me/interests') && init?.method === 'POST',
+    );
+    expect(JSON.parse(saved?.[1].body)).toEqual({ fieldIds: ['history'] });
+  });
+
+  it('persists skipping onboarding with empty interests', async () => {
+    await signUp();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Skip for now' }));
+    expect(await screen.findByText('Continue with…')).toBeOnTheScreen();
+    const saved = (globalThis.fetch as jest.Mock).mock.calls.find(
+      ([url, init]) => String(url).endsWith('/users/me/interests') && init?.method === 'POST',
+    );
+    expect(JSON.parse(saved?.[1].body)).toEqual({ fieldIds: [] });
+  });
 });

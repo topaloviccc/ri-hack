@@ -105,10 +105,26 @@ export function SwipeableReel({
         accessibilityActions={[
           { name: 'decrement', label: 'Recommend less like this' },
           { name: 'activate', label: 'Open details' },
+          { name: 'increment', label: 'Next course' },
+          { name: 'previous', label: 'Previous course' },
         ]}
-        onAccessibilityAction={(e) =>
-          disabled ? undefined : e.nativeEvent.actionName === 'activate' ? onOpen() : onDismiss()
-        }
+        onAccessibilityAction={(e) => {
+          if (disabled) return;
+          switch (e.nativeEvent.actionName) {
+            case 'activate':
+              onOpen();
+              break;
+            case 'decrement':
+              onDismiss();
+              break;
+            case 'increment':
+              onNext();
+              break;
+            case 'previous':
+              onPrevious();
+              break;
+          }
+        }}
       >
         {children}
       </Animated.View>

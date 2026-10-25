@@ -64,12 +64,6 @@ public class CourseRepository {
                         WHERE en.course_id=c.id AND cc.completed_at>=now()-interval '30 days') DESC,
                         learner_count DESC, c.id LIMIT 5
                     """;
-        } else if ("recommended".equals(collection)) {
-            sql += """
-                     ORDER BY (SELECT coalesce(sum(ui.weight),0) FROM user_interest ui
-                       JOIN course_field cf ON cf.field_id=ui.field_id
-                       WHERE ui.user_id=:viewer AND cf.course_id=c.id) DESC, c.id
-                    """;
         } else {
             sql += " ORDER BY c.created_at DESC, c.id";
         }

@@ -41,6 +41,7 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
   };
   const processed = new Set<string>();
   const dismissed = new Set<string>();
+  let interests = { fieldIds: [] as string[], onboardingComplete: true };
   const users = MOCK_USERS.map(({ bio: _bio, ...user }) => ({ ...user }));
   // Sara has sent the signed-in user a friend request.
   const sara = users.find((u) => u.id === 'u9');
@@ -73,6 +74,22 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
     const params = url.searchParams;
     const method = init?.method ?? 'GET';
     if (path.startsWith('/benefits/')) return benefits.handle(url, init, wallet());
+    if (path === '/auth/signup' && method === 'POST') {
+      interests = { fieldIds: [], onboardingComplete: false };
+      return httpResponse({ token: 'fixture-token', user: { id: ME_ID } });
+    }
+    if (path === '/codebooks/fields')
+      return httpResponse([
+        { id: 'history', label: 'History' },
+        { id: 'nature', label: 'Nature & Wildlife' },
+      ]);
+    if (path === '/users/me/interests') {
+      if (method === 'POST') {
+        const { fieldIds } = JSON.parse(String(init?.body)) as { fieldIds: string[] };
+        interests = { fieldIds, onboardingComplete: true };
+      }
+      return httpResponse(interests);
+    }
     if (path === '/auth/login' && method === 'POST') {
       const { password } = JSON.parse(String(init?.body)) as { password: string };
       return password === 'demo1234'
@@ -96,6 +113,8 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
       dismissed.add(path.split('/')[2]);
       return httpResponse(undefined, 204);
     }
+    if (/^\/courses\/[^/]+\/feedback$/.test(path) && method === 'POST')
+      return httpResponse(undefined, 204);
     if (path === '/courses') {
       const ids = params.get('ids');
       const collection = params.get('collection');

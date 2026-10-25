@@ -34,11 +34,14 @@ export const coursesApi = {
     return rows.map(toCourse);
   },
   getById: async (id: string): Promise<Course> =>
-    toCourse(
-      await apiRequest<CourseResponse>(`/courses/${encodeURIComponent(id)}`),
-    ),
+    toCourse(await apiRequest<CourseResponse>(`/courses/${encodeURIComponent(id)}`)),
   dismiss: (id: string): Promise<void> =>
     apiRequest(`/courses/${encodeURIComponent(id)}/dismiss`, { method: 'POST' }),
+  feedback: (id: string, action: 'OPEN' | 'NEXT', dwellMs: number): Promise<void> =>
+    apiRequest(`/courses/${encodeURIComponent(id)}/feedback`, {
+      method: 'POST',
+      body: { action, dwellMs },
+    }),
 };
 
 export const locationsApi = {

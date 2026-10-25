@@ -12,6 +12,7 @@ import ri.hack.outthere.course.dto.LocationResponse;
 import ri.hack.outthere.course.model.CourseRow;
 import ri.hack.outthere.course.repository.CourseRepository;
 import ri.hack.outthere.course.repository.GeographyRepository;
+import ri.hack.outthere.course.repository.RecommendationRepository;
 import ri.hack.outthere.user.service.UserService;
 
 @Service
@@ -22,11 +23,16 @@ public class CourseService {
     private final CourseRepository courses;
     private final GeographyRepository geography;
     private final UserService users;
+    private final RecommendationService recommendations;
+    private final RecommendationRepository feedback;
 
-    public CourseService(CourseRepository courses, GeographyRepository geography, UserService users) {
+    public CourseService(CourseRepository courses, GeographyRepository geography, UserService users,
+                         RecommendationService recommendations, RecommendationRepository feedback) {
         this.courses = courses;
         this.geography = geography;
         this.users = users;
+        this.recommendations = recommendations;
+        this.feedback = feedback;
     }
 
     public List<CourseResponse> list(UUID viewer, Collection collection, String countryCode,
@@ -34,6 +40,7 @@ public class CourseService {
         users.requireUser(viewer);
         var rows = courses.courses(viewer, collection == null ? null : collection.name().toLowerCase(java.util.Locale.ROOT),
                 countryCode, locationId, ids);
+        if (collection == Collection.RECOMMENDED || collection == Collection.FEED) rows = recommendations.rank(viewer, rows);
         var locations = courses.locations(rows.stream().map(CourseRow::id).toList());
         return rows.stream().map(row -> new CourseResponse(row.id(), row.title(), row.subject(),
                 row.countryCode(), row.countryName(), locations.stream()
@@ -62,8 +69,15 @@ public class CourseService {
 
     @Transactional
     public void dismiss(UUID viewer, UUID course) {
-        users.requireUser(viewer);
-        if (!courses.exists(course)) throw ApiException.notFound("Course");
+        get(viewer, course);
         courses.dismiss(viewer, course);
+    }
+
+    @Transactional
+    public void feedback(UUID viewer, UUID course, String action, Integer dwellMs) {
+        get(viewer, course);
+        if (!("OPEN".equals(action) || "NEXT".equals(action)) || dwellMs == null || dwellMs < 0 || dwellMs > 120000)
+            throw ApiException.badRequest("Use OPEN or NEXT and a dwellMs between 0 and 120000");
+        feedback.feedback(viewer, course, "OPEN".equals(action), dwellMs);
     }
 }

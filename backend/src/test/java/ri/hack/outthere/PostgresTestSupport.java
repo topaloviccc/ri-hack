@@ -22,6 +22,7 @@ public abstract class PostgresTestSupport {
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
         registry.add("app.benefits.expiry-sweep-ms", () -> "3600000");
+        registry.add("app.recommendations.worker-enabled", () -> "false");
     }
 
     /** Authenticates a MockMvc request as the given user, as a decoded bearer token would. */
