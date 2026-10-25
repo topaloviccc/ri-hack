@@ -11,7 +11,7 @@ bucket integration.
 | --- | --- | --- |
 | Courses | Catalogue, details, country/place filters, subject grouping, Continue, Popular, recommendations, reel dismissals | Cover images are demo content; no lesson player or course authoring UI |
 | Learning history | Existing progress, completed-course lists, statistics, streaks and country badges | History can be seeded/read; no grading, completion submission or reward-earning flow |
-| Geography | Countries, places, coordinates, map counts and course links | Country introductions and location types/cities/images are labelled demos |
+| Geography | Full ISO country catalogue, English names, image flags, places, coordinates, map counts and course links | Country introductions and location types/cities/images are labelled demos |
 | Wallet | Stored balance, transactional paid/free unlocks, retry protection | Demo opening credit is seeded; no top-up or reward API |
 | People / network | Profiles, people search, suggestions, friend requests, friends' completion feed and weekly leaderboard | Bios are demos; no accept/decline/remove-friend UI |
 | Events | Stored titles, dates, descriptions, venues, coordinates, organizers, free/paid status and external registration URLs | Categories, cities/filters, languages, images and numeric paid prices are labelled demos; registration opens a sample external link |
@@ -27,6 +27,22 @@ Liquibase creates the selected schema at startup. Source CHECK constraints and
 stored validation functions/triggers are intentionally omitted; primary keys,
 foreign keys, unique keys and NOT NULL columns remain. `worldlearn.sql` is a
 reference document: do not execute it separately before starting the application.
+
+Countries are production reference data: Liquibase's `002-iso-countries.sql`
+supplies all **249 ISO 3166-1 alpha-2 countries and territories**, English display
+names and flag image URLs. `003-hosted-country-flags.sql` switches those URLs to
+FlagCDN, for example `https://flagcdn.com/w160/hr.png`. The app loads flags directly
+from that service on country pages/lists, maps, course/place details and
+profiles/badges. No flag image files are stored in the repository or backend;
+the phone needs internet access to FlagCDN. No bucket configuration is needed.
+Countries with no content still appear with zero counts. Only country introductions
+remain demo supplements. Sources and update instructions are in
+[backend/reference/README.md](backend/reference/README.md).
+
+For an existing local database, restart the backend to apply the new migration,
+then reload Expo. Country UUIDs and their links are preserved; no database reset
+or demo reseed is required. Fresh installations receive the same country catalogue
+automatically, even if the optional demo seed is never loaded.
 
 ## Prerequisites
 
@@ -73,10 +89,13 @@ docker cp backend/dev/demo-data.sql outthere-postgres:/tmp/outthere-demo-data.sq
 docker exec outthere-postgres psql -U outthere -d outthere -v ON_ERROR_STOP=1 -f /tmp/outthere-demo-data.sql
 ```
 
-This optional script supplies 12 countries, 7 subjects, 16 users, 48 courses,
+This optional script supplies content across 12 countries, 7 subjects, 16 users, 48 courses,
 94 places, 32 events and 83 learning-history records. One course is intentionally
 unpublished. Demo Learner starts with **250 coins**, progress, completions, friends
 and pending/suggested connections.
+
+The 249 country reference records and hosted flag URLs come from the application
+migrations, not this demo script.
 
 The seed is separate from Liquibase and does not run automatically. It is additive:
 re-running does not reset purchases, balances, friendships or dismissals. Event dates

@@ -14,7 +14,7 @@ async function main() {
   const lists = [
     ['/courses', 40], ['/courses?collection=continue', 1], ['/courses?collection=popular', 1],
     ['/courses?collection=recommended', 1], ['/courses?collection=feed', 1],
-    ['/countries', 12], ['/locations', 94], ['/events', 32], ['/users?relation=friend', 1],
+    ['/countries', 249], ['/locations', 94], ['/events', 32], ['/users?relation=friend', 1],
     ['/users?relation=requested', 1], ['/users?suggested=true', 1],
     ['/network/feed', 1], ['/network/leaderboard', 2], ['/codebooks/fields', 7],
   ];
@@ -24,6 +24,9 @@ async function main() {
     console.log(`${path}: ${rows.length} rows`);
   }
   const profile = await get('/users/me');
+  const country = await get('/countries/HR');
+  assert.equal(country.name, 'Croatia');
+  assert.equal(country.flagUrl, 'https://flagcdn.com/w160/hr.png');
   assert.equal(profile.id, seed.viewer);
   assert.ok(profile.stats.completedCount >= 5);
   assert.ok(profile.inProgressCourseIds.length >= 4);

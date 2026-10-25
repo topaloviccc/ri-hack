@@ -25,7 +25,7 @@ behaviors and the relational dependencies needed to read or write them.
 | --- | --- |
 | Expert applications: qualification title, pending/approved/rejected requests, rejection reason, certificate attachments | `expert_field` records granted expertise, not applications. There is no application table or approval workflow. File/bucket integration is also explicitly excluded. No request endpoints were invented. |
 | Weekly challenge card, target, deadline and reward | No challenge definition or progress/reward model. No challenge endpoint. |
-| Country `blurb` | `country` has only ID, ISO code and label. |
+| Country `blurb` | No introduction column. Country code/name and the added flag image path are production reference data; introductions remain demo content. |
 | Location `kind`, `city`, `imageUrl` | `place` has no kind, city or image column. Its free-form `address` is not a reliable city field. |
 | Course `imageUrl` | `cover_asset_id` references private storage metadata, not a public URL. Bucket/media URL resolution is excluded. |
 | Profile `bio` | No `app_user.bio` column. Avatar URLs are supported because `avatar_url` exists. |

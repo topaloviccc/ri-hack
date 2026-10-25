@@ -46,6 +46,7 @@ through the computer's firewall if that URL cannot be reached.
 | Data | Source |
 | --- | --- |
 | Courses, subjects, prices, learner counts, country/place identity and coordinates, progress and ownership | Backend |
+| All 249 ISO alpha-2 countries/territories, English display names and image flag URLs | Production Liquibase reference data; images load directly from FlagCDN; no demo seed required |
 | Wallet/unlocks, profiles/statistics, friendships, completion feed and leaderboard | Backend |
 | Benefits partners/countries/offers, coupon activation and history | Backend; demo partners are explicitly labelled |
 | Event identity, start time, venue/coordinates, organizer, description, free/paid status and registration link | Backend |
@@ -59,6 +60,15 @@ replace backend records, coordinates, unlock prices, balances, ownership, learni
 history or social state. Errors never fall back to mock records. Original mock
 modules supply demo-only fields/test fixtures; the mock wallet/pricing implementation
 has been removed.
+
+Country responses include `flagUrl`, an absolute HTTPS URL such as
+`https://flagcdn.com/w160/hr.png`. The adapter preserves the URL and the shared
+`CountryFlag` component loads the image directly from FlagCDN. Code-only
+profile/course records use the same hosted URL convention. No image files are
+bundled and no backend image proxy is used. The phone needs internet access to
+the CDN. Emoji flags are no longer used. Country lists include
+zero-content countries with real zero counts. English names and ISO identifiers
+are backend-owned; introductions remain explicitly labelled demo content.
 
 The calendar defaults to all events. Selecting a city filters **demo city labels**
 locally, not real geographic coverage. "My location" only selects that demo filter.

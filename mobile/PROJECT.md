@@ -35,7 +35,7 @@ see [API.md](API.md) for the current source of each field and run configuration.
 ## Domain (as used in the app today)
 - **Course**: a concept tied to one country — title, image, subject (Nature & Wildlife, Culture & Traditions, Monuments & Architecture, History, Food & Drink, Arts & Music, Sport & Games), description, learner count, estimated minutes, difficulty, 0–n locations, progress for owned in-progress courses. No ratings or reviews. The UI still says "course".
 - **Location**: a real site (monument, nature, museum, venue, historic site) with town, country, coordinates and photo; shared between courses. These are the map waypoints.
-- **Country**: name, blurb, course and location counts.
+- **Country**: production ISO 3166-1 alpha-2 code, English display name, hosted image flag URL and course/location counts; introduction text remains demo content.
 - **Event** (`LearningEvent`): title, category, start time, city, venue, coordinates, image, description, organizer, price (null = free), language, registration URL. Seed cities are in Montenegro.
 - **User**: name, handle, avatar, country, bio, stats (completed, streak, countries), country badges, in-progress/completed course ids, relation to me (me/friend/requested/none).
 - **Network**: feed of friends' completions, one weekly challenge, weekly friends leaderboard.

@@ -15,7 +15,7 @@ function samples(file) {
   vm.runInNewContext(compiled, context, { filename: file });
   return context.exports;
 }
-const { MOCK_COUNTRIES: countries, MOCK_LOCATIONS: places, MOCK_COURSES: courses } = samples('features/courses/api/courses.mock.ts');
+const { MOCK_LOCATIONS: places, MOCK_COURSES: courses } = samples('features/courses/api/courses.mock.ts');
 const { MOCK_USERS: users } = samples('features/users/api/users.mock.ts');
 const { MOCK_EVENTS: events } = samples('features/events/api/events.mock.ts');
 const { SUBJECTS: subjects } = samples('features/courses/types.ts');
@@ -49,7 +49,7 @@ const sql = [
   fs.readFileSync(path.join(__dirname, 'demo-learner.sql'), 'utf8').replace(/^BEGIN;|^COMMIT;/gm, ''),
 ];
 const insert = (...args) => sql.push(statement(...args) + ';');
-insert('country', ['id','iso_code','label'], countries.map((n) => [id('country',n.code),n.code,n.name]));
+// Countries are production reference data supplied by Liquibase, never demo records.
 insert('field', ['id','label'], subjects.map((label) => [id('field',label),label]));
 insert('app_user', ['id','first_name','last_name','username','email','country_id','avatar_url','timezone','created_at'],
   users.filter((u) => u.id !== 'u0').map((u) => {
@@ -148,7 +148,7 @@ fs.writeFileSync(path.join(__dirname,'demo-data.sql'),sql.join('\n\n')+'\n');
 const scenario = (sourceId) => ({id:id('course',sourceId),title:allCourses.find((c) => c.id===sourceId).title,price:prices.get(sourceId)??40});
 const summary = {
   viewer, openingBalance:250,
-  counts:{countries:countries.length,fields:subjects.length,users:users.length,courses:allCourses.length,
+  counts:{countries:JSON.parse(fs.readFileSync(path.join(root,'backend/reference/countries.json'),'utf8')).length,fields:subjects.length,users:users.length,courses:allCourses.length,
     places:places.length+1+events.length,events:events.length,learningHistories:history.length},
   scenarios:{paidUnlock:scenario('c3'),freeUnlock:scenario('c2'),insufficientCoins:scenario('c45'),
     continue:scenario('c1'),ownedNotStarted:scenario('c8'),ownedArchived:scenario('demo-archive'),
