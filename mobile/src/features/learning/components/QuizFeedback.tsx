@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { FlatList, View } from 'react-native';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Text } from '@/components/ui/Text';
+import { useBlocksDuringCourses } from '@/features/focus';
 import type { QuizResponse, QuizResult } from '@/features/learning/api/learning.dto';
 import { LearningAction } from './LearningAction';
 import { LearningBackLink } from './LearningBackLink';
@@ -12,6 +13,7 @@ export type QuizFeedbackProps = { quiz: QuizResponse; result: QuizResult; onRetr
 export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
   const index = result.learning.lessons.findIndex((lesson) => lesson.quiz.id === quiz.id);
   const next = result.learning.lessons[index + 1];
+  const blocksDuringCourses = useBlocksDuringCourses();
   return (
     <FlatList
       data={result.feedback}
@@ -43,6 +45,7 @@ export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
           {result.learning.completed ? (
             <Text variant="heading" className="rounded-card bg-primary/15 p-4 text-base">
               Course passed! {pluralize(result.learning.awardedCoins, 'coin')} awarded.
+              {blocksDuringCourses ? ' Your apps are unblocked.' : ''}
             </Text>
           ) : (
             <Text variant="caption">

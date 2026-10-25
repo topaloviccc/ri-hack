@@ -5,6 +5,7 @@ export const STORAGE_KEYS = {
   themePreference: 'settings.themePreference',
   focusBlockedApps: 'focus.blockedApps',
   focusIsActive: 'focus.isActive',
+  focusEnabled: 'focus.enabled',
   feedHintsSeen: 'courses.feedHintsSeen',
 } as const;
 

@@ -24,6 +24,8 @@ const readBlockedApps = async (): Promise<string[]> => {
 };
 
 const readIsActive = async () => (await storage.get(STORAGE_KEYS.focusIsActive)) === 'true';
+// On unless the user switched it off: blocking is the point of picking apps.
+const readIsEnabled = async () => (await storage.get(STORAGE_KEYS.focusEnabled)) !== 'false';
 
 /**
  * Device-local app blocking. Our storage owns the chosen apps; the native blocker only gets them
@@ -79,5 +81,14 @@ export const focusApi = {
     }
     await storage.set(STORAGE_KEYS.focusIsActive, String(isActive));
     return isActive;
+  },
+
+  /** Settings' master switch for blocking and reminders during courses. */
+  getIsEnabled: readIsEnabled,
+  setEnabled: async (isEnabled: boolean): Promise<boolean> => {
+    await storage.set(STORAGE_KEYS.focusEnabled, String(isEnabled));
+    // The failsafe: switching off must end blocking right away, whatever left it on.
+    if (!isEnabled && (await readIsActive())) await focusApi.setActive(false);
+    return isEnabled;
   },
 };

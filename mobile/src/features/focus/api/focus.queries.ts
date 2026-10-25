@@ -9,7 +9,7 @@ export const focusKeys = {
   permissions: () => [...focusKeys.all, 'permissions'] as const,
   installedApps: () => [...focusKeys.all, 'installedApps'] as const,
   blockedApps: () => [...focusKeys.all, 'blockedApps'] as const,
-  isActive: () => [...focusKeys.all, 'isActive'] as const,
+  isEnabled: () => [...focusKeys.all, 'isEnabled'] as const,
 };
 
 export const useFocusPermissionsQuery = () =>
@@ -35,5 +35,9 @@ export const useBlockedAppsQuery = () =>
     staleTime: Infinity,
   });
 
-export const useFocusActiveQuery = () =>
-  useQuery({ queryKey: focusKeys.isActive(), queryFn: focusApi.getIsActive, staleTime: Infinity });
+export const useFocusEnabledQuery = () =>
+  useQuery({
+    queryKey: focusKeys.isEnabled(),
+    queryFn: focusApi.getIsEnabled,
+    staleTime: Infinity,
+  });

@@ -37,6 +37,7 @@
       "expo-secure-store",
       "react-native-nfc-manager",
       "expo-app-blocker",
+      "expo-notifications",
       [
         "expo-build-properties",
         {

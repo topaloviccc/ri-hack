@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ApiConfigurationNotice } from '@/components/shared/ApiConfigurationNotice';
 import { WelcomeScreen } from '@/components/layout/WelcomeScreen';
 import { AuthProvider, useAuth } from '@/features/auth';
+import { CourseFocusListener } from '@/features/focus';
 import { NfcTagListener } from '@/features/nfc';
 import { InterestOnboardingGate } from '@/features/interests/InterestOnboardingGate';
 import { useThemePreferenceQuery } from '@/features/settings';
@@ -52,6 +53,7 @@ function AppShell() {
         <StatusBar style="auto" />
         <ApiConfigurationNotice />
         <NfcTagListener />
+        <CourseFocusListener />
         <InterestOnboardingGate>
           <Stack screenOptions={stackScreenOptions}>
             {/* Signed-out users can only reach sign-in; signing in or out swaps the available screens. */}

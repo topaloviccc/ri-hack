@@ -18,6 +18,11 @@ jest.mock('@/features/network', () => ({
 jest.mock('@/features/users', () => ({
   userKeys: jest.requireActual('@/features/users/api/users.queries').userKeys,
 }));
+// App blocking is native and Android only; its own tests cover it.
+jest.mock('@/features/focus', () => ({
+  useCourseFocus: () => {},
+  useBlocksDuringCourses: () => false,
+}));
 jest.mock('@/features/wallet', () => ({
   walletKeys: jest.requireActual('@/features/wallet/api/wallet.queries').walletKeys,
 }));

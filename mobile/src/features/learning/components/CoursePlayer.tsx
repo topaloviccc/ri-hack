@@ -3,6 +3,7 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { useLearningQuery } from '@/features/learning/api/learning.queries';
+import { useCourseFocus } from '@/features/focus';
 import { LearningBackLink } from './LearningBackLink';
 import { LearningOutline } from './LearningOutline';
 import { LessonReader } from './LessonReader';
@@ -11,6 +12,7 @@ import { QuizPlayer } from './QuizPlayer';
 export type CoursePlayerProps = { id: string; lesson?: string; quiz?: string };
 export function CoursePlayer({ id, lesson, quiz }: CoursePlayerProps) {
   const query = useLearningQuery(id);
+  useCourseFocus(id, !!query.data?.started && !query.data.completed);
   if (query.isPending) return <LoadingState />;
   if (query.isError) return <ErrorState message={query.error.message} onRetry={query.refetch} />;
   const learning = query.data;

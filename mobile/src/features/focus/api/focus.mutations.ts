@@ -16,11 +16,11 @@ export function useToggleBlockedApp() {
   });
 }
 
-export function useSetFocusActive() {
+export function useSetFocusEnabled() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: focusApi.setActive,
-    onSuccess: (isActive) => queryClient.setQueryData(focusKeys.isActive(), isActive),
+    mutationFn: focusApi.setEnabled,
+    onSuccess: (isEnabled) => queryClient.setQueryData(focusKeys.isEnabled(), isEnabled),
   });
 }
 
