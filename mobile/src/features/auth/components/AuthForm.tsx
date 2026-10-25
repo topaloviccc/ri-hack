@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
+import { FormField } from '@/components/shared/FormField';
 import { Button } from '@/components/ui/Button';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Text } from '@/components/ui/Text';
 import { TextField } from '@/components/ui/TextField';
 import { useLogin, useSignup } from '@/features/auth/api/auth.mutations';
 import type { AuthMode } from '@/features/auth/types';
+import { validateAuthForm, type AuthFormErrors } from '@/features/auth/validation';
 
 const MODE_OPTIONS = [
   { value: 'login', label: 'Log in' },
@@ -27,19 +29,27 @@ export function AuthForm() {
   const active = mode === 'login' ? login : signup;
   const isSignup = mode === 'signup';
 
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  // Errors show after the first submit attempt, then update live as fields are fixed.
+  const errors: AuthFormErrors = hasSubmitted ? validateAuthForm(mode, fields) : {};
+
   const field = (key: keyof Fields) => ({
     value: fields[key],
     onChangeText: (value: string) => setFields((current) => ({ ...current, [key]: value })),
     editable: !active.isPending,
+    className: errors[key] ? 'border-primary' : undefined,
   });
 
   const handleModeChange = (next: AuthMode) => {
     login.reset();
     signup.reset();
+    setHasSubmitted(false);
     setMode(next);
   };
 
   const handleSubmit = () => {
+    setHasSubmitted(true);
+    if (Object.keys(validateAuthForm(mode, fields)).length > 0) return;
     if (isSignup) signup.mutate({ ...fields, timezone: deviceTimezone() });
     else login.mutate({ email: fields.email, password: fields.password });
   };
@@ -66,45 +76,55 @@ export function AuthForm() {
         <SegmentedControl options={MODE_OPTIONS} value={mode} onChange={handleModeChange} />
         {isSignup ? (
           <>
-            <TextField
-              placeholder="First name"
-              accessibilityLabel="First name"
-              autoComplete="given-name"
-              {...field('firstName')}
-            />
-            <TextField
-              placeholder="Last name"
-              accessibilityLabel="Last name"
-              autoComplete="family-name"
-              {...field('lastName')}
-            />
-            <TextField
-              placeholder="Username"
-              accessibilityLabel="Username"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="username"
-              {...field('username')}
-            />
+            <FormField error={errors.firstName}>
+              <TextField
+                placeholder="First name"
+                accessibilityLabel="First name"
+                autoComplete="given-name"
+                {...field('firstName')}
+              />
+            </FormField>
+            <FormField error={errors.lastName}>
+              <TextField
+                placeholder="Last name"
+                accessibilityLabel="Last name"
+                autoComplete="family-name"
+                {...field('lastName')}
+              />
+            </FormField>
+            <FormField error={errors.username}>
+              <TextField
+                placeholder="Username"
+                accessibilityLabel="Username"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="username"
+                {...field('username')}
+              />
+            </FormField>
           </>
         ) : null}
-        <TextField
-          placeholder="Email"
-          accessibilityLabel="Email"
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="email"
-          keyboardType="email-address"
-          {...field('email')}
-        />
-        <TextField
-          placeholder="Password"
-          accessibilityLabel="Password"
-          secureTextEntry
-          autoComplete={isSignup ? 'new-password' : 'current-password'}
-          onSubmitEditing={handleSubmit}
-          {...field('password')}
-        />
+        <FormField error={errors.email}>
+          <TextField
+            placeholder="Email"
+            accessibilityLabel="Email"
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="email"
+            keyboardType="email-address"
+            {...field('email')}
+          />
+        </FormField>
+        <FormField error={errors.password}>
+          <TextField
+            placeholder="Password"
+            accessibilityLabel="Password"
+            secureTextEntry
+            autoComplete={isSignup ? 'new-password' : 'current-password'}
+            onSubmitEditing={handleSubmit}
+            {...field('password')}
+          />
+        </FormField>
         {active.isError ? (
           <Text variant="caption" accessibilityRole="alert" className="text-primary">
             {active.error.message}

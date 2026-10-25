@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
-import { useState, type ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { useState } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 
 import { ErrorState } from '@/components/shared/ErrorState';
+import { FormField } from '@/components/shared/FormField';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Button } from '@/components/ui/Button';
@@ -21,22 +22,6 @@ import {
   type ExpertFormValues,
 } from '@/features/experts/validation';
 import { capitalize } from '@/utils/format';
-
-type FieldProps = { label: string; error?: string; children: ReactNode };
-
-function Field({ label, error, children }: FieldProps) {
-  return (
-    <View className="gap-2">
-      <Text variant="label">{label}</Text>
-      {children}
-      {error ? (
-        <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
-          {error}
-        </Text>
-      ) : null}
-    </View>
-  );
-}
 
 const subjectOptions = (requests: ExpertRequest[]) =>
   SUBJECTS.map((subject) => {
@@ -86,7 +71,7 @@ function Form({ requests }: FormProps) {
       <Text variant="body">
         Share your qualifications to become an expert in a field. Each field is reviewed separately.
       </Text>
-      <Field label="Field" error={errors.subject}>
+      <FormField label="Field" error={errors.subject}>
         <Select
           label="Field"
           placeholder="Choose a field"
@@ -95,8 +80,8 @@ function Form({ requests }: FormProps) {
           onChange={(subject) => update('subject', subject)}
           hasError={!!errors.subject}
         />
-      </Field>
-      <Field label="Title" error={errors.title}>
+      </FormField>
+      <FormField label="Title" error={errors.title}>
         <TextField
           value={values.title}
           onChangeText={(title) => update('title', title)}
@@ -106,14 +91,14 @@ function Form({ requests }: FormProps) {
           returnKeyType="done"
           className={errors.title ? 'border-primary' : undefined}
         />
-      </Field>
-      <Field label="Certificate" error={errors.certificate}>
+      </FormField>
+      <FormField label="Certificate" error={errors.certificate}>
         <CertificatePicker
           value={values.certificate}
           onChange={(certificate) => update('certificate', certificate)}
           hasError={!!errors.certificate}
         />
-      </Field>
+      </FormField>
       {create.isError ? (
         <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
           {create.error.message}
