@@ -5,7 +5,6 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { Hero } from '@/components/shared/Hero';
 import { InfoRow } from '@/components/shared/InfoRow';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { DemoNotice } from '@/components/shared/DemoNotice';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { CoinIcon } from '@/components/ui/CoinIcon';
@@ -41,7 +40,6 @@ export function CourseDetails({ id }: CourseDetailsProps) {
         }
       />
       <View className="gap-5 p-4">
-        <DemoNotice>cover image</DemoNotice>
         <CourseMeta course={course} />
         {hasStarted ? (
           <View className="gap-1">

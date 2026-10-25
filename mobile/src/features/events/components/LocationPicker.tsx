@@ -3,7 +3,6 @@ import { Pressable, ScrollView, View } from 'react-native';
 import { Chip } from '@/components/ui/Chip';
 import { Text } from '@/components/ui/Text';
 import { useLocateCity } from '@/features/events/hooks/useLocateCity';
-import { CITIES } from '@/features/events/types';
 
 const STATUS_MESSAGES = {
   denied: 'Location permission denied. Pick a city instead.',
@@ -11,15 +10,16 @@ const STATUS_MESSAGES = {
 } as const;
 
 export type LocationPickerProps = {
+  /** Cities that have events, from the backend. */
+  cities: string[];
   city: string;
   onSelectCity: (city: string) => void;
 };
 
-export function LocationPicker({ city, onSelectCity }: LocationPickerProps) {
+export function LocationPicker({ cities, city, onSelectCity }: LocationPickerProps) {
   const { locate, status } = useLocateCity(onSelectCity);
-  // A GPS city outside the seeded list still gets its own chip.
-  const cities = CITIES.includes(city as (typeof CITIES)[number]) ? CITIES : [city, ...CITIES];
-  const options = ['', ...cities.filter(Boolean)];
+  // A GPS city without events still gets its own chip, so the choice stays visible.
+  const options = ['', ...(city && !cities.includes(city) ? [city] : []), ...cities];
 
   return (
     <View className="gap-1">

@@ -1,14 +1,11 @@
 import type { UserResponse } from './users.dto';
-import { MOCK_USERS } from './users.mock';
 import type { FriendshipAction, User, UserFilters } from '@/features/users/types';
 import { apiRequest } from '@/lib/api-client';
-import { demoSample } from '@/utils/demo-sample';
 
 const toUser = (row: UserResponse): User => ({
   ...row,
   avatarUrl: row.avatarUrl ?? '',
   countryCode: row.countryCode ?? '',
-  bio: demoSample(row.id, MOCK_USERS).bio,
 });
 
 export const usersApi = {

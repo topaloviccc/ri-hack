@@ -7,7 +7,6 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Scrim } from '@/components/ui/Scrim';
 import { Text } from '@/components/ui/Text';
 import { CourseMeta } from '@/features/courses/components/CourseMeta';
-import { DemoNotice } from '@/components/shared/DemoNotice';
 import { LockBadge } from '@/features/courses/components/LockBadge';
 import type { Course } from '@/features/courses/types';
 
@@ -44,7 +43,6 @@ export const CourseCard = memo(function CourseCard({
       <View className="gap-2 p-4">
         <CourseMeta course={course} />
         <Chip label={course.subject} />
-        <DemoNotice>cover image</DemoNotice>
         {course.progress !== undefined ? <ProgressBar value={course.progress} /> : null}
       </View>
     </Pressable>

@@ -6,7 +6,7 @@ import { Scrim } from '@/components/ui/Scrim';
 import { Text } from '@/components/ui/Text';
 
 export type HeroProps = {
-  imageUrl: string;
+  imageUrl: string | null;
   title: string;
   /** Rendered above the title, e.g. a category chip. */
   eyebrow?: ReactNode;

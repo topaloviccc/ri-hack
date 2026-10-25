@@ -5,7 +5,6 @@ import { Pressable, View } from 'react-native';
 import { Card } from '@/components/ui/Card';
 import { Image } from '@/components/ui/Image';
 import { Text } from '@/components/ui/Text';
-import { DemoNotice } from '@/components/shared/DemoNotice';
 import { CATEGORY_ICONS } from '@/features/events/categories';
 import type { LearningEvent } from '@/features/events/types';
 import { useThemeColors } from '@/lib/theme';
@@ -53,15 +52,16 @@ export const EventRow = memo(function EventRow({ event, onPress, onOpenMap }: Ev
           </View>
         </View>
         <View className="flex-1 gap-1">
-          <DemoNotice>city, category and image</DemoNotice>
           <Text variant="label" className="text-base" numberOfLines={2}>
             {event.title}
           </Text>
           <Text variant="caption" numberOfLines={1}>
-            <Text variant="caption" className="font-sans-semibold">
-              {event.city}
-            </Text>
-            , {event.venue}
+            {event.city ? (
+              <Text variant="caption" className="font-sans-semibold">
+                {event.city},{' '}
+              </Text>
+            ) : null}
+            {event.venue}
           </Text>
         </View>
         <Image uri={event.imageUrl} className="h-16 w-16 rounded-lg bg-border" />

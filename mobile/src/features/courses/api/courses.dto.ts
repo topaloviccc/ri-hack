@@ -6,6 +6,7 @@ export type CountryResponse = {
   flagUrl: string;
   courseCount: number;
   locationCount: number;
+  blurb: string | null;
 };
 
 export type LocationResponse = {
@@ -15,6 +16,10 @@ export type LocationResponse = {
   countryName: string;
   lat: number | null;
   lng: number | null;
+  imageUrl: string | null;
+  /** Lowercase code; see LOCATION_KINDS. */
+  kind: string | null;
+  city: string | null;
 };
 
 export type CourseResponse = {
@@ -31,4 +36,5 @@ export type CourseResponse = {
   progress: number | null;
   unlockCost: number;
   isUnlocked: boolean;
+  imageUrl: string | null;
 };

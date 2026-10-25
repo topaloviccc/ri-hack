@@ -14,9 +14,8 @@ extension, not a requirement. Users are general learners; reviewers, local contr
 admins are role capabilities added later.
 
 ## Built so far (mobile)
-Core records and mutations now use the Spring Boot backend. Images and unsupported
-extra details remain explicitly labelled demo content; expert applications remain
-demos. The table below records prototype feature coverage;
+Core records, images and display details now use the Spring Boot backend; only expert
+applications remain a labelled frontend demo. The table below records prototype feature coverage;
 see [API.md](API.md) for the current source of each field and run configuration.
 
 | Area | State |
@@ -24,7 +23,7 @@ see [API.md](API.md) for the current source of each field and run configuration.
 | Tabs: Home · Scroll · Calendar · Network · Courses | ✅ |
 | Home: "Continue with…", "Most Popular" (by learner count), "Recommended for you" | ✅ mock data |
 | Scroll: full-screen reels; swipe right = less like this (local), swipe left = details | ✅ mock data |
-| Events: city picker + "my location", calendar with event dots, day list, event details + Register link | ✅ mock data |
+| Events: city picker + "my location", calendar with event dots, day list, event details + Register link | Connected backend |
 | Network: friends strip, feed, suggested friends; Leaderboard (friends, weekly); People search; send friend request | ✅ mock data |
 | Courses: Map (SVG world, tap country → site pins + country card, clustering, location page) · Countries (A–Z → Country page) · Fields (by subject) | ✅ mock data |
 | Course details, Profile (own + others, one view), Settings (System/Light/Dark, persisted) | ✅ mock data |
@@ -39,8 +38,8 @@ completion coins are paid once per course. Content is seeded; LLM generation is 
 ## Domain (as used in the app today)
 - **Course**: a concept tied to one country — title, image, subject (Nature & Wildlife, Culture & Traditions, Monuments & Architecture, History, Food & Drink, Arts & Music, Sport & Games), description, learner count, estimated minutes, difficulty, 0–n locations, progress for owned in-progress courses. No ratings or reviews. The UI still says "course".
 - **Location**: a real site (monument, nature, museum, venue, historic site) with town, country, coordinates and photo; shared between courses. These are the map waypoints.
-- **Country**: production ISO 3166-1 alpha-2 code, English display name, hosted image flag URL and course/location counts; introduction text remains demo content.
-- **Event** (`LearningEvent`): title, category, start time, city, venue, coordinates, image, description, organizer, price (null = free), language, registration URL. Seed cities are in Montenegro.
+- **Country**: production ISO 3166-1 alpha-2 code, English display name, hosted image flag URL, course/location counts and optional introduction text.
+- **Event** (`LearningEvent`): title, category, start time, city, venue, coordinates, image, description, organizer, free/paid with optional price, language, registration URL. Seed cities are in Montenegro.
 - **User**: name, handle, avatar, country, bio, stats (completed, streak, countries), country badges, in-progress/completed course ids, relation to me (me/friend/requested/none).
 - **Network**: feed of friends' completions, weekly friends leaderboard.
 

@@ -41,21 +41,19 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
   };
   const processed = new Set<string>();
   const dismissed = new Set<string>();
-  const users = MOCK_USERS.map(({ bio: _bio, ...user }) => ({ ...user }));
+  const users = MOCK_USERS.map((user) => ({ ...user }));
   // Sara has sent the signed-in user a friend request.
   const sara = users.find((u) => u.id === 'u9');
   if (sara) sara.relation = 'incoming';
   const countryName = (code: string) => MOCK_COUNTRIES.find((n) => n.code === code)?.name ?? code;
-  const locations = MOCK_LOCATIONS.map(
-    ({ kind: _kind, city: _city, imageUrl: _image, ...site }) => ({
-      ...site,
-      countryName: countryName(site.countryCode),
-    }),
-  );
+  const locations = MOCK_LOCATIONS.map((site) => ({
+    ...site,
+    countryName: countryName(site.countryCode),
+  }));
   const course = (id: string): CourseResponse => {
     const row = MOCK_COURSES.find((c) => c.id === id);
     if (!row) throw new Error(`Unknown fixture course ${id}`);
-    const { imageUrl: _image, locationIds, ...rest } = row;
+    const { locationIds, ...rest } = row;
     return {
       ...rest,
       countryName: countryName(row.countryCode),
@@ -114,7 +112,7 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
       return httpResponse(rows);
     }
     if (path.startsWith('/courses/')) return httpResponse(course(path.split('/')[2]));
-    const countries = MOCK_COUNTRIES.map(({ blurb: _blurb, ...country }) => ({
+    const countries = MOCK_COUNTRIES.map((country) => ({
       ...country,
       flagUrl: `https://flagcdn.com/w160/${country.code.toLowerCase()}.png`,
       courseCount: MOCK_COURSES.filter((c) => c.countryCode === country.code).length,
@@ -204,6 +202,11 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
         organizer: e.organizer,
         isFree: e.priceEur === null,
         registrationUrl: e.registrationUrl,
+        imageUrl: e.imageUrl,
+        category: e.category,
+        city: e.city,
+        language: e.language,
+        priceEur: e.priceEur,
       };
     });
     if (path === '/events') return httpResponse(events);

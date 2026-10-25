@@ -2,7 +2,6 @@ import { ScrollView, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/Avatar';
 import { Text } from '@/components/ui/Text';
-import { DemoNotice } from '@/components/shared/DemoNotice';
 import { AddFriendButton } from '@/features/users/components/AddFriendButton';
 import { RemoveFriendButton } from '@/features/users/components/RemoveFriendButton';
 import type { User } from '@/features/users/types';
@@ -42,10 +41,11 @@ export function ProfileHeader({ user, coins }: ProfileHeaderProps) {
           <Text variant="caption">@{user.handle}</Text>
           <CountryFlag code={user.countryCode} />
         </View>
-        <DemoNotice>bio</DemoNotice>
-        <Text variant="body" className="text-center">
-          {user.bio}
-        </Text>
+        {user.bio ? (
+          <Text variant="body" className="text-center">
+            {user.bio}
+          </Text>
+        ) : null}
         {/* TODO(hack): own profile gets an Edit profile button once editing exists. See BACKLOG.md. */}
         {isOwn ? null : <FriendshipButton user={user} />}
       </View>

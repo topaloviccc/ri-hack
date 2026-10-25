@@ -29,9 +29,7 @@ export function LearningHeader({ learning }: LearningHeaderProps) {
               label={course?.subject ?? 'Your course'}
               variant={course?.imageUrl ? 'onImage' : 'secondary'}
             />
-            {course?.imageUrl ? (
-              <Chip label="Demo image" variant="onImage" />
-            ) : (
+            {course?.imageUrl ? null : (
               <Ionicons name="book-outline" size={28} color={colors.text} />
             )}
           </View>

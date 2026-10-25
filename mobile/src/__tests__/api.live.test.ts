@@ -29,9 +29,24 @@ live('frontend adapters against Spring Boot and PostgreSQL', () => {
       id: started,
       progress: 0.5,
     });
-    expect(await countriesApi.getByCode('ME')).toMatchObject({ courseCount: 3, locationCount: 1 });
-    expect((await locationsApi.list())[0].lat).toBe(42.424662);
-    expect((await eventsApi.list({}))[0].title).toBe('Museum lecture');
+    expect(await countriesApi.getByCode('ME')).toMatchObject({
+      courseCount: 3,
+      locationCount: 1,
+      blurb: 'Mountains meet the sea.',
+    });
+    expect((await locationsApi.list())[0]).toMatchObject({
+      lat: 42.424662,
+      kind: 'museum',
+      city: 'Kotor',
+    });
+    expect((await eventsApi.list())[0]).toMatchObject({
+      title: 'Museum lecture',
+      category: 'lecture',
+      city: 'Kotor',
+      language: 'en',
+      isFree: true,
+      priceEur: null,
+    });
     expect((await networkApi.listFeed())[0].userName).toBe('Alex Friend');
     expect((await networkApi.listLeaderboard())[0].completedThisWeek).toBe(1);
     expect(await walletApi.get()).toEqual({ balance: 100, heldBalance: 0, availableBalance: 100 });

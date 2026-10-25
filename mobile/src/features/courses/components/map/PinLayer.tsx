@@ -1,6 +1,6 @@
 import { MapPin, PIN_SIZE } from '@/features/courses/components/map/MapPin';
 import type { MapCamera } from '@/features/courses/hooks/useMapCamera';
-import { LOCATION_KIND_ICONS } from '@/features/courses/location-kinds';
+import { locationKindIcon, locationKindLabel } from '@/features/courses/location-kinds';
 import { clusterPoints } from '@/features/courses/map/cluster';
 import {
   boxOfPoints,
@@ -50,14 +50,14 @@ export function PinLayer({
       return cluster.members.map((site, i) => (
         <MapPin
           key={site.id}
-          kind="image"
-          imageUrl={site.imageUrl}
-          badgeIcon={LOCATION_KIND_ICONS[site.kind]}
+          {...(site.imageUrl
+            ? { kind: 'image', imageUrl: site.imageUrl, badgeIcon: locationKindIcon(site.kind) }
+            : { kind: 'icon', icon: locationKindIcon(site.kind) })}
           point={cluster}
           offsetX={rowOffset(i, cluster.members.length)}
           camera={camera}
           viewport={viewport}
-          label={`${site.name}: show courses. Demo image and location type`}
+          label={`${site.name}, ${locationKindLabel(site.kind)}: show courses`}
           onPress={() => onOpenLocation(site.id)}
         />
       ));

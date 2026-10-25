@@ -9,4 +9,10 @@ export type EventResponse = {
   organizer: string | null;
   isFree: boolean;
   registrationUrl: string | null;
+  imageUrl: string | null;
+  /** Lowercase code; see EVENT_CATEGORIES. */
+  category: string | null;
+  city: string | null;
+  language: string | null;
+  priceEur: number | null;
 };

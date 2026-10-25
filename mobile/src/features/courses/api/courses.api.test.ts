@@ -24,6 +24,9 @@ describe('course HTTP mapping', () => {
         countryName: 'Montenegro',
         lat: null,
         lng: null,
+        imageUrl: null,
+        kind: 'castle',
+        city: null,
       },
     ],
     difficulty: 'beginner',
@@ -31,9 +34,10 @@ describe('course HTTP mapping', () => {
     progress: null,
     unlockCost: 73,
     isUnlocked: true,
+    imageUrl: null,
   };
 
-  it('preserves server prices, ownership, arbitrary subjects and nullable coordinates', async () => {
+  it('preserves server prices, ownership, arbitrary subjects and nullable details', async () => {
     fetchMock.mockResolvedValue(httpResponse(row));
     const result = await coursesApi.getById(row.id);
     expect(result).toMatchObject({
@@ -45,8 +49,15 @@ describe('course HTTP mapping', () => {
       estimatedMinutes: null,
       progress: undefined,
     });
-    expect(result.locations[0]).toMatchObject({ name: 'A real place', lat: null, lng: null });
-    expect(result.imageUrl).toBeTruthy();
+    // No invented images, and unknown place kinds become null (rendered as a generic place).
+    expect(result.locations[0]).toMatchObject({
+      name: 'A real place',
+      lat: null,
+      lng: null,
+      kind: null,
+      city: null,
+    });
+    expect(result.imageUrl).toBeNull();
   });
 
   it('fetches actual country counts and does not substitute missing resources', async () => {
@@ -57,6 +68,7 @@ describe('course HTTP mapping', () => {
         flagUrl: 'https://flagcdn.com/w160/me.png',
         courseCount: 2,
         locationCount: 1,
+        blurb: null,
       }),
     );
     expect(await countriesApi.getByCode('ME')).toMatchObject({
@@ -65,6 +77,7 @@ describe('course HTTP mapping', () => {
       flagUrl: 'https://flagcdn.com/w160/me.png',
       courseCount: 2,
       locationCount: 1,
+      blurb: null,
     });
     fetchMock.mockResolvedValueOnce(httpResponse({ detail: 'Location not found' }, 404));
     await expect(locationsApi.getById('missing')).rejects.toMatchObject({ status: 404 });

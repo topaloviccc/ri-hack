@@ -12,7 +12,7 @@ export type UserSummary = {
 export type User = UserSummary & {
   /** ISO 3166-1 alpha-2 */
   countryCode: string;
-  bio: string;
+  bio: string | null;
   stats: { completedCount: number; streakDays: number; countriesCount: number };
   /** Countries where the user completed at least one course */
   badgeCountryCodes: string[];

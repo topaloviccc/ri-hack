@@ -132,7 +132,7 @@ describe('screens', () => {
   it('Country page shows the blurb and its courses', async () => {
     const country = MOCK_COUNTRIES[0];
     await renderAt(`/country/${country.code}`);
-    expect(await screen.findByText(country.blurb)).toBeOnTheScreen();
+    expect(await screen.findByText(country.blurb ?? '')).toBeOnTheScreen();
     expect((await screen.findAllByLabelText(/^Open course /)).length).toBeGreaterThan(0);
   });
 

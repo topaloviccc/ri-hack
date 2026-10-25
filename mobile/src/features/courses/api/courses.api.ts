@@ -1,21 +1,20 @@
-import { demoCountryBlurb, demoCourseImage, demoLocationDetails } from './courses.demo';
 import type { CountryResponse, CourseResponse, LocationResponse } from './courses.dto';
-import type {
-  Country,
-  Course,
-  CourseFilters,
-  Location,
-  LocationFilters,
+import {
+  isLocationKind,
+  type Country,
+  type Course,
+  type CourseFilters,
+  type Location,
+  type LocationFilters,
 } from '@/features/courses/types';
 import { apiRequest } from '@/lib/api-client';
 
 const toLocation = (row: LocationResponse): Location => ({
-  ...demoLocationDetails(row.id),
   ...row,
+  kind: isLocationKind(row.kind) ? row.kind : null,
 });
 const toCourse = (row: CourseResponse): Course => ({
   ...row,
-  imageUrl: demoCourseImage(row.id),
   subject: row.subject ?? 'Uncategorized',
   countryCode: row.countryCode ?? '',
   countryName: row.countryName ?? 'Country not specified',
@@ -23,10 +22,7 @@ const toCourse = (row: CourseResponse): Course => ({
   locations: row.locations.map(toLocation),
   progress: row.progress ?? undefined,
 });
-const toCountry = (row: CountryResponse): Country => ({
-  ...row,
-  blurb: demoCountryBlurb(row.code),
-});
+const toCountry = (row: CountryResponse): Country => row;
 
 export const coursesApi = {
   list: async (filters: CourseFilters = {}): Promise<Course[]> => {
@@ -34,9 +30,7 @@ export const coursesApi = {
     return rows.map(toCourse);
   },
   getById: async (id: string): Promise<Course> =>
-    toCourse(
-      await apiRequest<CourseResponse>(`/courses/${encodeURIComponent(id)}`),
-    ),
+    toCourse(await apiRequest<CourseResponse>(`/courses/${encodeURIComponent(id)}`)),
   dismiss: (id: string): Promise<void> =>
     apiRequest(`/courses/${encodeURIComponent(id)}/dismiss`, { method: 'POST' }),
 };

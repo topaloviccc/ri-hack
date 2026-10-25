@@ -19,6 +19,9 @@ export const LOCATION_KINDS = ['monument', 'nature', 'museum', 'venue', 'site'] 
 
 export type LocationKind = (typeof LOCATION_KINDS)[number];
 
+export const isLocationKind = (value: string | null): value is LocationKind =>
+  (LOCATION_KINDS as readonly (string | null)[]).includes(value);
+
 export const HOME_SECTIONS = ['continue', 'popular', 'recommended'] as const;
 
 export type HomeSection = (typeof HOME_SECTIONS)[number];
@@ -40,15 +43,16 @@ export type LocationFilters = { countryCode?: string; ids?: string[] };
 export type Location = {
   id: string;
   name: string;
-  kind: LocationKind;
+  /** null when the backend has no (or an unknown) kind. */
+  kind: LocationKind | null;
   /** Town or city, display only */
-  city: string;
+  city: string | null;
   /** ISO 3166-1 alpha-2 */
   countryCode: string;
   countryName: string;
   lat: number | null;
   lng: number | null;
-  imageUrl: string;
+  imageUrl: string | null;
 };
 
 export type Country = {
@@ -57,7 +61,7 @@ export type Country = {
   name: string;
   /** Hosted flag image URL supplied by the backend. */
   flagUrl: string;
-  blurb: string;
+  blurb: string | null;
   courseCount: number;
   locationCount: number;
 };
@@ -66,7 +70,7 @@ export type Country = {
 export type Course = {
   id: string;
   title: string;
-  imageUrl: string;
+  imageUrl: string | null;
   subject: Subject;
   countryCode: string;
   countryName: string;

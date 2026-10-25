@@ -51,16 +51,16 @@ through the computer's firewall if that URL cannot be reached.
 | Lessons/quizzes, submitted answers, best scores, reading progress, completion and coin rewards | Backend; optional sample lesson/quiz content is stored in PostgreSQL and labelled Demo |
 | Benefits partners/countries/offers, coupon activation and history | Backend; demo partners are explicitly labelled |
 | Event identity, start time, venue/coordinates, organizer, description, free/paid status and registration link | Backend |
-| Course/place/event images, location kinds/cities, country introductions and profile bios | Stable demo supplements, labelled in the UI |
-| Event city/category/language and numeric paid-price examples | Stable demo supplements, labelled in list and details |
+| Course/place/event images, place kinds/cities, country introductions and profile bios | Backend (`006-content-details`); nullable, the UI hides or falls back when missing |
+| Event city (from its venue), category, language and paid price | Backend; unknown categories show as a generic event, paid events without a price show "Paid" |
 | Expert applications/statuses/certificates | Explicitly labelled demos; expert changes are in memory only |
 | Theme preference | Device storage |
 
-Demo supplements use a stable ID hash, or country code for introductions. They never
-replace backend records, coordinates, unlock prices, balances, ownership, learning
-history or social state. Errors never fall back to mock records. Original mock
-modules supply demo-only fields/test fixtures; the mock wallet/pricing implementation
-has been removed.
+Every displayed field comes from the backend; errors never fall back to mock records.
+The `*.mock.ts` modules are no longer imported at runtime: they are the source for the
+backend's generated dev seed (`backend/dev/generate-demo-data.cjs`) and the Jest API
+fixture. Missing images render as an empty tinted panel; unknown place kinds show as
+"Place". Only expert applications remain a frontend mock, labelled Demo.
 
 Country responses include `flagUrl`, an absolute HTTPS URL such as
 `https://flagcdn.com/w160/hr.png`. The adapter preserves the URL and the shared
@@ -69,10 +69,11 @@ profile/course records use the same hosted URL convention. No image files are
 bundled and no backend image proxy is used. The phone needs internet access to
 the CDN. Emoji flags are no longer used. Country lists include
 zero-content countries with real zero counts. English names and ISO identifiers
-are backend-owned; introductions remain explicitly labelled demo content.
+and introductions (when present) are backend-owned.
 
-The calendar defaults to all events. Selecting a city filters **demo city labels**
-locally, not real geographic coverage. "My location" only selects that demo filter.
+The calendar defaults to all events. City chips are the distinct venue cities of the
+loaded events, filtered locally. "My location" selects the device's reverse-geocoded
+city, which may have no events.
 Registration always uses the server URL and is hidden if absent. Map pins/actions
 use actual coordinates and are omitted when absent. Null durations display
 "Not specified"; null progress hides the progress bar. Database subject labels
