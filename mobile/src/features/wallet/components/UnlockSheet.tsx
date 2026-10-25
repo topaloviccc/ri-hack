@@ -95,7 +95,7 @@ export function UnlockSheet({ courseId }: UnlockSheetProps) {
 
       {canAfford ? null : (
         <Text variant="caption" className="text-center">
-          Ways to earn coins are coming soon.
+          Earn coins by passing a course: score at least 80% overall on its quizzes.
         </Text>
       )}
       {unlock.isError ? (

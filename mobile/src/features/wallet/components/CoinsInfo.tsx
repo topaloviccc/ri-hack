@@ -28,7 +28,9 @@ export function CoinsInfo() {
         Use coins to unlock courses or redeem Benefits. Submit every quiz and score at least 80%
         overall to earn the course completion reward, paid once per course.
       </Text>
-      <Text>Posted balance: {data.balance} coins</Text>
+      {data.heldBalance > 0 ? (
+        <Text variant="caption">{data.heldBalance} coins on hold</Text>
+      ) : null}
       <Text variant="caption" className="text-center">
         Coins are virtual, not cash.
       </Text>
