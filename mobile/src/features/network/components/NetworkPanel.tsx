@@ -8,7 +8,7 @@ import { FriendRequests, FriendStrip, SuggestedFriends } from '@/features/users'
 
 const MODES = [
   { value: 'network', label: 'Network' },
-  { value: 'leaderboards', label: 'Leaderboards' },
+  { value: 'leaderboards', label: 'Leaderboard' },
 ] as const;
 
 type Mode = (typeof MODES)[number]['value'];

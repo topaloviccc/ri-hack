@@ -98,7 +98,7 @@ describe('screens', () => {
 
   it('Network leaderboard marks your own row', async () => {
     await renderAt('/network');
-    await fireEvent.press(await screen.findByText('Leaderboards'));
+    await fireEvent.press(await screen.findByText('Leaderboard'));
     expect(await screen.findByText(/\(you\)$/)).toBeOnTheScreen();
   });
 
