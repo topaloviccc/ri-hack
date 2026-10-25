@@ -58,3 +58,5 @@ example
 # generated native folders
 /ios
 /android
+# iOS extension templates expo-app-blocker copies on every config read
+/targets

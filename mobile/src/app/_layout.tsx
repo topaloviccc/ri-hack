@@ -58,10 +58,15 @@ function AppShell() {
           <Stack.Screen name="profile" options={{ title: 'Profile' }} />
           <Stack.Screen name="user/[id]" options={{ title: 'Profile' }} />
           <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+          <Stack.Screen name="focus-apps" options={{ title: 'Blocked apps' }} />
           <Stack.Screen name="people" options={{ title: 'People' }} />
           <Stack.Screen name="expert/apply" options={{ title: 'Become an expert' }} />
           <Stack.Screen name="expert/requests" options={{ title: 'Your requests' }} />
-          <Stack.Screen name="course/[id]/index" options={{ title: '' }} />
+          <Stack.Screen
+            name="course/[id]/index"
+            // Continues the feed's swipe-left gesture on both platforms.
+            options={{ title: '', animation: 'slide_from_right' }}
+          />
           <Stack.Screen name="course/[id]/learn" options={{ title: 'Learn' }} />
           <Stack.Screen
             name="course/[id]/unlock"

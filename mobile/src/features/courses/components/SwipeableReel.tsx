@@ -4,6 +4,8 @@ import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
+  withSequence,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
@@ -15,13 +17,18 @@ const SWIPE_THRESHOLD = 0.25;
 const ACTIVE_OFFSET_X = 20;
 const FAIL_OFFSET_Y = 15;
 const DISMISS_DURATION_MS = 200;
+const OPEN_DURATION_MS = 180;
+// Snap the reel back only once the details screen has slid over it.
+const OPEN_RESET_DELAY_MS = 600;
 
 export type SwipeableReelProps = {
   children: ReactNode;
   /** Swipe right: the reel flies off ("less like this"). */
   onDismiss: () => void;
-  /** Swipe left: open the course; the reel springs back. */
+  /** Swipe left: the reel slides out and the course opens. */
   onOpen: () => void;
+  /** A horizontal swipe has started: a chance to load what `onOpen` will show. */
+  onSwipeStart?: () => void;
   disabled?: boolean;
 };
 
@@ -29,6 +36,7 @@ export function SwipeableReel({
   children,
   onDismiss,
   onOpen,
+  onSwipeStart,
   disabled = false,
 }: SwipeableReelProps) {
   const { width } = useWindowDimensions();
@@ -38,6 +46,10 @@ export function SwipeableReel({
     enabled: !disabled,
     activeOffsetX: [-ACTIVE_OFFSET_X, ACTIVE_OFFSET_X],
     failOffsetY: [-FAIL_OFFSET_Y, FAIL_OFFSET_Y],
+    onActivate: () => {
+      'worklet';
+      if (onSwipeStart) scheduleOnRN(onSwipeStart);
+    },
     onUpdate: (e) => {
       'worklet';
       translateX.value = e.translationX;
@@ -53,7 +65,15 @@ export function SwipeableReel({
         });
         return;
       }
-      if (e.translationX < -threshold) scheduleOnRN(onOpen);
+      if (e.translationX < -threshold) {
+        // Navigate right away and let the reel finish its slide under the incoming screen.
+        scheduleOnRN(onOpen);
+        translateX.value = withSequence(
+          withTiming(-width, { duration: OPEN_DURATION_MS }),
+          withDelay(OPEN_RESET_DELAY_MS, withTiming(0, { duration: 0 })),
+        );
+        return;
+      }
       translateX.value = withSpring(0);
     },
   });
