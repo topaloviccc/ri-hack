@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FlatList, Modal, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { OptionRow } from '@/components/ui/OptionRow';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/cn';
 import { useThemeColors } from '@/lib/theme';
@@ -82,27 +83,14 @@ export function Select<T extends string>({
           <FlatList
             data={options}
             keyExtractor={(o) => o.value}
-            renderItem={({ item }) => {
-              const isSelected = item.value === value;
-              const isDisabled = !!item.disabledReason;
-              return (
-                <Pressable
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: isSelected, disabled: isDisabled }}
-                  disabled={isDisabled}
-                  onPress={() => handlePick(item)}
-                  className="min-h-12 flex-row items-center justify-between px-4 active:bg-background"
-                >
-                  <Text variant="body" className={cn(isDisabled && 'text-muted')}>
-                    {item.label}
-                  </Text>
-                  {isDisabled ? <Text variant="caption">{item.disabledReason}</Text> : null}
-                  {isSelected ? (
-                    <Ionicons name="checkmark" size={20} color={colors.primary} />
-                  ) : null}
-                </Pressable>
-              );
-            }}
+            renderItem={({ item }) => (
+              <OptionRow
+                label={item.label}
+                isSelected={item.value === value}
+                disabledReason={item.disabledReason}
+                onPress={() => handlePick(item)}
+              />
+            )}
           />
         </View>
       </Modal>
