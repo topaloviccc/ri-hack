@@ -20,7 +20,7 @@ export function ReelCard({ course }: ReelCardProps) {
         <Chip label="Demo image" variant="onImage" />
         {course.isUnlocked ? null : <LockBadge cost={course.unlockCost} />}
       </View>
-      <Text variant="title" className="text-on-image">
+      <Text variant="title" className="text-on-image" numberOfLines={3}>
         {course.title}
       </Text>
       <View className="flex-row items-center gap-2">

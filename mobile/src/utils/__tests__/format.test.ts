@@ -1,4 +1,17 @@
-import { formatBytes, formatCount, formatDuration, pluralize } from '@/utils/format';
+import {
+  formatBytes,
+  formatCount,
+  formatDuration,
+  listWithMore,
+  pluralize,
+} from '@/utils/format';
+
+describe('listWithMore', () => {
+  it('lists everything up to the cap, then counts the rest', () => {
+    expect(listWithMore(['A', 'B'], 2)).toBe('A\nB');
+    expect(listWithMore(['A', 'B', 'C', 'D'], 2)).toBe('A\nB\n+ 2 more');
+  });
+});
 
 describe('formatCount', () => {
   it.each([

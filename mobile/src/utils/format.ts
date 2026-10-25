@@ -14,6 +14,13 @@ export const formatNumber = (n: number) => n.toLocaleString('en-GB');
 export const pluralize = (count: number, singular: string, plural = `${singular}s`) =>
   `${formatNumber(count)} ${count === 1 ? singular : plural}`;
 
+/** One item per line, capped: (['A', 'B', 'C'], 2) -> 'A', 'B', '+ 1 more' on three lines. */
+export const listWithMore = (items: string[], max: number) => {
+  const shown = items.slice(0, max);
+  if (items.length > max) shown.push(`+ ${items.length - max} more`);
+  return shown.join('\n');
+};
+
 /** 95 -> '1 h 35 min', 45 -> '45 min' */
 export const formatDuration = (minutes: number) => {
   const h = Math.floor(minutes / 60);

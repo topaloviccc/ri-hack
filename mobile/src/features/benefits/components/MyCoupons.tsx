@@ -68,7 +68,9 @@ export function MyCoupons() {
           <View className="flex-row items-center gap-3">
             <BenefitArtwork offer={item.offer} className="h-20 w-20 shrink-0 rounded-lg" />
             <View className="flex-1 gap-1">
-              <Text variant="heading">{item.offer.title}</Text>
+              <Text variant="heading" numberOfLines={2}>
+                {item.offer.title}
+              </Text>
               <Text variant="caption">{item.offer.partner.name}</Text>
             </View>
           </View>

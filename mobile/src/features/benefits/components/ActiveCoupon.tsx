@@ -11,7 +11,10 @@ import { useMarkCouponUsed } from '@/features/benefits/api/benefits.mutations';
 import { BenefitArtwork, PartnerAvatar } from '@/features/benefits/components/BenefitArtwork';
 import { RedemptionCode } from '@/features/benefits/components/RedemptionCode';
 import { confirmDestructive } from '@/utils/confirm';
-import { pluralize } from '@/utils/format';
+import { listWithMore, pluralize } from '@/utils/format';
+
+// Keeps the code and Mark as used near the top; the offer page lists every venue.
+const MAX_VENUES = 5;
 
 export function ActiveCoupon({ couponId }: { couponId: string }) {
   const coupon = useQuery(couponQueryOptions(couponId));
@@ -41,7 +44,12 @@ export function ActiveCoupon({ couponId }: { couponId: string }) {
             <Text variant="label" className="text-center">
               {data.offer.partner.name}
             </Text>
-            <Text variant="title" className="text-center text-2xl" accessibilityRole="header">
+            <Text
+              variant="title"
+              className="text-center text-2xl"
+              accessibilityRole="header"
+              numberOfLines={3}
+            >
               {data.offer.title}
             </Text>
             {data.offer.subtitle ? (
@@ -86,7 +94,10 @@ export function ActiveCoupon({ couponId }: { couponId: string }) {
           ) : null}
           <View className="w-full flex-row items-start gap-2 border-t border-border pt-4">
             <Text variant="caption" className="flex-1">
-              {data.offer.venues.map((venue) => venue.name).join('\n')}
+              {listWithMore(
+                data.offer.venues.map((venue) => venue.name),
+                MAX_VENUES,
+              )}
             </Text>
           </View>
         </View>
