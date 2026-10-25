@@ -16,7 +16,7 @@ export type CourseListItemProps = {
   onPressIn?: (id: string) => void;
 };
 
-/** Compact row used by the location sheet, Country page, Fields list and profiles. */
+/** Compact row used by the Location page, Country page, Fields list and profiles. */
 export const CourseListItem = memo(function CourseListItem({
   course,
   onPress,
