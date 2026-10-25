@@ -10,13 +10,21 @@ import { couponQueryOptions } from '@/features/benefits/api/benefits.queries';
 import { useMarkCouponUsed } from '@/features/benefits/api/benefits.mutations';
 import { BenefitArtwork, PartnerAvatar } from '@/features/benefits/components/BenefitArtwork';
 import { RedemptionCode } from '@/features/benefits/components/RedemptionCode';
+import { confirmDestructive } from '@/utils/confirm';
 
 export function ActiveCoupon({ couponId }: { couponId: string }) {
   const coupon = useQuery(couponQueryOptions(couponId));
   const markUsed = useMarkCouponUsed();
   if (coupon.isPending) return <LoadingState />;
   if (!coupon.data)
-    return <ErrorState message={coupon.error?.message} onRetry={() => { void coupon.refetch(); }} />;
+    return (
+      <ErrorState
+        message={coupon.error?.message}
+        onRetry={() => {
+          void coupon.refetch();
+        }}
+      />
+    );
 
   const data = coupon.data;
   return (
@@ -29,11 +37,17 @@ export function ActiveCoupon({ couponId }: { couponId: string }) {
             <PartnerAvatar partner={data.offer.partner} />
           </View>
           <View className="items-center gap-1">
-            <Text variant="label" className="text-center">{data.offer.partner.name}</Text>
+            <Text variant="label" className="text-center">
+              {data.offer.partner.name}
+            </Text>
             <Text variant="title" className="text-center text-2xl" accessibilityRole="header">
               {data.offer.title}
             </Text>
-            {data.offer.subtitle ? <Text variant="caption" className="text-center">{data.offer.subtitle}</Text> : null}
+            {data.offer.subtitle ? (
+              <Text variant="caption" className="text-center">
+                {data.offer.subtitle}
+              </Text>
+            ) : null}
           </View>
           {data.status === 'ACTIVE' ? (
             <RedemptionCode code={data.redemptionCode} />
@@ -42,18 +56,30 @@ export function ActiveCoupon({ couponId }: { couponId: string }) {
           ) : (
             <Text>This coupon has expired.</Text>
           )}
-          <Text variant="caption" className="text-center">{data.priceCoins} coins used</Text>
+          <Text variant="caption" className="text-center">
+            {data.priceCoins} coins used
+          </Text>
           {data.status === 'ACTIVE' ? (
             <View className="w-full items-center gap-2">
-              {markUsed.isError ? <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">{markUsed.error.message}</Text> : null}
+              {markUsed.isError ? (
+                <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">
+                  {markUsed.error.message}
+                </Text>
+              ) : null}
               <Button
                 label={markUsed.isPending ? 'Updating…' : 'Mark as used'}
                 className="self-center"
                 disabled={markUsed.isPending}
                 accessibilityState={{ busy: markUsed.isPending }}
-                onPress={() => markUsed.mutate({ couponId }, {
-                  onSuccess: () => { void coupon.refetch(); },
-                })}
+                onPress={() =>
+                  confirmDestructive({
+                    title: 'Mark this coupon as used?',
+                    message: "Only do this once the venue has accepted it. You can't undo this.",
+                    confirmLabel: 'Mark as used',
+                    onConfirm: () =>
+                      markUsed.mutate({ couponId }, { onSuccess: () => void coupon.refetch() }),
+                  })
+                }
               />
             </View>
           ) : null}

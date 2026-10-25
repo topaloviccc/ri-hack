@@ -1,4 +1,5 @@
-import { fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
+import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
+import { Alert, type AlertButton } from 'react-native';
 
 import {
   MOCK_COUNTRIES,
@@ -80,12 +81,19 @@ describe('screens', () => {
     expect(await screen.findByLabelText('Add Ivan Perović as a friend')).toBeOnTheScreen();
   });
 
-  it('Removing a friend asks for a second tap', async () => {
+  it('Removing a friend asks for confirmation first', async () => {
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
     await renderAt('/user/u1');
     await fireEvent.press(await screen.findByLabelText('Remove Ana Pejović as a friend'));
-    expect(screen.getByText('Tap again to remove Ana')).toBeOnTheScreen();
-    await fireEvent.press(screen.getByLabelText('Confirm removing Ana Pejović as a friend'));
+    expect(alert).toHaveBeenCalledWith(
+      'Remove Ana Pejović?',
+      expect.any(String),
+      expect.any(Array),
+    );
+    const buttons: AlertButton[] = alert.mock.calls[0][2] ?? [];
+    await act(async () => buttons.find((b) => b.style === 'destructive')?.onPress?.());
     expect(await screen.findByLabelText('Add Ana Pejović as a friend')).toBeOnTheScreen();
+    alert.mockRestore();
   });
 
   it('Network leaderboard marks your own row', async () => {
