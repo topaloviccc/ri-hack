@@ -101,7 +101,7 @@ export function QuizPlayer({ learning, quizId }: QuizPlayerProps) {
             </Text>
           ) : null}
           <LearningAction
-            label={submit.isPending ? 'Submitting...' : 'Submit quiz'}
+            label={submit.isPending ? 'Submitting…' : 'Submit quiz'}
             disabled={!ready || submit.isPending}
             onPress={() =>
               submit.mutate({

@@ -77,7 +77,7 @@ export function LessonReader({ course, lesson }: LessonReaderProps) {
                 {lesson.quiz.questionCount} questions · Unlimited retries
               </Text>
               <LearningAction
-                label={complete.isPending ? 'Saving...' : 'Continue to quiz'}
+                label={complete.isPending ? 'Saving…' : 'Continue to quiz'}
                 disabled={complete.isPending || !lesson.text}
                 onPress={() =>
                   complete.mutate(lesson.id, {

@@ -47,7 +47,7 @@ export function ActiveCoupon({ couponId }: { couponId: string }) {
             <View className="w-full items-center gap-2">
               {markUsed.isError ? <Text variant="caption" className="text-primary" accessibilityLiveRegion="polite">{markUsed.error.message}</Text> : null}
               <Button
-                label={markUsed.isPending ? 'Updating...' : 'Mark as used'}
+                label={markUsed.isPending ? 'Updating…' : 'Mark as used'}
                 className="self-center"
                 disabled={markUsed.isPending}
                 accessibilityState={{ busy: markUsed.isPending }}

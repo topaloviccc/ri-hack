@@ -44,7 +44,7 @@ export function LearningOutline({ learning }: LearningOutlineProps) {
           <LearningHeader learning={learning} />
           <LearningProgressCard learning={learning} />
           <LearningAction
-            label={start.isPending ? 'Starting...' : action}
+            label={start.isPending ? 'Starting…' : action}
             disabled={start.isPending}
             onPress={handleContinue}
           />
