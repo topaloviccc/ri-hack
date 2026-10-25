@@ -48,3 +48,4 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **Map colours as a prop** — the map palette lives in `lib/theme.ts` tokens (`map*`); expose a per-map override if a screen ever needs a different scheme.
 - [ ] **Jest Reanimated/Skia stubs** — `jest.setup.ts` stubs Reanimated because its v4 mock crashes; delete the stub when upstream fixes it.
 - [ ] **App identity** — name/slug/scheme are still `mobile`; icons and splash are Expo defaults.
+- [ ] **Server-side undo for "less like this"** — Undo is a 4 s client-side window before `POST /courses/{id}/dismiss` is sent; a dismissal made just before the app is killed is lost. An un-dismiss endpoint would let the save happen immediately.
