@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Image } from 'expo-image';
 import { View } from 'react-native';
 
+import { Image } from '@/components/ui/Image';
 import type { Offer, Partner } from '@/features/benefits/types';
 import { cn } from '@/lib/cn';
 import { useThemeColors } from '@/lib/theme';
@@ -21,11 +21,7 @@ export function PartnerAvatar({ partner }: { partner: Partner }) {
   return (
     <View className="h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-secondary/30 bg-secondary/20">
       {partner.logoUrl ? (
-        <Image
-          source={{ uri: partner.logoUrl }}
-          style={{ width: '100%', height: '100%' }}
-          contentFit="cover"
-        />
+        <Image uri={partner.logoUrl} className="h-full w-full" />
       ) : (
         <Ionicons name={icon} size={28} color={colors.onSecondary} />
       )}
@@ -35,17 +31,10 @@ export function PartnerAvatar({ partner }: { partner: Partner }) {
 
 export function BenefitArtwork({ offer, className }: { offer: Offer; className?: string }) {
   const colors = useThemeColors();
-  const source = offer.imageUrl ? { uri: offer.imageUrl } : undefined;
   return (
     <View className={cn('items-center justify-center overflow-hidden bg-secondary/20', className)}>
-      {source ? (
-        <Image
-          source={source}
-          contentFit="cover"
-          transition={150}
-          accessibilityLabel={offer.title}
-          style={{ width: '100%', height: '100%' }}
-        />
+      {offer.imageUrl ? (
+        <Image uri={offer.imageUrl} accessibilityLabel={offer.title} className="h-full w-full" />
       ) : (
         <Ionicons name="gift-outline" size={32} color={colors.secondary} />
       )}
