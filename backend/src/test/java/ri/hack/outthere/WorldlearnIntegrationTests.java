@@ -44,7 +44,7 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
     }
 
     @Test
-    void browsesSchemaBackedCoursesAndFiltersWithoutInventingFields() throws Exception {
+    void browsesCoursesWithDisplayDetailsAndFilters() throws Exception {
         mvc.perform(get("/api/courses").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(4));
         mvc.perform(get("/api/courses/" + PAID).with(viewer(ME))).andExpect(status().isOk())
@@ -52,7 +52,11 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
                 .andExpect(jsonPath("$.unlockCost").value(40))
                 .andExpect(jsonPath("$.isUnlocked").value(false))
                 .andExpect(jsonPath("$.locations[0].lat").value(42.424662))
-                .andExpect(jsonPath("$.imageUrl").doesNotExist());
+                .andExpect(jsonPath("$.locations[0].kind").value("museum"))
+                .andExpect(jsonPath("$.locations[0].city").value("Kotor"))
+                .andExpect(jsonPath("$.imageUrl").value("https://example.test/paid.jpg"));
+        mvc.perform(get("/api/courses/" + FREE).with(viewer(ME))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.imageUrl").isEmpty());
         mvc.perform(get("/api/courses").with(viewer(ME)).param("collection", "continue"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(STARTED)).andExpect(jsonPath("$[0].progress").value(0.5));
@@ -77,15 +81,23 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
     void servesCountriesLocationsEventsAndUuidCodebooks() throws Exception {
         mvc.perform(get("/api/countries/ME").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.courseCount").value(3)).andExpect(jsonPath("$.locationCount").value(1))
-                .andExpect(jsonPath("$.blurb").doesNotExist());
+                .andExpect(jsonPath("$.blurb").value("Mountains meet the sea."));
         mvc.perform(get("/api/locations").with(viewer(ME)).param("countryCode", "ME"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1));
+                .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].imageUrl").value("https://example.test/museum.jpg"))
+                .andExpect(jsonPath("$[0].kind").value("museum"))
+                .andExpect(jsonPath("$[0].city").value("Kotor"));
         mvc.perform(get("/api/events").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("Museum lecture"))
                 .andExpect(jsonPath("$[0].organizer").value("Alex Friend"))
                 .andExpect(jsonPath("$[0].startsAt").isString())
                 .andExpect(jsonPath("$[0].isFree").value(true))
-                .andExpect(jsonPath("$[0].registrationUrl").value("https://example.test/register"));
+                .andExpect(jsonPath("$[0].registrationUrl").value("https://example.test/register"))
+                .andExpect(jsonPath("$[0].imageUrl").value("https://example.test/lecture.jpg"))
+                .andExpect(jsonPath("$[0].category").value("lecture"))
+                .andExpect(jsonPath("$[0].city").value("Kotor"))
+                .andExpect(jsonPath("$[0].language").value("en"))
+                .andExpect(jsonPath("$[0].priceEur").isEmpty());
         mvc.perform(get("/api/events/a0000000-0000-0000-0000-000000000001").with(viewer(ME)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.venue").value("Museum"));
         mvc.perform(get("/api/codebooks/difficulties/08000e35-c398-5283-8335-920c4f7ad08d").with(viewer(ME)))
@@ -169,6 +181,7 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
                 .andExpect(jsonPath("$.relation").value("me"))
                 .andExpect(jsonPath("$.inProgressCourseIds[0]").value(STARTED));
         mvc.perform(get("/api/users/" + FRIEND).with(viewer(ME))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.bio").value("Loves old maps."))
                 .andExpect(jsonPath("$.stats.completedCount").value(1))
                 .andExpect(jsonPath("$.stats.streakDays").value(1))
                 .andExpect(jsonPath("$.badgeCountryCodes[0]").value("ME"));

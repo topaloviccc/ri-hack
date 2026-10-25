@@ -13,8 +13,11 @@ INSERT INTO wallet(user_id,balance) VALUES
  ('00000000-0000-0000-0000-000000000003',0);
 INSERT INTO friendship(requester_id,addressee_id,friendship_status_id) VALUES
  ('00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','1fd341a9-517a-5e85-b681-2f558ce03441');
-INSERT INTO place(id,name,country_id,address,latitude,longitude) VALUES
- ('70000000-0000-0000-0000-000000000001','Museum',(SELECT id FROM country WHERE iso_code='ME'),'Test address',42.424662,18.771234);
+INSERT INTO place(id,name,country_id,address,latitude,longitude,image_url,kind,city) VALUES
+ ('70000000-0000-0000-0000-000000000001','Museum',(SELECT id FROM country WHERE iso_code='ME'),'Test address',42.424662,18.771234,
+  'https://example.test/museum.jpg','museum','Kotor');
+UPDATE country SET blurb='Mountains meet the sea.' WHERE iso_code='ME';
+UPDATE app_user SET bio='Loves old maps.' WHERE username='alex';
 INSERT INTO course(id,creator_id,title,description,country_id,estimated_minutes,price_coins,reward_coins) VALUES
  ('10000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','Paid course','Paid description',(SELECT id FROM country WHERE iso_code='ME'),30,40,10),
  ('10000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000002','Free course','Free description',(SELECT id FROM country WHERE iso_code='HR'),15,0,0),
@@ -26,6 +29,7 @@ INSERT INTO course_version(id,course_id,version_number,title,created_by,publicat
         'aa7192b0-4b5d-5230-b311-25aa6b0e59ff',now() FROM course c WHERE c.title<>'Draft course';
 UPDATE course SET current_published_version_id=('20000000-0000-0000-0000-' || right(id::text,12))::uuid
  WHERE title<>'Draft course';
+UPDATE course SET image_url='https://example.test/paid.jpg' WHERE id='10000000-0000-0000-0000-000000000001';
 INSERT INTO course_field(course_id,field_id) VALUES
  ('10000000-0000-0000-0000-000000000001','90000000-0000-0000-0000-000000000001'),
  ('10000000-0000-0000-0000-000000000002','90000000-0000-0000-0000-000000000002');
@@ -49,6 +53,8 @@ INSERT INTO lesson_progress(enrollment_id,course_version_id,lesson_id,completed_
  ('40000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000003','50000000-0000-0000-0000-000000000001',now());
 INSERT INTO course_completion(enrollment_id,completed_at,quiz_count,aggregate_percentage,score_sum_numerator,score_sum_denominator)
  SELECT id,completed_at,1,100,1,1 FROM enrollment WHERE completed_at IS NOT NULL;
-INSERT INTO event(id,name,description,organizer_id,place_id,starts_at,ends_at,external_registration_url) VALUES
+-- price_eur on a free event must not be exposed.
+INSERT INTO event(id,name,description,organizer_id,place_id,starts_at,ends_at,external_registration_url,image_url,category,language,price_eur) VALUES
  ('a0000000-0000-0000-0000-000000000001','Museum lecture','A lecture','00000000-0000-0000-0000-000000000002',
-  '70000000-0000-0000-0000-000000000001',now()+interval '1 day',now()+interval '2 days','https://example.test/register');
+  '70000000-0000-0000-0000-000000000001',now()+interval '1 day',now()+interval '2 days','https://example.test/register',
+  'https://example.test/lecture.jpg','lecture','en',12);

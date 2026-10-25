@@ -140,6 +140,29 @@ insert('event',['id','name','description','organizer_id','country_id','place_id'
     return [id('event',e.id),e.title,e.description,id('user',`u${index%6+1}`),country('ME'),id('event-place',e.id),
       e.registrationUrl,raw(`(${start})`),raw(`(${start})+interval '2 hours'`),'Europe/Podgorica',e.priceEur===null];
   }));
+// Display details from 006-content-details. Inserts above skip existing rows, so fill the new
+// columns separately and only where empty: re-running backfills old databases, keeps local edits.
+function backfill(table, key, columns, rows) {
+  const names = [key[0], ...columns.map(([name]) => name)];
+  const types = [key[1], ...columns.map(([, type]) => type)];
+  sql.push(`UPDATE ${table} t SET ${columns.map(([c]) => `${c}=coalesce(t.${c},v.${c})`).join(',')}
+FROM (VALUES
+${rows.map((row) => `  (${row.map((v, i) => `${value(v)}::${types[i]}`).join(',')})`).join(',\n')}
+) v(${names.join(',')}) WHERE t.${key[0]}=v.${key[0]};`);
+}
+const { MOCK_COUNTRIES: countryDetails } = samples('features/courses/api/courses.mock.ts');
+backfill('country', ['iso_code','text'], [['blurb','text']],
+  countryDetails.map((c) => [c.code, c.blurb]));
+backfill('course', ['id','uuid'], [['image_url','text']],
+  courses.map((c) => [id('course',c.id), c.imageUrl]));
+backfill('place', ['id','uuid'], [['image_url','text'],['kind','varchar'],['city','varchar']],
+  places.map((p) => [id('place',p.id), p.imageUrl, p.kind, p.city]));
+backfill('place', ['id','uuid'], [['city','varchar']],
+  events.map((e) => [id('event-place',e.id), e.city]));
+backfill('app_user', ['id','uuid'], [['bio','text']],
+  users.map((u) => [id('user',u.id), u.bio]));
+backfill('event', ['id','uuid'], [['image_url','text'],['category','varchar'],['language','varchar'],['price_eur','numeric']],
+  events.map((e) => [id('event',e.id), e.imageUrl, e.category, e.language, e.priceEur]));
 sql.push(fs.readFileSync(path.join(__dirname,'demo-learning.sql'),'utf8').replace(/^BEGIN;|^COMMIT;/gm, ''));
 sql.push('COMMIT;');
 fs.writeFileSync(path.join(__dirname,'demo-data.sql'),sql.join('\n\n')+'\n');

@@ -28,7 +28,7 @@ public class UserRepository {
                     JOIN friendship_status fs ON fs.id=f.friendship_status_id WHERE fs.label='ACCEPTED'
                 )
                 SELECT u.id, concat_ws(' ',u.first_name,u.last_name) AS name, u.username AS handle,
-                  u.avatar_url, n.iso_code AS country_code,
+                  u.avatar_url, n.iso_code AS country_code, u.bio,
                   CASE WHEN u.id=:viewer THEN 'me' WHEN fs.label='ACCEPTED' THEN 'friend'
                        WHEN fs.label='PENDING' AND f.requester_id=:viewer THEN 'requested'
                        WHEN fs.label='PENDING' THEN 'incoming' ELSE 'none' END AS relation,

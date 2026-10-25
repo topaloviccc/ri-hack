@@ -16,7 +16,8 @@ public class EventRepository {
         String sql = """
                 SELECT e.id, e.name AS title, e.starts_at, p.name AS venue, p.latitude AS lat, p.longitude AS lng,
                        e.description, CASE WHEN u.id IS NULL THEN NULL ELSE concat_ws(' ',u.first_name,u.last_name) END AS organizer,
-                       e.is_free, e.external_registration_url AS registration_url
+                       e.is_free, e.external_registration_url AS registration_url, e.image_url, e.category,
+                       p.city, e.language, CASE WHEN e.is_free THEN NULL ELSE e.price_eur END AS price_eur
                 FROM event e JOIN event_status s ON s.id=e.status_id
                 LEFT JOIN place p ON p.id=e.place_id LEFT JOIN app_user u ON u.id=e.organizer_id
                 WHERE s.label<>'CANCELLED'

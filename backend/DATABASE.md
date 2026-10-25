@@ -8,7 +8,9 @@ reference data and `003-hosted-country-flags.sql` for hosted flag image URLs.
 The Benefits migrations (`002-benefits-redemption.sql`,
 `003-benefits-instant-coupons.sql`, `004-benefit-remote-images.sql`) add the
 coupon flow. `004-course-learning.sql` adds quizzes, answers, attempts and
-completion rewards. Changesets retain their original names and identities
+completion rewards. `005-auth.sql` adds login credentials, and `006-content-details.sql`
+adds nullable display details: `country.blurb`, `app_user.bio`, `course.image_url`,
+`place.image_url/kind/city` and `event.image_url/category/language/price_eur`. Changesets retain their original names and identities
 across both feature branches; the numeric prefixes are not globally unique.
 See [SCOPE.md](SCOPE.md) for the included tables and intentional
 omissions. UUIDs, defaults, keys and relationships follow the source schema;

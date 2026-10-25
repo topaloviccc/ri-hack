@@ -11,4 +11,5 @@
     <include file="004-benefit-remote-images.sql" relativeToChangelogFile="true"/>
     <include file="004-course-learning.sql" relativeToChangelogFile="true"/>
     <include file="005-auth.sql" relativeToChangelogFile="true"/>
+    <include file="006-content-details.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

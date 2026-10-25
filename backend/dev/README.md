@@ -79,8 +79,12 @@ Course grants/completion history are seeded examples, not earned quiz rewards.
 
 Short-answer/matching questions, spaced revision, course authoring/LLM generation,
 profile editing and event registration storage remain unavailable. Expert requests
-and the weekly challenge remain labelled frontend demos. Course/place/event images, city filters and
-other unsupported presentation details remain labelled demos as previously chosen.
+remain a labelled frontend demo; the weekly challenge was removed from the app.
+
+The seed also fills the `006-content-details` columns (course/place/event images, place
+kind/city, event category/language/price, country introductions and bios) from the mobile
+samples. It only fills empty columns, so re-running `demo-data.sql` after restarting the
+backend backfills an existing database without overwriting edits.
 
 Reload Expo Go after seeding. `mobile/.env.local` holds the computer's LAN API URL; update that URL if the computer's Wi-Fi address changes.
 

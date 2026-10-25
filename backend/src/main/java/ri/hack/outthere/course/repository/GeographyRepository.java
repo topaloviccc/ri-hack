@@ -23,7 +23,8 @@ public class GeographyRepository {
                    JOIN publication_status ps ON ps.id=v.publication_status_id
                    WHERE c.country_id=n.id AND c.archived_at IS NULL
                      AND vis.label='PUBLIC' AND ps.label='PUBLISHED') AS course_count,
-                  (SELECT count(*) FROM place p WHERE p.country_id=n.id AND p.archived_at IS NULL) AS location_count
+                  (SELECT count(*) FROM place p WHERE p.country_id=n.id AND p.archived_at IS NULL) AS location_count,
+                  n.blurb
                 FROM country n ORDER BY n.label, n.iso_code
                 """).query(CountryResponse.class).list();
     }
@@ -31,7 +32,7 @@ public class GeographyRepository {
     public List<LocationResponse> locations(String countryCode, List<UUID> ids) {
         String sql = """
                 SELECT p.id, p.name, n.iso_code AS country_code, n.label AS country_name,
-                       p.latitude AS lat, p.longitude AS lng
+                       p.latitude AS lat, p.longitude AS lng, p.image_url, p.kind, p.city
                 FROM place p JOIN country n ON n.id=p.country_id
                 WHERE p.archived_at IS NULL
                 """;

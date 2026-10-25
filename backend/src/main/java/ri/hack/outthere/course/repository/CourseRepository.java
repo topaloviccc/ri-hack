@@ -34,7 +34,7 @@ public class CourseRepository {
                             / nullif((SELECT count(*) FROM lesson l WHERE l.course_version_id=e.course_version_id)
                               + (SELECT count(*) FROM quiz q WHERE q.course_version_id=e.course_version_id),0)
                        END AS progress,
-                  c.price_coins AS unlock_cost, (ce.id IS NOT NULL) AS unlocked
+                  c.price_coins AS unlock_cost, (ce.id IS NOT NULL) AS unlocked, c.image_url
                 FROM course c LEFT JOIN country n ON n.id=c.country_id
                 JOIN difficulty d ON d.id=c.difficulty_id
                 JOIN visibility vis ON vis.id=c.visibility_id
@@ -90,13 +90,15 @@ public class CourseRepository {
     public List<CourseLocation> locations(List<UUID> courseIds) {
         if (courseIds.isEmpty()) return List.of();
         return jdbc.sql("""
-                SELECT cp.course_id, p.id, p.name, n.iso_code, n.label, p.latitude, p.longitude
+                SELECT cp.course_id, p.id, p.name, n.iso_code, n.label, p.latitude, p.longitude,
+                       p.image_url, p.kind, p.city
                 FROM course_place cp JOIN place p ON p.id=cp.place_id JOIN country n ON n.id=p.country_id
                 WHERE cp.course_id IN (:ids) AND p.archived_at IS NULL ORDER BY p.name, p.id
                 """).param("ids", courseIds).query((rs, row) -> new CourseLocation(
                     rs.getObject("course_id", UUID.class), new LocationResponse(rs.getObject("id", UUID.class),
                     rs.getString("name"), rs.getString("iso_code"), rs.getString("label"),
-                    rs.getBigDecimal("latitude"), rs.getBigDecimal("longitude")))).list();
+                    rs.getBigDecimal("latitude"), rs.getBigDecimal("longitude"), rs.getString("image_url"),
+                    rs.getString("kind"), rs.getString("city")))).list();
     }
 
     public boolean exists(UUID id) {

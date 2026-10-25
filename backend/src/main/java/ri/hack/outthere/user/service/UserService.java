@@ -93,6 +93,6 @@ public class UserService {
                 new UserResponse.Stats(completions.size(), repository.streak(row.id()), countries.size()),
                 countries, repository.inProgress(row.id()),
                 completions.stream().map(UserRepository.CompletionRow::courseId).toList(),
-                row.relation(), row.mutualFriendsCount());
+                row.relation(), row.mutualFriendsCount(), row.bio());
     }
 }

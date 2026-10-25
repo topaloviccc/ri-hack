@@ -20,19 +20,13 @@ The learning/scoring policy is detailed in [LEARNING.md](LEARNING.md).
 | Completion activity, friends' weekly leaderboard, profile counts/streaks/country badges | Derived from `course_completion` + enrollment/course/country + friendships |
 | Event calendar/list/details, venue coordinates, organizer and external registration | `event`, `event_status`, `place`, `app_user`; read only |
 | Recommended row without AI | `user_interest`, `course_field`; explicit interest-weight ordering |
+| Images, country introductions, bios, place kinds/cities, event categories/languages/prices, event city filter | Columns added by `006-content-details` (not in the reference SQL): `course/place/event.image_url`, `country.blurb`, `app_user.bio`, `place.kind/city`, `event.category/language/price_eur`. Image URLs are public links, not uploaded assets; the app filters events by venue city locally |
 
 ## Frontend-only data and behavior not implemented
 
 | Gap | Why it cannot be backed by this schema |
 | --- | --- |
 | Expert applications: qualification title, pending/approved/rejected requests, rejection reason, certificate attachments | `expert_field` records granted expertise, not applications. There is no application table or approval workflow. File/bucket integration is also explicitly excluded. No request endpoints were invented. |
-| Weekly challenge card, target, deadline and reward | No challenge definition or progress/reward model. No challenge endpoint. |
-| Country `blurb` | No introduction column. Country code/name and the added flag image path are production reference data; introductions remain demo content. |
-| Location `kind`, `city`, `imageUrl` | `place` has no kind, city or image column. Its free-form `address` is not a reliable city field. |
-| Course `imageUrl` | `cover_asset_id` references private storage metadata, not a public URL. Bucket/media URL resolution is excluded. |
-| Profile `bio` | No `app_user.bio` column. Avatar URLs are supported because `avatar_url` exists. |
-| Event `category`, `city`, `imageUrl`, `language`, numeric `priceEur` | No corresponding columns. `field_id` is a subject, not an event format/category. Schema only models `is_free`, exposed as `isFree`; a paid price is unknown. |
-| City-filtered events | No structured city in event/place. The API lists events without treating an address/timezone as a city. The connected frontend explicitly labels its local city filters as demos. |
 | Theme preference | Device-local setting with no schema column; no backend endpoint. |
 | Mock IDs, duration-based prices, starting balance 250, relative event dates, hardcoded home/feed collections | Replaced with schema UUIDs, stored prices/balances/actual timestamps and SQL-derived collections. No mock catalogue data is seeded in production. |
 
@@ -101,13 +95,14 @@ copied into new numeric `codebook_*` tables. Existing numeric codebooks still wo
 
 ## Frontend integration
 
-The mobile app now uses the backend for shared data and mutations, as the signed-in user. The user chose to keep unsupported details explicitly
-labelled as demo content, including images, bios, country introductions, location
-types/cities, event categories/cities/languages/numeric paid prices, expert applications
-and weekly challenges. These details do not create backend tables or integrations.
+The mobile app now uses the backend for shared data and mutations, as the signed-in user.
+Display details it used to fake (images, bios, introductions, place kinds/cities, event
+categories/cities/languages/prices) are now stored in the `006-content-details` columns and
+filled by the dev seed. Expert applications remain a labelled frontend demo with no backend
+table; the weekly challenge was removed from the app.
 
-The event calendar defaults to all events; selecting a city filters its demo city
-labels locally. Map/registration actions use actual backend coordinates and URLs.
+The event calendar defaults to all events; selecting a city filters by the venue cities
+returned by the API, locally. Map/registration actions use actual backend coordinates and URLs.
 Subject sections accept arbitrary database field labels; nullable coordinates,
 durations and progress are handled explicitly. There is no fallback to mock records
 when the server is unavailable. See [mobile/API.md](../mobile/API.md) for setup.

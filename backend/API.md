@@ -12,8 +12,9 @@ is built in; every shared deployment must set it). The viewer is always the toke
 user; there is no default "me" user. A missing, expired or invalid token returns 401.
 Logout is client-side: the app discards its token. The mobile frontend uses these
 endpoints and reads `EXPO_PUBLIC_API_URL` (including `/api`).
-Unsupported fields remain explicitly labelled demo content, per the chosen integration
-policy. See [mobile/API.md](../mobile/API.md) for configuration and demo boundaries.
+Display details (images, introductions, bios, place kinds/cities, event categories,
+languages and prices) are stored columns; see [mobile/API.md](../mobile/API.md) for
+configuration and the remaining frontend demo (expert applications).
 Browser CORS allows localhost/127.0.0.1 on port 8081 by default; configure additional
 origins with the backend `CORS_ALLOWED_ORIGINS` environment variable.
 
@@ -58,13 +59,20 @@ use `application/problem+json` with `status` and `detail`.
 
 | Type | Fields |
 | --- | --- |
-| Course | `id`, `title`, `subject`, `countryCode`, `countryName`, `locations: Location[]`, `description`, `learnerCount`, `estimatedMinutes`, `difficulty`, `progress`, `unlockCost`, `isUnlocked` |
-| Country | `code`, `name`, `flagUrl`, `courseCount`, `locationCount` |
-| Location | `id`, `name`, `countryCode`, `countryName`, `lat`, `lng` |
-| User | `id`, `name`, `handle`, `avatarUrl`, `countryCode`, `stats: {completedCount,streakDays,countriesCount}`, `badgeCountryCodes`, `inProgressCourseIds`, `completedCourseIds`, `relation` (`me`, `friend`, `requested` = viewer sent a pending request, `incoming` = viewer received one, `none`), `mutualFriendsCount` |
+| Course | `id`, `title`, `subject`, `countryCode`, `countryName`, `locations: Location[]`, `description`, `learnerCount`, `estimatedMinutes`, `difficulty`, `progress`, `unlockCost`, `isUnlocked`, `imageUrl` |
+| Country | `code`, `name`, `flagUrl`, `courseCount`, `locationCount`, `blurb` |
+| Location | `id`, `name`, `countryCode`, `countryName`, `lat`, `lng`, `imageUrl`, `kind`, `city` |
+| User | `id`, `name`, `handle`, `avatarUrl`, `countryCode`, `stats: {completedCount,streakDays,countriesCount}`, `badgeCountryCodes`, `inProgressCourseIds`, `completedCourseIds`, `relation` (`me`, `friend`, `requested` = viewer sent a pending request, `incoming` = viewer received one, `none`), `mutualFriendsCount`, `bio` |
 | FeedItem | `id`, `userId`, `userName`, `userAvatarUrl`, `courseId`, `courseTitle`, `completedAt` |
 | LeaderboardEntry | `rank`, `userId`, `userName`, `userAvatarUrl`, `completedThisWeek`, `isMe` |
-| Event | `id`, `title`, `startsAt`, `venue`, `lat`, `lng`, `description`, `organizer`, `isFree`, `registrationUrl` |
+| Event | `id`, `title`, `startsAt`, `venue`, `lat`, `lng`, `description`, `organizer`, `isFree`, `registrationUrl`, `imageUrl`, `category`, `city`, `language`, `priceEur` |
+
+The display details added by `006-content-details` are all nullable. Image fields are
+public URLs the client loads directly. Location `kind` is one of `monument`, `nature`,
+`museum`, `venue`, `site`; event `category` is one of `lecture`, `workshop`, `exhibition`,
+`film`, `sport`, `other`. Neither is constrained in the database, so clients treat unknown
+codes generically. Event `city` is the venue place's city. `priceEur` is null for free
+events and for paid events with no stored price; `language` is a BCP 47 tag.
 
 Country `code` is the uppercase ISO 3166-1 alpha-2 identifier, for example `HR`.
 `name` is the full English display name, for example `Croatia`. `flagUrl` is an

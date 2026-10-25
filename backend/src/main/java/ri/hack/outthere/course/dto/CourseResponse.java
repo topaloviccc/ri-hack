@@ -6,4 +6,4 @@ import java.util.UUID;
 public record CourseResponse(UUID id, String title, String subject, String countryCode,
                              String countryName, List<LocationResponse> locations, String description,
                              long learnerCount, Integer estimatedMinutes, String difficulty,
-                             Double progress, long unlockCost, boolean isUnlocked) { }
+                             Double progress, long unlockCost, boolean isUnlocked, String imageUrl) { }

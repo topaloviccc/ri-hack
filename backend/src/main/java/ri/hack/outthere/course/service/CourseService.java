@@ -39,7 +39,7 @@ public class CourseService {
                 row.countryCode(), row.countryName(), locations.stream()
                     .filter(link -> link.courseId().equals(row.id())).map(CourseRepository.CourseLocation::location).toList(),
                 row.description(), row.learnerCount(), row.estimatedMinutes(), row.difficulty(),
-                row.progress(), row.unlockCost(), row.unlocked())).toList();
+                row.progress(), row.unlockCost(), row.unlocked(), row.imageUrl())).toList();
     }
 
     public CourseResponse get(UUID viewer, UUID id) {

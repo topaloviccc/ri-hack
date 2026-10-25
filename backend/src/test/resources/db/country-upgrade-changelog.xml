@@ -15,4 +15,6 @@
     </changeSet>
     <include file="db/changelog/002-iso-countries.sql"/>
     <include file="db/changelog/003-hosted-country-flags.sql"/>
+    <!-- The countries endpoint reads country.blurb, added later as an independent nullable column. -->
+    <include file="db/changelog/006-content-details.sql"/>
 </databaseChangeLog>
