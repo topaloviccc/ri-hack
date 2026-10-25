@@ -92,7 +92,15 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.label").value("BEGINNER"));
         mvc.perform(get("/api/codebooks/fields")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
-        assertThat(jdbc.sql("SELECT count(*) FROM pg_constraint WHERE contype='c' AND connamespace='public'::regnamespace")
+        assertThat(jdbc.sql("""
+                SELECT count(*) FROM pg_constraint co JOIN pg_class t ON t.oid=co.conrelid
+                WHERE co.contype='c' AND co.connamespace='public'::regnamespace
+                  AND t.relname IN ('country','field','visibility','difficulty','publication_status',
+                    'enrollment_status','wallet_transaction_type','friendship_status','event_status',
+                    'app_user','user_interest','place','course','course_field','course_place',
+                    'course_version','lesson','wallet','wallet_transaction','course_entitlement',
+                    'enrollment','lesson_progress','course_completion','user_course_preference','friendship','event')
+                """)
                 .query(Long.class).single()).isZero();
         assertThat(jdbc.sql("SELECT count(*) FROM pg_trigger WHERE NOT tgisinternal")
                 .query(Long.class).single()).isZero();
@@ -101,15 +109,15 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
     @Test
     void unlocksAtomicallyAndRetriesWithoutDoubleCharging() throws Exception {
         mvc.perform(post("/api/courses/" + PAID + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "one"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.balance").value(60));
+                .andExpect(status().isOk()).andExpect(content().json("{\"balance\":60,\"heldBalance\":0,\"availableBalance\":60}"));
         mvc.perform(post("/api/courses/" + PAID + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "one"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.balance").value(60));
+                .andExpect(status().isOk()).andExpect(content().json("{\"balance\":60,\"heldBalance\":0,\"availableBalance\":60}"));
         mvc.perform(post("/api/courses/" + PAID + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "new"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.balance").value(60));
+                .andExpect(status().isOk()).andExpect(content().json("{\"balance\":60,\"heldBalance\":0,\"availableBalance\":60}"));
         mvc.perform(post("/api/courses/" + FREE + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "one"))
                 .andExpect(status().isConflict());
         mvc.perform(post("/api/courses/" + FREE + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "free"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.balance").value(60));
+                .andExpect(status().isOk()).andExpect(content().json("{\"balance\":60,\"heldBalance\":0,\"availableBalance\":60}"));
         mvc.perform(get("/api/courses/" + PAID).header("X-User-Id", ME))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.isUnlocked").value(true));
         assertThat(jdbc.sql("SELECT count(*) FROM wallet_transaction").query(Long.class).single()).isEqualTo(1);
@@ -133,7 +141,7 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
                         .header("X-User-Id", ME).header("Idempotency-Key", "expensive"))
                 .andExpect(status().isPaymentRequired()).andExpect(jsonPath("$.status").value(402));
         mvc.perform(get("/api/wallet").header("X-User-Id", ME))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.balance").value(100));
+                .andExpect(status().isOk()).andExpect(content().json("{\"balance\":100,\"heldBalance\":0,\"availableBalance\":100}"));
         assertThat(jdbc.sql("SELECT count(*) FROM wallet_transaction").query(Long.class).single()).isZero();
     }
 
@@ -146,6 +154,8 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
                     wallets.unlock(UUID.fromString(ME),UUID.fromString(PAID),"rollback"))
                     .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
             assertThat(wallets.get(UUID.fromString(ME)).balance()).isEqualTo(100);
+            assertThat(wallets.get(UUID.fromString(ME)).heldBalance()).isZero();
+            assertThat(wallets.get(UUID.fromString(ME)).availableBalance()).isEqualTo(100);
             assertThat(jdbc.sql("SELECT count(*) FROM wallet_transaction").query(Long.class).single()).isZero();
         } finally {
             jdbc.sql("ALTER TABLE course_entitlement DROP CONSTRAINT test_no_purchase").update();

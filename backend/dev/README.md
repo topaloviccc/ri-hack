@@ -59,7 +59,7 @@ Open the app as Demo Learner. Exact UUIDs are in [demo-scenarios.json](demo-scen
 | Missing optional metadata | **Optional metadata example** has no duration/country/subject. Its linked place has no coordinates, so it has no map pin or map-opening action. |
 | Unpublished course | **Unpublished demo course (hidden)** is deliberately absent from public browsing and returns 404 for this learner. |
 | Profile | Five completed courses across five countries, five-day initial streak, five courses in progress. |
-| People / network | Accepted friends, a pending request to Jelena Bulatović, suggestions with mutual friends, completion feed and weekly leaderboard. Send Ivan Perović a friend request and reload to verify persistence. |
+| People / network | Accepted friends, a pending request to Jelena Bulatović, suggestions with mutual friends, completion feed and weekly leaderboard. Send Ivan PeroviÄ‡ a friend request and reload to verify persistence. |
 | Scroll | Dismiss a reel and reload; it should remain absent. One course was initially dismissed to exercise the filter. |
 | Calendar | Events use actual stored dates, initially today and upcoming days. Select a dotted date, open details/maps, or follow a sample registration link. |
 
@@ -76,3 +76,47 @@ other unsupported presentation details remain labelled demos as previously chose
 
 Reload Expo Go after seeding. `mobile/.env.local` selects the demo viewer and the
 computer's LAN API URL; update that URL if the computer's Wi-Fi address changes.
+
+## Optional Benefits samples
+
+`benefits-seed.sql` is an independent, additive development seed, applied manually
+after the backend's Benefits Liquibase migration. It does not need the full demo
+catalogue. It reuses HR/ES/FR/IT/PT by ISO code, adds labelled demo partners/venues/offers,
+and provisions a **separate** learner with 520 opening sample coins. It never resets
+the original 250-coin Demo Learner, any purchases, or previously spent coins. A
+wallet lock and once-only opening ledger credit preserve balances on reruns.
+
+| Sample | Stable ID |
+| --- | --- |
+| Benefits learner | `b0000000-0000-4000-8000-000000000001` |
+| Burek kod braće partner | `b1000000-0000-4000-8000-000000000001` |
+| Zagreb venue | `b2000000-0000-4000-8000-000000000001` |
+| Recuerdos del Sol, Barcelona venue | `b2000000-0000-4000-8000-000000000003` |
+| Musée Atelier Lumière, Paris venue | `b2000000-0000-4000-8000-000000000004` |
+| Caffè Piccolo, Rome venue | `b2000000-0000-4000-8000-000000000005` |
+| Lisbon Postcard Club venue | `b2000000-0000-4000-8000-000000000006` |
+| Adriatic Scoops, Split venue | `b2000000-0000-4000-8000-000000000007` |
+| Free burek of your choice, HR, 150 coins | `b3000000-0000-4000-8000-000000000001` |
+| Free Barcelona fridge magnet, ES, 100 coins | `b3000000-0000-4000-8000-000000000002` |
+| 10% off a Paris museum exhibition, FR, 200 coins | `b3000000-0000-4000-8000-000000000003` |
+| Free Roman cappuccino, IT, 90 coins | `b3000000-0000-4000-8000-000000000004` |
+| Free Lisbon postcard set, PT, 80 coins | `b3000000-0000-4000-8000-000000000005` |
+| Free gelato by the Adriatic, HR, 120 coins | `b3000000-0000-4000-8000-000000000006` |
+
+From the repository root, with the database/backend already coordinated and running:
+
+```powershell
+docker cp backend/dev/benefits-seed.sql outthere-postgres:/tmp/outthere-benefits-seed.sql
+docker exec outthere-postgres psql -U outthere -d outthere -v ON_ERROR_STOP=1 -f /tmp/outthere-benefits-seed.sql
+```
+
+The seed does not create merchant credentials. Its offers initially last 90 days;
+rerunning refreshes catalogue copy, prices and locations while preserving the
+original campaign dates, stock, status, existing coupons and wallet activity.
+Changed offer terms/prices increment the terms version once; unchanged reruns
+leave it alone. Samples have max-per-user 1. Names, coordinates, discounts and
+tickets are illustrative and imply no real agreement.
+
+Activating an offer immediately deducts its coin price and creates a coupon with a
+random code. No quote, reservation, merchant setup, QR/PIN credential, or activation
+retry key is required. Coupons expire after 15 minutes; expiry does not refund coins.

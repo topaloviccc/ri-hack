@@ -13,6 +13,7 @@ bucket integration.
 | Learning history | Saved reading progress, submitted attempts, best-question scoring, completion, statistics, streaks and country badges | Unsubmitted selections are local; short-answer/matching questions and spaced revision are deferred |
 | Geography | Full ISO country catalogue, English names, image flags, places, coordinates, map counts and course links | Country introductions and location types/cities/images are labelled demos |
 | Wallet | Stored balance, paid/free unlocks and once-per-course completion rewards with retry protection | Demo opening credit is seeded; no top-up API |
+| Benefits | Offer catalogue, coupon activation, codes, history and shared wallet debit | Optional sample partners are labelled Demo; public partner onboarding is deferred |
 | People / network | Profiles, people search, suggestions, friend requests, friends' completion feed and weekly leaderboard | Bios are demos; no accept/decline/remove-friend UI |
 | Events | Stored titles, dates, descriptions, venues, coordinates, organizers, free/paid status and external registration URLs | Categories, cities/filters, languages, images and numeric paid prices are labelled demos; registration opens a sample external link |
 | Experts / challenges | No backend implementation | Entire flows remain explicitly labelled frontend demos; expert requests are kept in memory only |
@@ -35,8 +36,8 @@ For an existing demo database, restart the backend and load
 new sample lessons/quizzes while preserving your wallet and learning history.
 Fresh `demo-data.sql` loads already include this content. No LLM integration is used.
 
-Liquibase creates the selected schema at startup. Source CHECK constraints and
-stored validation functions/triggers are intentionally omitted; primary keys,
+Liquibase creates the selected schema at startup. The initial schema subset omits
+source CHECK constraints and stored validation functions/triggers; primary keys,
 foreign keys, unique keys and NOT NULL columns remain. `worldlearn.sql` is a
 reference document: do not execute it separately before starting the application.
 

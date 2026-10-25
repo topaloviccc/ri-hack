@@ -51,6 +51,10 @@ describe('HTTP client', () => {
       status: 404,
       message: 'Course not found',
     });
+    fetchMock.mockResolvedValueOnce(httpResponse({ detail: 'Quote expired', code: 'QUOTE_EXPIRED' }, 409));
+    await expect(apiRequest('/benefits/offers/id/activate', { method: 'POST' })).rejects.toMatchObject({
+      status: 409, details: { code: 'QUOTE_EXPIRED' },
+    });
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -67,6 +71,21 @@ describe('HTTP client', () => {
       status: 0,
       message: expect.stringContaining('Cannot reach'),
     });
+  });
+
+  it('serializes JSON bodies and preserves bodyless POST requests', async () => {
+    fetchMock.mockResolvedValue(httpResponse({}));
+    await apiRequest('/benefits/offers/id/activate', {
+      method: 'POST', viewer: true, body: { quoteId: 'quote-id', termsVersion: 2 },
+      headers: { 'Idempotency-Key': 'activation-1' },
+    });
+    expect(fetchMock).toHaveBeenLastCalledWith(expect.any(String), expect.objectContaining({
+      body: '{"quoteId":"quote-id","termsVersion":2}',
+      headers: expect.objectContaining({ 'Content-Type': 'application/json', 'Idempotency-Key': 'activation-1' }),
+    }));
+    await apiRequest('/courses/id/unlock', { method: 'POST' });
+    expect(fetchMock.mock.calls[1][1]?.body).toBeUndefined();
+    expect(fetchMock.mock.calls[1][1]?.headers).not.toHaveProperty('Content-Type');
   });
 
   it('requires explicit server and viewer configuration', async () => {

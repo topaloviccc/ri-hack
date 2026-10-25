@@ -11,10 +11,10 @@ describe('wallet HTTP adapter', () => {
   });
 
   it('sends the same purchase key on retry and returns server balances', async () => {
-    fetchMock.mockResolvedValue(httpResponse({ balance: 60 }));
+    fetchMock.mockResolvedValue(httpResponse({ balance: 60, heldBalance: 20, availableBalance: 40 }));
     const input = { courseId, idempotencyKey: 'purchase-1' };
-    expect(await walletApi.unlockCourse(input)).toEqual({ balance: 60 });
-    expect(await walletApi.unlockCourse(input)).toEqual({ balance: 60 });
+    expect(await walletApi.unlockCourse(input)).toEqual({ balance: 60, heldBalance: 20, availableBalance: 40 });
+    expect(await walletApi.unlockCourse(input)).toEqual({ balance: 60, heldBalance: 20, availableBalance: 40 });
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock).toHaveBeenLastCalledWith(
       expect.stringContaining(`/courses/${courseId}/unlock`),

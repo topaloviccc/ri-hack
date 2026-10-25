@@ -52,7 +52,7 @@ export function ProfileView({ userId }: ProfileViewProps) {
   const isOwn = user.relation === 'me';
   return (
     <ScrollView contentContainerClassName="gap-6 p-4 pb-10">
-      <ProfileHeader user={user} coins={isOwn ? wallet.data?.balance : undefined} />
+      <ProfileHeader user={user} coins={isOwn ? wallet.data?.availableBalance : undefined} />
       {/* TODO(hack): privacy rules for other people's profiles come with the backend. See BACKLOG.md. */}
       {isOwn ? (
         <CourseSection

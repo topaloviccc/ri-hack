@@ -52,6 +52,7 @@ function AppShell() {
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="benefits" options={{ headerShown: false }} />
           <Stack.Screen name="profile" options={{ title: 'Profile' }} />
           <Stack.Screen name="user/[id]" options={{ title: 'Profile' }} />
           <Stack.Screen name="settings" options={{ title: 'Settings' }} />

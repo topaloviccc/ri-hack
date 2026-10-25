@@ -28,7 +28,8 @@ see [API.md](API.md) for the current source of each field and run configuration.
 | Network: friends strip, feed, weekly challenge, suggested friends; Leaderboards (friends, weekly); People search; send friend request | ✅ mock data |
 | Courses: Map (SVG world, tap country → site pins + country card, clustering, location sheet) · Countries (A–Z → Country page) · Fields (by subject) | ✅ mock data |
 | Course details, Profile (own + others, one view), Settings (System/Light/Dark, persisted) | ✅ mock data |
-| Coins (display only) and unlocking locked courses via an unlock sheet with a celebration | ✅ mock data |
+| Shared coins: posted/held/available balances and course unlocks with a celebration | Connected backend |
+| Benefits: server search/filters/sort, offer details, direct coupon activation with random code, and My Coupons | Connected backend; sample partners labelled Demo |
 | Expert requests: Settings › Become an expert (field, title, certificate upload) and request status list | ✅ mock data |
 
 The course player now reads real database lessons/quizzes, saves attempts and progress,
@@ -46,7 +47,7 @@ completion coins are paid once per course. Content is seeded; LLM generation is 
 ## Spec features not started (pick from here when asked)
 F1 accounts/onboarding · F2 search · F5 completion timing ·
 F7 spaced repetition, streaks · F8 knowledge map · F9 NFC visits/badges · F10 local stories ·
-F11–F13 AI generation/assistant · F14 expert review · F15 friends/leaderboards · F16 merchant rewards · F17 full event model.
+F11–F13 AI generation/assistant · F14 expert review · F15 friends/leaderboards · F16 public commercial partner onboarding · F17 full event model.
 
 ## Backend
 Spring Boot modular monolith with PostgreSQL, JDBC and Liquibase. The frontend now
