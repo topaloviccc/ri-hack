@@ -9,6 +9,7 @@ import type { CourseResponse } from '@/features/courses/api/courses.dto';
 import { MOCK_EVENTS } from '@/features/events/api/events.mock';
 import { MOCK_FEED, MOCK_WEEKLY_COMPLETIONS } from '@/features/network/api/network.mock';
 import { ME_ID, MOCK_USERS } from '@/features/users/api/users.mock';
+import { createBenefitsFixture } from '@/test-support/benefits-fixture';
 
 const initialOwned = [
   ...MOCK_SECTION_IDS.continue,
@@ -25,9 +26,14 @@ export const httpResponse = (body: unknown, status = 200) =>
   }) as Response;
 
 /** Backend-shaped HTTP fixture: adapters and query/mutation hooks run unchanged. */
-export function installApiFixture() {
+export function installApiFixture(options: { balance?: number; heldBalance?: number } = {}) {
   owned = new Set(initialOwned);
-  let balance = 250;
+  let balance = options.balance ?? 250;
+  const benefits = createBenefitsFixture({ getBalance: () => balance, spendCoins: (amount) => { balance -= amount; } });
+  const wallet = () => {
+    const heldBalance = options.heldBalance ?? 0;
+    return { balance, heldBalance, availableBalance: balance - heldBalance };
+  };
   const processed = new Set<string>();
   const dismissed = new Set<string>();
   const users = MOCK_USERS.map(({ bio: _bio, ...user }) => ({ ...user }));
@@ -58,17 +64,18 @@ export function installApiFixture() {
     const path = url.pathname.replace(/^\/api/, '');
     const params = url.searchParams;
     const method = init?.method ?? 'GET';
-    if (path === '/wallet') return httpResponse({ balance });
+    if (path.startsWith('/benefits/')) return benefits.handle(url, init, wallet());
+    if (path === '/wallet') return httpResponse(wallet());
     if (/^\/courses\/[^/]+\/unlock$/.test(path) && method === 'POST') {
       const id = path.split('/')[2];
       const key = new Headers(init?.headers).get('Idempotency-Key') ?? '';
       if (!processed.has(key) && !owned.has(id)) {
-        if (balance < 40) return httpResponse({ detail: 'Not enough coins' }, 402);
+        if (wallet().availableBalance < 40) return httpResponse({ detail: 'Not enough coins' }, 402);
         balance -= 40;
         owned.add(id);
         processed.add(key);
       }
-      return httpResponse({ balance });
+      return httpResponse(wallet());
     }
     if (/^\/courses\/[^/]+\/dismiss$/.test(path) && method === 'POST') {
       dismissed.add(path.split('/')[2]);
@@ -94,6 +101,7 @@ export function installApiFixture() {
     if (path.startsWith('/courses/')) return httpResponse(course(path.split('/')[2]));
     const countries = MOCK_COUNTRIES.map(({ blurb: _blurb, ...country }) => ({
       ...country,
+      flagUrl: `https://flagcdn.com/w160/${country.code.toLowerCase()}.png`,
       courseCount: MOCK_COURSES.filter((c) => c.countryCode === country.code).length,
       locationCount: locations.filter((l) => l.countryCode === country.code).length,
     })).sort((a, b) => a.name.localeCompare(b.name));

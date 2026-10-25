@@ -13,11 +13,14 @@ export class ApiError extends Error {
 
 const REQUEST_TIMEOUT_MS = 15_000;
 type QueryValue = string | number | boolean | readonly string[] | undefined;
+type JsonValue =
+  string | number | boolean | null | readonly JsonValue[] | { [key: string]: JsonValue };
 type RequestOptions = {
   method?: 'GET' | 'POST';
   query?: Record<string, QueryValue>;
   headers?: Record<string, string>;
   viewer?: boolean;
+  body?: JsonValue;
 };
 
 const errorMessage = (body: unknown, fallback: string) => {
@@ -47,10 +50,12 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       method: options.method ?? 'GET',
       headers: {
         Accept: 'application/json',
+        ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
         ...(options.viewer && env.userId ? { 'X-User-Id': env.userId } : {}),
         ...options.headers,
       },
       signal: abort.signal,
+      ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
     });
     const raw = await response.text();
     let body: unknown;

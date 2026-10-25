@@ -54,6 +54,7 @@ function AppShell() {
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="benefits" options={{ headerShown: false }} />
           <Stack.Screen name="profile" options={{ title: 'Profile' }} />
           <Stack.Screen name="user/[id]" options={{ title: 'Profile' }} />
           <Stack.Screen name="settings" options={{ title: 'Settings' }} />
@@ -61,6 +62,7 @@ function AppShell() {
           <Stack.Screen name="expert/apply" options={{ title: 'Become an expert' }} />
           <Stack.Screen name="expert/requests" options={{ title: 'Your requests' }} />
           <Stack.Screen name="course/[id]/index" options={{ title: '' }} />
+          <Stack.Screen name="course/[id]/learn" options={{ title: 'Learn' }} />
           <Stack.Screen
             name="course/[id]/unlock"
             options={{

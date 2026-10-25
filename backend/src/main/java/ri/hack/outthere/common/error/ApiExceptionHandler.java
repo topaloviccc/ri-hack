@@ -13,6 +13,7 @@ public class ApiExceptionHandler {
             case NOT_FOUND -> HttpStatus.NOT_FOUND;
             case CONFLICT -> HttpStatus.CONFLICT;
             case INSUFFICIENT_COINS -> HttpStatus.PAYMENT_REQUIRED;
+            case BAD_REQUEST -> HttpStatus.BAD_REQUEST;
         };
         return ProblemDetail.forStatusAndDetail(status, exception.getMessage());
     }

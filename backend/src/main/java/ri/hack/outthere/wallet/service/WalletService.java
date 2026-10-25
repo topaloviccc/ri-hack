@@ -22,7 +22,7 @@ public class WalletService {
 
     public WalletResponse get(UUID viewer) {
         users.requireUser(viewer);
-        return new WalletResponse(repository.wallet(viewer, false).orElseThrow(() -> ApiException.notFound("Wallet")).balance());
+        return repository.balances(repository.wallet(viewer, false).orElseThrow(() -> ApiException.notFound("Wallet")).id());
     }
 
     @Transactional
@@ -34,17 +34,17 @@ public class WalletService {
             if (!Objects.equals(previous.get().courseId(), course)) {
                 throw ApiException.conflict("Idempotency key already used for a different course");
             }
-            return new WalletResponse(wallet.balance());
+            return repository.balances(wallet.id());
         }
         // Course-level ownership also makes repeated/free acquisitions naturally idempotent.
-        if (repository.owns(viewer, course)) return new WalletResponse(wallet.balance());
+        if (repository.owns(viewer, course)) return repository.balances(wallet.id());
         var price = repository.price(course).orElseThrow(() -> ApiException.notFound("Course"));
-        if (wallet.balance() < price.priceCoins()) {
+        if (repository.balances(wallet.id()).availableBalance() < price.priceCoins()) {
             throw new ApiException(ApiException.Kind.INSUFFICIENT_COINS, "Not enough coins");
         }
         UUID transaction = price.priceCoins() == 0 ? null
                 : repository.debit(wallet.id(), course, price.priceCoins(), idempotencyKey);
         repository.grant(viewer, price, transaction);
-        return new WalletResponse(wallet.balance() - price.priceCoins());
+        return repository.balances(wallet.id());
     }
 }

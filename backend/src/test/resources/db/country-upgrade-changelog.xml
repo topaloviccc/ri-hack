@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd">
+    <include file="db/changelog/001-worldlearn.sql"/>
+    <changeSet id="country-upgrade-fixture" author="test">
+        <sql>
+            INSERT INTO country(id, iso_code, label)
+            VALUES ('80000000-0000-0000-0000-000000000001', 'ME', 'Old country display name');
+            INSERT INTO app_user(id, first_name, last_name, username, email, country_id)
+            VALUES ('00000000-0000-0000-0000-000000000001', 'Existing', 'Learner', 'existing',
+                    'existing@example.test', '80000000-0000-0000-0000-000000000001');
+            INSERT INTO wallet(user_id, balance) VALUES ('00000000-0000-0000-0000-000000000001', 123);
+        </sql>
+    </changeSet>
+    <include file="db/changelog/002-iso-countries.sql"/>
+    <include file="db/changelog/003-hosted-country-flags.sql"/>
+</databaseChangeLog>

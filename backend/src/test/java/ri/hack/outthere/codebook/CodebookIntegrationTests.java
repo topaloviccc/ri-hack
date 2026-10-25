@@ -50,7 +50,7 @@ class CodebookIntegrationTests extends PostgresTestSupport {
     @Test
     void discoversDefinitionsAndOrdersOnlyTheirEntries() throws Exception {
         mvc.perform(get("/api/codebooks")).andExpect(status().isOk())
-                .andExpect(content().json("[\"course-levels\",\"difficulties\",\"empty\",\"fields\"]"));
+                .andExpect(content().json("[\"course-levels\",\"difficulties\",\"empty\",\"fields\",\"question-types\"]"));
         mvc.perform(get("/api/codebooks/course-levels")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3))
                 .andExpect(jsonPath("$[0].id").value(10))

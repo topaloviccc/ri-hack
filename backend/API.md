@@ -1,4 +1,4 @@
-# Backend API
+﻿# Backend API
 
 Base path: `/api`; default local URL: `http://localhost:8080`.
 IDs are UUID strings, not the frontend's mock IDs (`u0`, `c1`, etc.).
@@ -6,9 +6,11 @@ Requests and responses use JSON. Times use ISO 8601 UTC. Nullable source columns
 remain nullable; unsupported frontend fields are omitted, as listed in [SCOPE.md](SCOPE.md).
 
 Viewer-specific endpoints require `X-User-Id: <existing app_user UUID>`.
-This is caller-supplied context, with no authentication, authorization, token,
-role or privacy enforcement. There is no default "me" user. Countries, locations,
-events and codebooks do not require the header. The mobile frontend now uses these
+This is untrusted caller-supplied context, not authenticated identity. Benefits
+queries and mutations enforce ownership against this declared viewer, but public
+deployment requires authenticated learner identity. Merchant endpoints separately
+verify bearer credentials and partner/venue grants. There is no default "me" user.
+Countries, locations, events and codebooks do not require the header. The mobile frontend now uses these
 endpoints. It reads `EXPO_PUBLIC_API_URL` (including `/api`) and `EXPO_PUBLIC_USER_ID`.
 Unsupported fields remain explicitly labelled demo content, per the chosen integration
 policy. See [mobile/API.md](../mobile/API.md) for configuration and demo boundaries.
@@ -19,13 +21,13 @@ origins with the backend `CORS_ALLOWED_ORIGINS` environment variable.
 | --- | --- | --- |
 | GET | `/courses` | `collection=continue\|popular\|recommended\|feed`, `countryCode`, `locationId`, `ids`; `Course[]` |
 | GET | `/courses/{id}` | `Course` |
-| POST | `/courses/{id}/unlock` | Required `Idempotency-Key` header, no body; `{ "balance": 60 }` |
+| POST | `/courses/{id}/unlock` | Required `Idempotency-Key` header, no body; `Wallet` |
 | POST | `/courses/{id}/dismiss` | No body; 204; persists the reel's "less like this" action |
-| GET | `/countries` | `Country[]`, ordered by name |
+| GET | `/countries` | All 249 ISO countries/territories, including zero-content rows; `Country[]`, ordered by English name |
 | GET | `/countries/{code}` | Uppercase ISO alpha-2 code; `Country` |
 | GET | `/locations` | Optional `countryCode`, `ids`; `Location[]` |
 | GET | `/locations/{id}` | `Location` |
-| GET | `/wallet` | `{ "balance": 100 }` |
+| GET | `/wallet` | `Wallet`: `{ "balance": 520, "heldBalance": 120, "availableBalance": 400 }` |
 | GET | `/users` | Optional `query`, `relation=friend\|requested\|none`, `suggested=true`; `User[]` excluding viewer |
 | GET | `/users/me` | Viewer profile; `User` |
 | GET | `/users/{id}` | `User` |
@@ -50,12 +52,22 @@ use `application/problem+json` with `status` and `detail`.
 | Type | Fields |
 | --- | --- |
 | Course | `id`, `title`, `subject`, `countryCode`, `countryName`, `locations: Location[]`, `description`, `learnerCount`, `estimatedMinutes`, `difficulty`, `progress`, `unlockCost`, `isUnlocked` |
-| Country | `code`, `name`, `courseCount`, `locationCount` |
+| Country | `code`, `name`, `flagUrl`, `courseCount`, `locationCount` |
 | Location | `id`, `name`, `countryCode`, `countryName`, `lat`, `lng` |
 | User | `id`, `name`, `handle`, `avatarUrl`, `countryCode`, `stats: {completedCount,streakDays,countriesCount}`, `badgeCountryCodes`, `inProgressCourseIds`, `completedCourseIds`, `relation`, `mutualFriendsCount` |
 | FeedItem | `id`, `userId`, `userName`, `userAvatarUrl`, `courseId`, `courseTitle`, `completedAt` |
 | LeaderboardEntry | `rank`, `userId`, `userName`, `userAvatarUrl`, `completedThisWeek`, `isMe` |
 | Event | `id`, `title`, `startsAt`, `venue`, `lat`, `lng`, `description`, `organizer`, `isFree`, `registrationUrl` |
+
+Country `code` is the uppercase ISO 3166-1 alpha-2 identifier, for example `HR`.
+`name` is the full English display name, for example `Croatia`. `flagUrl` is an
+absolute HTTPS image URL such as `https://flagcdn.com/w160/hr.png`; clients load
+the image directly from FlagCDN. There is no backend flag-image endpoint.
+The country reference catalogue is supplied by production Liquibase migration
+`002-iso-countries.sql`, independently of optional demo content;
+`003-hosted-country-flags.sql` migrates flag paths to hosted URLs. The device
+needs internet access for flags, while country names/counts use the backend. See
+[reference/README.md](reference/README.md) for data sources and maintenance.
 
 `subject` is the alphabetically first linked field label, or null, since the schema
 allows several fields and the frontend displays one. Field labels are database data,
@@ -89,15 +101,42 @@ Suggestions use mutual friends (up to ten), excluding the viewer and accepted fr
 Leaderboard ties use name then UUID, assign sequential ranks, and include zero scores;
 the week begins Monday 00:00 UTC and repeated versions of a course count once.
 
-Wallet unlocks lock the user's wallet, read the stored course price, write a ledger
+Wallet unlocks lock the user's wallet, check available funds after unexpired Benefits
+holds, read the stored course price, write a ledger
 debit, update the balance, and insert an entitlement atomically. Paid retries with
 the same key return the current wallet balance; reusing that key for a different
 course returns 409. Already-owned courses return the current balance without a
 second debit, including with a different key. Free acquisition writes an entitlement
 and no ledger row, so its retry guarantee is course ownership, not a stored key.
-Unlock does not create/open an enrollment because the frontend has no lesson player.
-There are no write APIs for credits, course completion, grading or course authoring.
+Unlock does not create/open an enrollment; starting the course player does.
+The `/courses/{id}/learning` endpoints now provide ordered lessons/quizzes, answer
+submission, persisted progress, question-based 80% completion and promised coin
+rewards. See [LEARNING.md](LEARNING.md) for paths, JSON contracts and retry rules.
+There are no arbitrary credit/top-up, generation or course-authoring APIs.
 
+## Benefits and coupons
+
+All routes below include the `/api` prefix. Learner routes require `X-User-Id`.
+Catalogue and history pages use `{items,page,size,total}`; coin amounts are integers.
+Country filters refer to eligible venue countries through `place.country_id`, not
+the partner's headquarters or the learner's location. Filters combine with AND.
+Sort values are `POPULAR`, `PRICE_ASC`, `PRICE_DESC`, and `NEWEST`; page is zero-based
+and size must be 1-50. Cards may include unavailable offers with explicit availability.
+
+| Method | Path | Contract |
+| --- | --- | --- |
+| GET | `/benefits/partners?countryCode=HR` | Active partners with discoverable offers |
+| GET | `/benefits/countries?partnerId={id}` | Countries with eligible venues/offers |
+| GET | `/benefits/offers?q=&partnerId=&countryCode=&sort=&page=&size=` | Filtered offer page, deterministic ordering with ID tie-breaker |
+| GET | `/benefits/offers/{id}` | Offer, terms, eligible countries/venues and availability |
+| POST | `/benefits/offers/{id}/activate` | Empty request body; immediately deducts the offer price and returns `{coupon,wallet,serverNow}` with the generated code |
+| GET | `/benefits/coupons?status=&page=&size=` | Viewer history; statuses `ACTIVE`, `REDEEMED` (legacy history), and `EXPIRED` |
+| GET | `/benefits/coupons/{id}` | Viewer-owned coupon and its generated redemption code |
+| POST | `/benefits/coupons/{id}/mark-used` | Marks an active, unexpired viewer-owned coupon as `REDEEMED`; no additional wallet debit |
+
+Wallet responses keep the shared shape `{balance,heldBalance,availableBalance}`; benefit activations do not hold coins, so `heldBalance` is zero. Coupons contain `id`, `status`, the offer snapshot, `priceCoins`, `issuedAt`, `expiresAt`, `redemptionCode`, and `serverNow`. Activating a coupon posts a negative `BENEFIT_ACTIVATION` ledger entry and updates the wallet in the same transaction. Codes are generated on the server. Coupons expire after 15 minutes; the activation charge is not refunded on expiry.
+
+Errors use ProblemDetail with stable `code`: 400 malformed input, 404 missing offer/coupon, 402 `INSUFFICIENT_COINS`, and 409 unavailable or sold-out offer. See [dev/README.md](dev/README.md) for sample data and [DATABASE.md](DATABASE.md) for schema details.
 ## Example requests
 
 With a provisioned database and real UUIDs:

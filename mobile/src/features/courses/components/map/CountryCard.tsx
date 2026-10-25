@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Text } from '@/components/ui/Text';
 import { useCountryQuery } from '@/features/courses/api/courses.queries';
-import { countryFlag } from '@/utils/flag';
+import { CountryFlag } from '@/components/shared/CountryFlag';
 
 export type CountryCardProps = { code: string };
 
@@ -19,9 +19,12 @@ export function CountryCard({ code }: CountryCardProps) {
     return (
       <>
         <View className="flex-1">
-          <Text variant="heading" numberOfLines={1}>
-            {countryFlag(code)} {data.name}
-          </Text>
+          <View className="flex-row items-center gap-2">
+            <CountryFlag code={code} name={data.name} uri={data.flagUrl} />
+            <Text variant="heading" numberOfLines={1} className="flex-1">
+              {data.name}
+            </Text>
+          </View>
           <Text variant="caption">
             {data.courseCount} courses · {data.locationCount} places
           </Text>

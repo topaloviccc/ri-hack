@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { ErrorState } from '@/components/shared/ErrorState';
 import { Hero } from '@/components/shared/Hero';
@@ -15,7 +15,6 @@ import { useCourseQuery } from '@/features/courses/api/courses.queries';
 import { CourseMeta } from '@/features/courses/components/CourseMeta';
 import { LocationRow } from '@/features/courses/components/LocationItems';
 import { LockBadge } from '@/features/courses/components/LockBadge';
-import { countryFlag } from '@/utils/flag';
 import { capitalize, formatDuration } from '@/utils/format';
 
 export type CourseDetailsProps = { id: string };
@@ -27,8 +26,7 @@ export function CourseDetails({ id }: CourseDetailsProps) {
   if (isError) return <ErrorState message="Couldn't load this course." onRetry={refetch} />;
 
   const hasStarted = course.progress !== undefined;
-  // TODO(hack): no lesson player yet. See BACKLOG.md.
-  const handleStart = () => Alert.alert('Coming soon', 'The lesson player is on its way.');
+  const handleStart = () => router.push({ pathname: '/course/[id]/learn', params: { id } });
 
   return (
     <ScrollView contentContainerClassName="pb-10">
@@ -47,7 +45,9 @@ export function CourseDetails({ id }: CourseDetailsProps) {
         <CourseMeta course={course} />
         {hasStarted ? (
           <View className="gap-1">
-            <Text variant="caption">{Math.round((course.progress ?? 0) * 100)}% complete</Text>
+            <Text variant="caption">
+              {Math.round((course.progress ?? 0) * 100)}% of content completed
+            </Text>
             <ProgressBar value={course.progress ?? 0} />
           </View>
         ) : null}
@@ -73,7 +73,7 @@ export function CourseDetails({ id }: CourseDetailsProps) {
           <InfoRow
             icon="flag-outline"
             label="Country"
-            value={`${countryFlag(course.countryCode)} ${course.countryName}`}
+            value={course.countryName}
             onPress={
               course.countryCode
                 ? () =>

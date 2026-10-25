@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import ri.hack.outthere.wallet.dto.WalletResponse;
 
 @Repository
 public class WalletRepository {
@@ -18,6 +19,11 @@ public class WalletRepository {
     public Optional<WalletRow> wallet(UUID user, boolean lock) {
         return jdbc.sql("SELECT id,balance FROM wallet WHERE user_id=:user" + (lock ? " FOR UPDATE" : ""))
                 .param("user", user).query(WalletRow.class).optional();
+    }
+
+    public WalletResponse balances(UUID walletId) {
+        return jdbc.sql("SELECT balance,0::bigint AS held_balance,balance AS available_balance FROM wallet WHERE id=:id")
+                .param("id", walletId).query(WalletResponse.class).single();
     }
 
     public Optional<PriceRow> price(UUID course) {

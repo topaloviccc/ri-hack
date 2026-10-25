@@ -4,6 +4,9 @@ const path = require('node:path');
 const vm = require('node:vm');
 const crypto = require('node:crypto');
 const ts = require('../../mobile/node_modules/typescript');
+const { noCoordinates, extra } = require('./demo-course-extras.cjs');
+const longCourse = require('./content/etna/course.cjs');
+const courseMinutes = (course) => course.estimatedMinutes == null ? null : Math.max(20,Math.min(40,course.estimatedMinutes));
 
 const root = path.resolve(__dirname, '../..');
 function samples(file) {
@@ -15,7 +18,7 @@ function samples(file) {
   vm.runInNewContext(compiled, context, { filename: file });
   return context.exports;
 }
-const { MOCK_COUNTRIES: countries, MOCK_LOCATIONS: places, MOCK_COURSES: courses } = samples('features/courses/api/courses.mock.ts');
+const { MOCK_LOCATIONS: places, MOCK_COURSES: courses } = samples('features/courses/api/courses.mock.ts');
 const { MOCK_USERS: users } = samples('features/users/api/users.mock.ts');
 const { MOCK_EVENTS: events } = samples('features/events/api/events.mock.ts');
 const { SUBJECTS: subjects } = samples('features/courses/types.ts');
@@ -49,7 +52,7 @@ const sql = [
   fs.readFileSync(path.join(__dirname, 'demo-learner.sql'), 'utf8').replace(/^BEGIN;|^COMMIT;/gm, ''),
 ];
 const insert = (...args) => sql.push(statement(...args) + ';');
-insert('country', ['id','iso_code','label'], countries.map((n) => [id('country',n.code),n.code,n.name]));
+// Countries are production reference data supplied by Liquibase, never demo records.
 insert('field', ['id','label'], subjects.map((label) => [id('field',label),label]));
 insert('app_user', ['id','first_name','last_name','username','email','country_id','avatar_url','timezone','created_at'],
   users.filter((u) => u.id !== 'u0').map((u) => {
@@ -60,20 +63,15 @@ insert('app_user', ['id','first_name','last_name','username','email','country_id
 sql.push(`UPDATE app_user SET country_id=coalesce(country_id,${value(country('ME'))}),
   avatar_url=coalesce(avatar_url,${value(users[0].avatarUrl)}) WHERE id=${value(viewer)};`);
 insert('wallet', ['user_id'], users.filter((u) => u.id !== 'u0').map((u) => [id('user',u.id)]));
-const noCoordinates = { id:'demo-no-coordinates', name:'Demo place without coordinates', countryCode:'ME', lat:null, lng:null };
 insert('place', ['id','name','country_id','description','latitude','longitude'], [...places,noCoordinates]
   .map((p) => [id('place',p.id),p.name,country(p.countryCode),'Demo location for testing',p.lat,p.lng]));
 
 const prices = new Map(courses.map((c) => [c.id, c.id === 'c2' ? 0 : c.id === 'c45' ? 1000
   : Math.min(200,Math.max(40,Math.round(c.estimatedMinutes * 0.8 / 10) * 10))]));
-const extra = [
-  { id:'demo-null',title:'Optional metadata example',description:null,countryCode:null,estimatedMinutes:null,difficulty:'beginner',locationIds:[noCoordinates.id] },
-  { id:'demo-archive',title:'Owned archived course example',description:'A granted private archived course remains in your library.',countryCode:'ME',estimatedMinutes:20,difficulty:'beginner',locationIds:[] },
-  { id:'demo-draft',title:'Unpublished demo course (hidden)',description:'This course must not appear in the public catalogue.',countryCode:'ME',estimatedMinutes:15,difficulty:'beginner',locationIds:[] },
-];
 const allCourses = [...courses,...extra];
+prices.set(longCourse.course.id,0);
 const courseRows = allCourses.map((c,index) => [id('course',c.id),id('user','u1'),c.title,c.description,
-  c.countryCode ? country(c.countryCode) : null,status('difficulty',c.difficulty.toUpperCase()),c.estimatedMinutes,
+  c.countryCode ? country(c.countryCode) : null,status('difficulty',c.difficulty.toUpperCase()),courseMinutes(c),
   prices.get(c.id) ?? 40,10,status('visibility',c.id === 'demo-archive' ? 'PRIVATE' : 'PUBLIC'),
   ago(1416-index),c.id === 'demo-archive' ? ago(2) : null]);
 sql.push('CREATE TEMP TABLE demo_new_courses(id uuid PRIMARY KEY) ON COMMIT DROP;');
@@ -82,17 +80,17 @@ sql.push(`WITH added AS (${statement('course',
   RETURNING id) INSERT INTO demo_new_courses SELECT id FROM added;`);
 insert('course_version', ['id','course_id','version_number','title','description','difficulty_id','estimated_minutes','publication_status_id','created_by','created_at','published_at'],
   allCourses.map((c) => [id('version',c.id),id('course',c.id),1,c.title,c.description,
-    status('difficulty',c.difficulty.toUpperCase()),c.estimatedMinutes,
+    status('difficulty',c.difficulty.toUpperCase()),courseMinutes(c),
     c.id === 'demo-draft' ? '9c74f449-1cb8-5745-a7f4-6cc7ef718481' : status('publication_status','PUBLISHED'),
     id('user','u1'),ago(1200),c.id === 'demo-draft' ? null : ago(1152)]));
 sql.push(`UPDATE course c SET current_published_version_id=v.id FROM course_version v
   JOIN publication_status ps ON ps.id=v.publication_status_id
   WHERE c.id=v.course_id AND c.id IN (SELECT id FROM demo_new_courses) AND ps.label='PUBLISHED';`);
-insert('course_field',['course_id','field_id'],courses.map((c) => [id('course',c.id),field(c.subject)]));
+insert('course_field',['course_id','field_id'],allCourses.filter((c) => c.subject).map((c) => [id('course',c.id),field(c.subject)]));
 insert('course_place',['course_id','place_id'],allCourses.flatMap((c) => c.locationIds.map((p) => [id('course',c.id),id('place',p)])));
 insert('lesson',['id','course_version_id','position','title','content_json'],allCourses.flatMap((c) =>
   Array.from({length:4},(_,i) => [id('lesson',`${c.id}:${i}`),id('version',c.id),i,`Part ${i+1}: ${c.title}`,
-    raw(`'{"demo":true,"text":"Seeded learning history. The lesson player is not implemented."}'::jsonb`)])));
+    raw(`'{"demo":true,"text":"Demo lesson pending optional learning seed."}'::jsonb`)])));
 
 const history = [];
 users.forEach((u,userIndex) => {
@@ -142,16 +140,18 @@ insert('event',['id','name','description','organizer_id','country_id','place_id'
     return [id('event',e.id),e.title,e.description,id('user',`u${index%6+1}`),country('ME'),id('event-place',e.id),
       e.registrationUrl,raw(`(${start})`),raw(`(${start})+interval '2 hours'`),'Europe/Podgorica',e.priceEur===null];
   }));
+sql.push(fs.readFileSync(path.join(__dirname,'demo-learning.sql'),'utf8').replace(/^BEGIN;|^COMMIT;/gm, ''));
 sql.push('COMMIT;');
 fs.writeFileSync(path.join(__dirname,'demo-data.sql'),sql.join('\n\n')+'\n');
 
 const scenario = (sourceId) => ({id:id('course',sourceId),title:allCourses.find((c) => c.id===sourceId).title,price:prices.get(sourceId)??40});
 const summary = {
   viewer, openingBalance:250,
-  counts:{countries:countries.length,fields:subjects.length,users:users.length,courses:allCourses.length,
-    places:places.length+1+events.length,events:events.length,learningHistories:history.length},
+  counts:{countries:JSON.parse(fs.readFileSync(path.join(root,'backend/reference/countries.json'),'utf8')).length,fields:subjects.length,users:users.length,courses:allCourses.length,
+    places:places.length+1+events.length,events:events.length,learningHistories:history.length,
+    lessons:allCourses.length*4,quizzes:allCourses.length*5,questions:(allCourses.length-1)*13+longCourse.lessons.reduce((n,l)=>n+l.questions.length,0)+longCourse.finalQuestions.length},
   scenarios:{paidUnlock:scenario('c3'),freeUnlock:scenario('c2'),insufficientCoins:scenario('c45'),
-    continue:scenario('c1'),ownedNotStarted:scenario('c8'),ownedArchived:scenario('demo-archive'),
+    continue:scenario('c1'),ownedNotStarted:scenario('c8'),longCourse:{...scenario(longCourse.course.id),estimatedMinutes:30},ownedArchived:scenario('demo-archive'),
     optionalMetadata:scenario('demo-null'),hiddenUnpublished:scenario('demo-draft'),
     suggestedFriend:{id:id('user','u8'),name:users.find((u) => u.id==='u8').name},
     pendingRequest:{id:id('user','u7'),name:users.find((u) => u.id==='u7').name}},

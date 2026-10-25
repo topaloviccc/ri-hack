@@ -1,4 +1,4 @@
-export type Wallet = { balance: number };
+export type Wallet = { balance: number; heldBalance: number; availableBalance: number };
 
 export type UnlockCourseInput = {
   courseId: string;

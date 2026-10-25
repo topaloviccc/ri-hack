@@ -9,10 +9,11 @@ bucket integration.
 
 | Area | Implemented through the backend | Remaining demo content / limitations |
 | --- | --- | --- |
-| Courses | Catalogue, details, country/place filters, subject grouping, Continue, Popular, recommendations, reel dismissals | Cover images are demo content; no lesson player or course authoring UI |
-| Learning history | Existing progress, completed-course lists, statistics, streaks and country badges | History can be seeded/read; no grading, completion submission or reward-earning flow |
-| Geography | Countries, places, coordinates, map counts and course links | Country introductions and location types/cities/images are labelled demos |
-| Wallet | Stored balance, transactional paid/free unlocks, retry protection | Demo opening credit is seeded; no top-up or reward API |
+| Courses | Catalogue, details, filters, recommendations, reels, ordered lesson/quiz player and final summary quizzes | Cover images and optional seeded lesson/quiz content are demos; no course authoring or LLM generation |
+| Learning history | Saved reading progress, submitted attempts, best-question scoring, completion, statistics, streaks and country badges | Unsubmitted selections are local; short-answer/matching questions and spaced revision are deferred |
+| Geography | Full ISO country catalogue, English names, image flags, places, coordinates, map counts and course links | Country introductions and location types/cities/images are labelled demos |
+| Wallet | Stored balance, paid/free unlocks and once-per-course completion rewards with retry protection | Demo opening credit is seeded; no top-up API |
+| Benefits | Offer catalogue, coupon activation, codes, history and shared wallet debit | Optional sample partners are labelled Demo; public partner onboarding is deferred |
 | People / network | Profiles, people search, suggestions, friend requests, friends' completion feed and weekly leaderboard | Bios are demos; no accept/decline/remove-friend UI |
 | Events | Stored titles, dates, descriptions, venues, coordinates, organizers, free/paid status and external registration URLs | Categories, cities/filters, languages, images and numeric paid prices are labelled demos; registration opens a sample external link |
 | Experts / challenges | No backend implementation | Entire flows remain explicitly labelled frontend demos; expert requests are kept in memory only |
@@ -23,10 +24,38 @@ catalogue lives in PostgreSQL and uses real HTTP requests. Supported mutations
 persist after reload. Unsupported fields/workflows display `Demo:` in the UI.
 Failed backend requests never fall back to mock records.
 
-Liquibase creates the selected schema at startup. Source CHECK constraints and
-stored validation functions/triggers are intentionally omitted; primary keys,
+Courses now follow **lesson → quiz → lesson → quiz → final summary quiz**.
+Submitting a quiz unlocks the next lesson even with a low score. Retries are
+unlimited; the best attempt per quiz counts. Every question has equal weight and
+**80% or more correct overall** passes once every step is complete. Completion
+awards the entitlement's promised coins once per course. See
+[backend/LEARNING.md](backend/LEARNING.md) for contracts and sample-content format.
+
+For an existing demo database, restart the backend and load
+`backend/dev/demo-learning.sql` using the commands in that guide. This adds the
+new sample lessons/quizzes while preserving your wallet and learning history.
+Fresh `demo-data.sql` loads already include this content. No LLM integration is used.
+
+Liquibase creates the selected schema at startup. The initial schema subset omits
+source CHECK constraints and stored validation functions/triggers; primary keys,
 foreign keys, unique keys and NOT NULL columns remain. `worldlearn.sql` is a
 reference document: do not execute it separately before starting the application.
+
+Countries are production reference data: Liquibase's `002-iso-countries.sql`
+supplies all **249 ISO 3166-1 alpha-2 countries and territories**, English display
+names and flag image URLs. `003-hosted-country-flags.sql` switches those URLs to
+FlagCDN, for example `https://flagcdn.com/w160/hr.png`. The app loads flags directly
+from that service on country pages/lists, maps, course/place details and
+profiles/badges. No flag image files are stored in the repository or backend;
+the phone needs internet access to FlagCDN. No bucket configuration is needed.
+Countries with no content still appear with zero counts. Only country introductions
+remain demo supplements. Sources and update instructions are in
+[backend/reference/README.md](backend/reference/README.md).
+
+For an existing local database, restart the backend to apply the new migration,
+then reload Expo. Country UUIDs and their links are preserved; no database reset
+or demo reseed is required. Fresh installations receive the same country catalogue
+automatically, even if the optional demo seed is never loaded.
 
 ## Prerequisites
 
@@ -73,10 +102,22 @@ docker cp backend/dev/demo-data.sql outthere-postgres:/tmp/outthere-demo-data.sq
 docker exec outthere-postgres psql -U outthere -d outthere -v ON_ERROR_STOP=1 -f /tmp/outthere-demo-data.sql
 ```
 
-This optional script supplies 12 countries, 7 subjects, 16 users, 48 courses,
+This optional script supplies content across 12 countries, 7 subjects, 16 users, 49 courses,
 94 places, 32 events and 83 learning-history records. One course is intentionally
 unpublished. Demo Learner starts with **250 coins**, progress, completions, friends
 and pending/suggested connections.
+
+The original samples include four lesson–quiz pairs and a five-question final
+summary quiz. One additional full-length sample, **Mount Etna: life on a living
+volcano**, takes about 30 minutes, with four longer lessons, reflection activities
+and 18 questions. It is free and already granted to Demo Learner. The course
+duration target is 20–40 minutes total; other samples remain short placeholders.
+All samples use real submission, grading and reward endpoints. The main lesson
+material is Markdown, rendered natively with rich formatting, tappable reflection
+checklists and expandable examples. See the [authoring format](backend/dev/content/MARKDOWN.md).
+
+The 249 country reference records and hosted flag URLs come from the application
+migrations, not this demo script.
 
 The seed is separate from Liquibase and does not run automatically. It is additive:
 re-running does not reset purchases, balances, friendships or dismissals. Event dates
@@ -180,6 +221,7 @@ Do not load the destructive test fixture into the working demo database.
 ## Further documentation
 
 - [Backend endpoint contracts](backend/API.md)
+- [Course player, scoring and demo learning content](backend/LEARNING.md)
 - [Frontend integration and demo boundaries](mobile/API.md)
 - [Schema/frontend scope and omissions](backend/SCOPE.md)
 - [Database configuration](backend/DATABASE.md)

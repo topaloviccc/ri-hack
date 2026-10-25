@@ -6,7 +6,7 @@ import { Scrim } from '@/components/ui/Scrim';
 import { Text } from '@/components/ui/Text';
 import { LockBadge } from '@/features/courses/components/LockBadge';
 import type { Course } from '@/features/courses/types';
-import { countryFlag } from '@/utils/flag';
+import { CountryFlag } from '@/components/shared/CountryFlag';
 
 export type ReelCardProps = { course: Course };
 
@@ -23,9 +23,12 @@ export function ReelCard({ course }: ReelCardProps) {
       <Text variant="title" className="text-on-image">
         {course.title}
       </Text>
-      <Text variant="label" className="text-on-image">
-        {countryFlag(course.countryCode)} {course.countryName}
-      </Text>
+      <View className="flex-row items-center gap-2">
+        <CountryFlag code={course.countryCode} name={course.countryName} />
+        <Text variant="label" className="text-on-image">
+          {course.countryName}
+        </Text>
+      </View>
       <Text variant="body" className="text-on-image" numberOfLines={3}>
         {course.description}
       </Text>

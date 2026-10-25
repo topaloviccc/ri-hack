@@ -14,9 +14,17 @@ export type ButtonProps = PressableProps & {
   variant?: keyof typeof VARIANTS;
   icon?: ReactNode;
   className?: string;
+  labelClassName?: string;
 };
 
-export function Button({ label, variant = 'primary', icon, className, ...props }: ButtonProps) {
+export function Button({
+  label,
+  variant = 'primary',
+  icon,
+  className,
+  labelClassName,
+  ...props
+}: ButtonProps) {
   const styles = VARIANTS[variant];
   return (
     <Pressable
@@ -29,7 +37,7 @@ export function Button({ label, variant = 'primary', icon, className, ...props }
       {...props}
     >
       {icon}
-      <Text variant="label" className={styles.label}>
+      <Text variant="label" className={cn(styles.label, labelClassName)}>
         {label}
       </Text>
     </Pressable>

@@ -6,12 +6,17 @@ When you defer something, add it here; when you build it, delete the line.
 ## Connected backend and demo boundaries
 Core data and mutations now use Spring Boot. Setup, endpoint mapping and remaining
 demo fields are documented in `API.md` and `../backend/SCOPE.md`.
-- [ ] **Unsupported demo content** — images, bios, country introductions, location types/cities, event categories/cities/languages/paid prices, expert applications and weekly challenges remain visibly labelled demos by request. Replace them only after a schema/product decision.
+- [ ] **Unsupported demo content** — course/place/event images, bios, country introductions, location types/cities, event categories/cities/languages/paid prices, expert applications and weekly challenges remain visibly labelled demos by request. Country names, codes and image flags are production reference data. Replace the remaining demos only after a schema/product decision.
 - [ ] **Real event city filtering** — current city filters operate on demo city labels; the calendar defaults to all live events. The schema has no structured city field.
 - [ ] **Verify mock content** — location coordinates and course facts were written from memory. Least certain: Ronda bullring, Las Ventas, Giverny, Camargue, Krka, St John Fortress, Our Lady of the Rocks, Skadar/Virpazar, Path of Philosophy, Jigokudani, Al-Muizz Street, Ranthambore, Sacsayhuaman, Qorikancha, Heron Island, Port Arthur, MCG, Strokkur, Thingvellir, Jökulsárlón, Etna, Blue Lagoon, Abu Simbel. Event coordinates are approximate too.
 
 ## Screens / features
-- [ ] **Lesson player** — "Start course"/"Continue" on course details shows a "coming soon" alert (spec F3).
+- [ ] **More question types** - single choice, multiple choice and true/false are implemented; short-answer and matching rendering/grading remain deferred.
+- [ ] **Quiz drafts** - unsubmitted selections are local form state and are lost on exit/reload; submitted attempts and reading progress persist.
+- [ ] **Course content authoring and generation** - current lesson/quiz text comes from an optional database seed; no LLM/import/authoring APIs.
+- [ ] **Spaced revision** - incorrect-answer revision scheduling is not part of the course player.
+- [ ] **Benefits device acceptance** — verify coupon activation/code display, narrow layouts, large font sizes, Android back and iOS modal behavior on physical devices. Automated checks do not establish device acceptance.
+- [ ] **Benefits beyond the current slice** — public commercial partner onboarding, push expiry reminders, offline merchant acceptance and merchant administration are deliberately deferred.
 - [ ] **Edit profile** — button on your own profile shows "coming soon".
 - [ ] **Profile privacy** — other people's profiles show completed courses to everyone; rules come with the backend.
 - [ ] **Friend requests: accept/decline, unfriend, incoming requests** — only "send request" exists; it now persists in the backend.
@@ -25,7 +30,6 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **What an approved expert can do** — approval changes nothing yet (no profile badge, no course review; spec F14 `expert_field_grants`).
 - [ ] **Expert requests: real upload, withdraw/edit, camera capture, several files** — the certificate is only picked locally; requests live in memory (`features/experts/api/experts.api.ts`).
 
-- [ ] **Earning coins** — no credit/reward API yet; the displayed balance and unlock charges come from the backend. The coins sheet says "coming soon".
 
 ## Behaviour
 - [ ] **Infinite feed** — Scroll feed is a finite list ending in "all caught up". Move to `useInfiniteQuery` with the real API.
@@ -35,7 +39,7 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **Real map tiles** — the Courses map is drawn with Skia from Natural Earth 50m outlines (no streets, no city labels). For street-level detail, move to MapLibre (needs development builds).
 - [ ] **Pins can't start a pan** — a drag that begins on a pin doesn't move the map.
 - [ ] **Clustering at scale** — `map/cluster.ts` is O(n²); fine for dozens of towns, switch to supercluster for thousands.
-- [ ] **Country names/flags in other languages** — English names from Natural Earth.
+- [ ] **Localized country names** — current country names are English ISO reference display names from the backend; image flags are implemented. Translated names remain deferred.
 
 ## Platform / infra
 - [ ] **Auth** — excluded from this integration; "me" comes from `/users/me` using the configured `EXPO_PUBLIC_USER_ID`. Tokens → `expo-secure-store` when authentication is added.

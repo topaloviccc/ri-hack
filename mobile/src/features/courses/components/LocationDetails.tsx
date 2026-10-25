@@ -14,7 +14,7 @@ import { CourseListItem } from '@/features/courses/components/CourseListItem';
 import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
 import { LOCATION_KIND_LABELS } from '@/features/courses/location-kinds';
 import { useThemeColors } from '@/lib/theme';
-import { countryFlag } from '@/utils/flag';
+import { CountryFlag } from '@/components/shared/CountryFlag';
 import { hasCoordinates } from '@/utils/has-coordinates';
 import { openInMaps } from '@/utils/open-in-maps';
 
@@ -54,9 +54,12 @@ export function LocationDetails({ id }: LocationDetailsProps) {
             <Text variant="title" accessibilityRole="header">
               {site.name}
             </Text>
-            <Text variant="caption">
-              {site.city}, {countryFlag(site.countryCode)} {site.countryName}
-            </Text>
+            <View className="flex-row items-center gap-2">
+              <CountryFlag code={site.countryCode} name={site.countryName} />
+              <Text variant="caption">
+                {site.city}, {site.countryName}
+              </Text>
+            </View>
             {hasCoordinates(site) ? (
               <Button
                 variant="soft"
