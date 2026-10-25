@@ -1,7 +1,7 @@
 # Schema/frontend intersection and gaps
 
-Sources: `../worldlearn.sql`, `../mobile/src/features/*/types.ts`, mock API adapters,
-and the current screens. The product specification is not used to expand this scope.
+Sources: `../worldlearn.sql`, `../mobile/src/features/*/types.ts`, the current screens,
+and the API implementation.
 The reference SQL is unchanged. This backend implements only shared
 behaviors and the relational dependencies needed to read or write them.
 
@@ -12,6 +12,7 @@ behaviors and the relational dependencies needed to read or write them.
 | Home rows, course cards/details, reel feed, country/location filters, map coordinates | `course`, `course_version`, `difficulty`, `visibility`, `publication_status`, `course_field`, `field`, `course_place`, `place`, `country` |
 | Continue/progress and profile course lists | `course_entitlement`, `enrollment`, `enrollment_status`, `lesson`, `lesson_progress`, `course_completion`; read only for learning history |
 | Wallet balance and unlock | `wallet`, `wallet_transaction`, `wallet_transaction_type`, `course_entitlement`; transactional writes |
+| Benefits catalogue, direct coupon activation/code, history, expiry and immediate wallet debit | `partner`, `partner_venue`, `benefit_offer`, `offer_venue`, `coupon_redemption`; same persisted wallet and ledger |
 | Less like this on reels | `user_course_preference.is_dismissed`; persistent write |
 | Profiles, people search, suggested friends, send request | `app_user`, `friendship`, `friendship_status` |
 | Completion activity, friends' weekly leaderboard, profile counts/streaks/country badges | Derived from `course_completion` + enrollment/course/country + friendships |
@@ -35,9 +36,9 @@ behaviors and the relational dependencies needed to read or write them.
 
 ## Schema-only features not implemented
 
-- Accounts/authentication, identity providers, tokens, email verification, roles/grants,
-  privacy/authorization, blocking and security. `X-User-Id` is an untrusted caller
-  choice, not an identity mechanism. No Spring Security dependency was added.
+- Learner accounts/authentication, identity providers, email verification, general
+  roles/privacy/blocking. `X-User-Id` is an untrusted caller choice, not an identity
+  mechanism. Benefits owner checks use that declared context.
 - AI course generation, durable generation jobs, extraction, source grants/chunks,
   provenance, embeddings/pgvector, model integrations and workers.
 - Uploads/media assets, buckets, private file delivery and presigned URLs.
@@ -49,9 +50,10 @@ behaviors and the relational dependencies needed to read or write them.
   part of the selected schema but have no administration endpoints.
 - Focus sessions, NFC tags/verified visits/rewards and explicit badge award workflows.
 - Expert grants, course reviews, contribution rewards, content reports and audit events.
-- Merchant offers/redemptions, cosmetics, wallet reservations, refunds, adjustments,
-  credit/top-up APIs and reward payments. The existing transaction-type lookup values
-  are retained verbatim; their presence does not imply those flows are implemented.
+- Cosmetics, refund/adjustment/credit/top-up APIs and reward payments. Benefits use
+  the `BENEFIT_ACTIVATION` transaction type; other lookup labels do not imply
+  implemented flows. Merchant self-service, payouts, real partner agreements,
+  offline acceptance, geofencing and badge/visit eligibility remain deferred.
 - Friend accept/decline/cancel/remove actions and incoming request inbox. The frontend
   only sends requests. Declined/cancelled pair rows can be reused for a new request.
 - Event save/registration/participant storage and capacity enforcement. The frontend
@@ -70,14 +72,22 @@ Those would otherwise require excluded subsystems. Decimal coordinates are enoug
 for the current map. No PostGIS or vector extension is installed. Other retained
 columns (for example event capacity and version objectives) have no extra APIs.
 
-All source CHECK constraints and stored functions/triggers are omitted, including
+In the initial 001 subset, source CHECK constraints and stored functions/triggers are omitted, including
 validation, immutability, scoring, publication guards, financial link checks and
 automatic wallet/reward creation. Primary keys, NOT NULL, unique keys and foreign
 keys remain as the structural relational model. No equivalent range/format/state
-validation was recreated in services. HTTP binding, missing-resource handling,
+validation was recreated for that initial subset. The incremental Benefits migration
+adds feature-specific state/amount/time constraints and explicit transactional validation.
+HTTP binding, missing-resource handling,
 insufficient-balance behavior and idempotent unlocks implement the existing frontend
 contract. The wallet use case updates balance and ledger itself because its trigger
 was omitted. Do not assume direct SQL ledger inserts update a balance.
+
+Benefits extends this baseline through incremental Liquibase changesets without
+rewriting 001 or 002. Activation directly debits the wallet and creates a coupon
+with a random code in one transaction. The old quote, reservation, and merchant
+credential tables are removed by the forward migration. Optional samples remain
+outside startup.
 
 The generic codebook infrastructure now also supports explicit registered table
 names and UUID IDs, so `field`/`difficulty` keep the source schema instead of being

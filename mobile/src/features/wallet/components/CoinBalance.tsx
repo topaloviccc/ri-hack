@@ -15,11 +15,11 @@ export type CoinBalanceProps = {
 /** "🪙 340" pill for headers; opens the coins info sheet. */
 export function CoinBalance({ elevated = false }: CoinBalanceProps) {
   const { data } = useWalletQuery();
-  const balance = data ? formatCount(data.balance) : '…';
+  const balance = data ? formatCount(data.availableBalance) : '…';
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={data ? `${data.balance} coins` : 'Coins loading'}
+      accessibilityLabel={data ? `${data.availableBalance} coins` : 'Coins loading'}
       accessibilityHint="Shows what coins are for"
       onPress={() => router.push('/coins')}
       className={cn(

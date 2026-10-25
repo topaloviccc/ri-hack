@@ -1,11 +1,12 @@
-# Database setup
+﻿# Database setup
 
 The application uses PostgreSQL through Spring JDBC. Liquibase runs the configured
 master changelog at startup and records applied changes in its own tracking tables.
 The master changelog includes `001-worldlearn.sql`, the frontend-backed subset of
 `../worldlearn.sql`. See [SCOPE.md](SCOPE.md) for the included tables and intentional
 omissions. UUIDs, defaults, keys and relationships follow the source schema;
-CHECK constraints, stored functions and triggers are intentionally omitted.
+CHECK constraints, stored functions and triggers are omitted from that initial subset.
+The incremental Benefits changeset adds its own feature-specific constraints.
 Subsequent changes belong in new changesets; do not edit an applied migration.
 
 ## Local PostgreSQL with Docker
@@ -57,6 +58,29 @@ with Java 21 and Docker available. Tests use
 disposable PostgreSQL containers, apply Liquibase, and never use the configured
 application database. API contracts and example requests are in [API.md](API.md).
 
+## Benefits storage and server secrets
+
+The incremental Benefits migrations add the catalogue and coupon tables, then simplify the earlier redemption schema. Coupons store a server-generated random code. Wallet debits and coupon creation happen in one transaction and are recorded using the `BENEFIT_ACTIVATION` transaction type. Benefit activation has no quote, reservation, merchant credential, or activation idempotency state. The shared wallet response retains `heldBalance` for API compatibility; it is always zero after the reservation table is removed.
+
+The forward migration expires legacy held and cancelled coupons before removing reservation and merchant credential tables. Already redeemed rows keep their historical status. Existing coupon rows receive generated codes for schema consistency. Keep 001 and 002 immutable and apply future changes as incremental migrations.
+Before an upgrade, take a database backup and verify it restores. Keep 001 immutable.
+For recovery, prefer a forward migration or restore the pre-upgrade backup; do not
+drop populated Benefits tables or erase captured ledger history to roll back an
+application deployment. Historical partner/offers should be deactivated, not deleted.
+
+Focused disposable-database checks from `backend`:
+
+```powershell
+.\mvnw.cmd '-Dtest=BenefitsIntegrationTests,BenefitsMigrationTests,BenefitsRestartIntegrationTests,BenefitsHttpIntegrationTests' test
+```
+
+The migration test starts with populated 001, applies the current master twice,
+and checks original balances/history plus empty Benefits tables. It then executes
+the optional dev seed repeatedly after simulated spending, verifying the separate
+520-coin opening credit occurs once and the original 250-coin learner is preserved.
+Integration tests exercise actual HTTP controller/service/JDBC transactions through MockMvc and
+PostgreSQL, including concurrent requests. They do not connect to the dev database.
+Tests use disposable PostgreSQL containers, not the dev database.
 ## Connect to a cloud PostgreSQL database
 
 Set the connection values in the environment where the application runs. `DB_URL`
