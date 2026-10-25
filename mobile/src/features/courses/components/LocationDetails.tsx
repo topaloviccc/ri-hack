@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ScrollView, View } from 'react-native';
 
+import { CountryFlag } from '@/components/shared/CountryFlag';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
@@ -10,10 +11,10 @@ import { Image } from '@/components/ui/Image';
 import { Text } from '@/components/ui/Text';
 import { useCoursesQuery, useLocationQuery } from '@/features/courses/api/courses.queries';
 import { CourseListItem } from '@/features/courses/components/CourseListItem';
+import { CoverImageCredit } from '@/features/courses/components/CoverImageCredit';
 import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
 import { locationKindLabel } from '@/features/courses/location-kinds';
 import { useThemeColors } from '@/lib/theme';
-import { CountryFlag } from '@/components/shared/CountryFlag';
 import { hasCoordinates } from '@/utils/has-coordinates';
 import { openInMaps } from '@/utils/open-in-maps';
 
@@ -45,6 +46,7 @@ export function LocationDetails({ id }: LocationDetailsProps) {
       <View className="gap-3">
         <Image uri={site.imageUrl} className="h-44 w-full bg-border" />
         <View className="gap-2 px-4">
+          <CoverImageCredit image={site.coverImage} />
           <Chip label={locationKindLabel(site.kind)} />
           <Text variant="title" accessibilityRole="header">
             {site.name}
@@ -62,6 +64,9 @@ export function LocationDetails({ id }: LocationDetailsProps) {
               icon={<Ionicons name="navigate-outline" size={16} color={colors.text} />}
               onPress={() => openInMaps(site.lat, site.lng, site.name)}
             />
+          ) : null}
+          {site.geocoderAttribution ? (
+            <Text variant="caption">{site.geocoderAttribution}</Text>
           ) : null}
           <Text variant="heading" className="mt-2">
             Courses here

@@ -6,14 +6,17 @@ import java.util.UUID;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import tools.jackson.databind.json.JsonMapper;
+import ri.hack.outthere.image.dto.CoverImageResponse;
 import ri.hack.outthere.course.dto.CountryResponse;
 import ri.hack.outthere.course.dto.LocationResponse;
 
 @Repository
 public class GeographyRepository {
     private final JdbcClient jdbc;
+    private final JsonMapper json;
 
-    public GeographyRepository(JdbcClient jdbc) { this.jdbc = jdbc; }
+    public GeographyRepository(JdbcClient jdbc, JsonMapper json) { this.jdbc = jdbc; this.json = json; }
 
     public List<CountryResponse> countries() {
         return jdbc.sql("""
@@ -32,7 +35,9 @@ public class GeographyRepository {
     public List<LocationResponse> locations(String countryCode, List<UUID> ids) {
         String sql = """
                 SELECT p.id, p.name, n.iso_code AS country_code, n.label AS country_name,
-                       p.latitude AS lat, p.longitude AS lng, p.image_url, p.kind, p.city
+                       p.latitude AS lat, p.longitude AS lng, p.image_url, p.kind, p.city,
+                       p.geocoder_attribution, p.cover_image::text AS cover_image,
+                       EXISTS(SELECT 1 FROM cover_image_job im WHERE im.place_id=p.id AND im.state IN ('QUEUED','RUNNING')) AS cover_image_pending
                 FROM place p JOIN country n ON n.id=p.country_id
                 WHERE p.archived_at IS NULL
                 """;
@@ -44,7 +49,10 @@ public class GeographyRepository {
         var query = jdbc.sql(sql + " ORDER BY p.name, p.id");
         if (countryCode != null) query.param("country", countryCode);
         if (ids != null) query.param("ids", ids);
-        return query.query(LocationResponse.class).list();
+        return query.query((rs, row) -> new LocationResponse(rs.getObject("id", UUID.class), rs.getString("name"),
+                rs.getString("country_code"), rs.getString("country_name"), rs.getBigDecimal("lat"), rs.getBigDecimal("lng"),
+                rs.getString("image_url"), rs.getString("kind"), rs.getString("city"), rs.getString("geocoder_attribution"), CoverImageResponse.parse(json, rs.getString("cover_image")),
+                rs.getBoolean("cover_image_pending"))).list();
     }
 
     public Optional<LocationResponse> location(UUID id) {

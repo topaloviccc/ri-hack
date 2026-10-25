@@ -14,6 +14,8 @@ import ri.hack.outthere.course.repository.CourseRepository;
 import ri.hack.outthere.course.repository.GeographyRepository;
 import ri.hack.outthere.course.repository.RecommendationRepository;
 import ri.hack.outthere.user.service.UserService;
+import tools.jackson.databind.json.JsonMapper;
+import ri.hack.outthere.image.dto.CoverImageResponse;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,28 +27,43 @@ public class CourseService {
     private final UserService users;
     private final RecommendationService recommendations;
     private final RecommendationRepository feedback;
+    private final JsonMapper json;
 
     public CourseService(CourseRepository courses, GeographyRepository geography, UserService users,
-                         RecommendationService recommendations, RecommendationRepository feedback) {
+                         RecommendationService recommendations, RecommendationRepository feedback, JsonMapper json) {
         this.courses = courses;
         this.geography = geography;
         this.users = users;
         this.recommendations = recommendations;
         this.feedback = feedback;
+        this.json = json;
     }
 
     public List<CourseResponse> list(UUID viewer, Collection collection, String countryCode,
                                      UUID locationId, List<UUID> ids) {
+        return search(viewer, collection, countryCode, locationId, ids, null);
+    }
+
+    public static String normalizeQuery(String query) {
+        if (query == null) return "";
+        String value = query.strip().replaceAll("\\s+", " ");
+        if (value.length() > 200) throw ApiException.badRequest("Search must be at most 200 characters");
+        return value;
+    }
+
+    public List<CourseResponse> search(UUID viewer, Collection collection, String countryCode,
+                                      UUID locationId, List<UUID> ids, String query) {
         users.requireUser(viewer);
         var rows = courses.courses(viewer, collection == null ? null : collection.name().toLowerCase(java.util.Locale.ROOT),
-                countryCode, locationId, ids);
+                countryCode, locationId, ids, normalizeQuery(query));
         if (collection == Collection.RECOMMENDED || collection == Collection.FEED) rows = recommendations.rank(viewer, rows);
         var locations = courses.locations(rows.stream().map(CourseRow::id).toList());
         return rows.stream().map(row -> new CourseResponse(row.id(), row.title(), row.subject(),
                 row.countryCode(), row.countryName(), locations.stream()
                     .filter(link -> link.courseId().equals(row.id())).map(CourseRepository.CourseLocation::location).toList(),
                 row.description(), row.learnerCount(), row.estimatedMinutes(), row.difficulty(),
-                row.progress(), row.unlockCost(), row.unlocked(), row.imageUrl())).toList();
+                row.progress(), row.unlockCost(), row.unlocked(), row.imageUrl(),
+                CoverImageResponse.parse(json, row.coverImageJson()), row.coverImagePending())).toList();
     }
 
     public CourseResponse get(UUID viewer, UUID id) {

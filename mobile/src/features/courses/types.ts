@@ -31,13 +31,33 @@ export type CourseCollection = HomeSection | 'feed';
 
 /** All fields optional: no filter lists every course. */
 export type CourseFilters = {
+  query?: string;
   collection?: CourseCollection;
   countryCode?: string;
   locationId?: string;
   ids?: string[];
 };
 
+export type CourseGeneration = {
+  id: string;
+  query: string;
+  state: 'QUEUED' | 'RUNNING' | 'READY' | 'REFUSED' | 'FAILED';
+  message: string | null;
+  courseId: string | null;
+};
+
 export type LocationFilters = { countryCode?: string; ids?: string[] };
+
+export type CoverImage = {
+  url: string;
+  sourceUrl: string;
+  author: string;
+  license: string;
+  licenseUrl: string;
+  caption: string;
+  width: number;
+  height: number;
+};
 
 /** A real site (monument, park, arena…). These are the waypoints on the Courses map. */
 export type Location = {
@@ -52,7 +72,14 @@ export type Location = {
   countryName: string;
   lat: number | null;
   lng: number | null;
+  /** The Commons cover photo when there is one, else the stored display image. */
   imageUrl: string | null;
+  /** Credit for imageUrl when it is a retrieved Commons photo. */
+  coverImage: CoverImage | null;
+  /** A cover photo search is still running. */
+  coverImagePending: boolean;
+  /** Credit the geocoding provider requires for generated places' coordinates. */
+  geocoderAttribution: string | null;
 };
 
 export type Country = {
@@ -70,7 +97,12 @@ export type Country = {
 export type Course = {
   id: string;
   title: string;
+  /** The Commons cover photo when there is one, else the stored display image. */
   imageUrl: string | null;
+  /** Credit for imageUrl when it is a retrieved Commons photo. */
+  coverImage: CoverImage | null;
+  /** A cover photo search is still running. */
+  coverImagePending: boolean;
   subject: Subject;
   countryCode: string;
   countryName: string;

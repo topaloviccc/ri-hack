@@ -6,4 +6,4 @@ import java.util.UUID;
 public record CourseRow(UUID id, String title, String subject, String countryCode, String countryName,
                         String description, long learnerCount, Integer estimatedMinutes,
                         String difficulty, Double progress, long unlockCost, boolean unlocked,
-                        String imageUrl) { }
+                        String imageUrl, String coverImageJson, boolean coverImagePending) { }

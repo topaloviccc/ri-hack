@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/Text';
 import { LockBadge } from '@/features/courses/components/LockBadge';
 import type { Course } from '@/features/courses/types';
 import { CountryFlag } from '@/components/shared/CountryFlag';
+import { CoverImageCredit } from './CoverImageCredit';
 
 export type ReelCardProps = { course: Course };
 
@@ -31,6 +32,7 @@ export function ReelCard({ course }: ReelCardProps) {
       <Text variant="body" className="text-on-image" numberOfLines={3}>
         {course.description}
       </Text>
+      <CoverImageCredit image={course.coverImage} compact onImage />
     </View>
   );
 }

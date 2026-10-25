@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BadgeIntegrationTests extends PostgresTestSupport {
     static final UUID ME=UUID.fromString("00000000-0000-0000-0000-000000000001");
     static final UUID ALEX=UUID.fromString("00000000-0000-0000-0000-000000000002");
-    // Seeded by the 007-badges changelog, so it survives the test data's truncation.
+    // Seeded by the 010-badges changelog, so it survives the test data's truncation.
     static final UUID TRSAT=UUID.fromString("b7000000-0000-4000-8000-000000000001");
     @Autowired JdbcClient jdbc;
     @Autowired MockMvc mvc;

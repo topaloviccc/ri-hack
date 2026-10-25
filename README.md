@@ -15,7 +15,7 @@ embeddings are pending. Interests can be skipped or edited in Settings. See
 
 | Area | Implemented through the backend | Remaining demo content / limitations |
 | --- | --- | --- |
-| Courses | Catalogue, details, filters, recommendations, reels, ordered lesson/quiz player and final summary quizzes | Cover images and optional seeded lesson/quiz content are demos; no course authoring or LLM generation |
+| Courses | Title/topic search, on-demand LLM generation with verified places, retrieved cover photos, catalogue, filters, recommendations, reels and ordered lesson/quiz player | Optional seeded lesson/quiz content is demo material; generation needs configured model and geocoder |
 | Learning history | Saved reading progress, submitted attempts, best-question scoring, completion, statistics, streaks and country badges | Unsubmitted selections are local; short-answer/matching questions and spaced revision are deferred |
 | Geography | Full ISO country catalogue, English names, image flags, places, coordinates, map counts and course links | Country introductions and location types/cities/images are labelled demos |
 | Wallet | Stored balance, paid/free unlocks and once-per-course completion rewards with retry protection | Demo opening credit is seeded; no top-up API |
@@ -227,6 +227,8 @@ Do not load the destructive test fixture into the working demo database.
 
 - [Backend endpoint contracts](backend/API.md)
 - [Course player, scoring and demo learning content](backend/LEARNING.md)
+- [Course search, generation setup and job contracts](backend/GENERATION.md)
+- [Course/place cover photo search and attribution](backend/IMAGES.md)
 - [Frontend integration and demo boundaries](mobile/API.md)
 - [Schema/frontend scope and omissions](backend/SCOPE.md)
 - [Database configuration](backend/DATABASE.md)

@@ -1,5 +1,5 @@
 --liquibase formatted sql
---changeset outthere:007-badges
+--changeset outthere:010-badges
 -- Collectible badges, earned by scanning their NFC tag. Adapted from the reference schema's
 -- badge, user_badge, nfc_tag_status and nfc_tag: tags point at the badge they award, and their
 -- place is optional so badges stay off the map. Rewards are paid once per user and badge and
@@ -50,7 +50,7 @@ CREATE TABLE nfc_tag (
 );
 CREATE INDEX ix_nfc_tag_badge_id ON nfc_tag(badge_id);
 
---changeset outthere:007-badges-trsat-stairs
+--changeset outthere:010-badges-trsat-stairs
 -- The first badge. Photo: "Rijeka-Trsat-stairs2.JPG" by László Szalai (Beyond silence), public
 -- domain, https://commons.wikimedia.org/wiki/File:Rijeka-Trsat-stairs2.JPG
 INSERT INTO badge(id,label,hook,subtitle,description,image_url,country_id,reward_coins) VALUES (

@@ -2,9 +2,15 @@ import type { Country, Course, Location } from '@/features/courses/types';
 
 export type MockCountry = Omit<Country, 'courseCount' | 'locationCount' | 'flagUrl'>;
 
-export type MockLocation = Omit<Location, 'countryName'>;
+// Retrieved cover photos are backend-only; the fixture serves every sample without one.
+type CoverImageFields = 'coverImage' | 'coverImagePending';
 
-export type MockCourse = Omit<Course, 'locations' | 'countryName' | 'unlockCost' | 'isUnlocked'> & {
+export type MockLocation = Omit<Location, 'countryName' | 'geocoderAttribution' | CoverImageFields>;
+
+export type MockCourse = Omit<
+  Course,
+  'locations' | 'countryName' | 'unlockCost' | 'isUnlocked' | CoverImageFields
+> & {
   locationIds: string[];
 };
 

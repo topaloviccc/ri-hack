@@ -4,17 +4,24 @@ import {
   type Country,
   type Course,
   type CourseFilters,
+  type CourseGeneration,
   type Location,
   type LocationFilters,
 } from '@/features/courses/types';
 import { apiRequest } from '@/lib/api-client';
 
+// A retrieved Commons photo (shown with its credit) beats the stored display image.
+const preferredImageUrl = (row: { coverImage?: { url: string } | null; imageUrl: string | null }) =>
+  row.coverImage?.url ?? row.imageUrl;
+
 const toLocation = (row: LocationResponse): Location => ({
   ...row,
   kind: isLocationKind(row.kind) ? row.kind : null,
+  imageUrl: preferredImageUrl(row),
 });
 const toCourse = (row: CourseResponse): Course => ({
   ...row,
+  imageUrl: preferredImageUrl(row),
   subject: row.subject ?? 'Uncategorized',
   countryCode: row.countryCode ?? '',
   countryName: row.countryName ?? 'Country not specified',
@@ -25,6 +32,11 @@ const toCourse = (row: CourseResponse): Course => ({
 const toCountry = (row: CountryResponse): Country => row;
 
 export const coursesApi = {
+  generate: (query: string): Promise<CourseGeneration> =>
+    apiRequest('/course-generations', { method: 'POST', body: { query } }),
+  generation: async (query: string): Promise<CourseGeneration | null> =>
+    (await apiRequest<CourseGeneration | null>('/course-generations', { query: { query } })) ??
+    null,
   list: async (filters: CourseFilters = {}): Promise<Course[]> => {
     const rows = await apiRequest<CourseResponse[]>('/courses', { query: filters });
     return rows.map(toCourse);

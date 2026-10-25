@@ -6,6 +6,7 @@ import { Image } from '@/components/ui/Image';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Text } from '@/components/ui/Text';
 import { CourseMeta } from '@/features/courses/components/CourseMeta';
+import { CoverImageCredit } from '@/features/courses/components/CoverImageCredit';
 import { LockBadge } from '@/features/courses/components/LockBadge';
 import type { Course } from '@/features/courses/types';
 
@@ -35,6 +36,7 @@ export const CourseListItem = memo(function CourseListItem({
           {course.title}
         </Text>
         <CourseMeta course={course} />
+        <CoverImageCredit image={course.coverImage} compact />
         <View className="flex-row flex-wrap gap-2">
           <Chip label={course.subject} />
           {course.isUnlocked ? null : <LockBadge cost={course.unlockCost} />}

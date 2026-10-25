@@ -47,9 +47,12 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
   const sara = users.find((u) => u.id === 'u9');
   if (sara) sara.relation = 'incoming';
   const countryName = (code: string) => MOCK_COUNTRIES.find((n) => n.code === code)?.name ?? code;
+  const noCoverImage = { coverImage: null, coverImagePending: false };
   const locations = MOCK_LOCATIONS.map((site) => ({
     ...site,
+    ...noCoverImage,
     countryName: countryName(site.countryCode),
+    geocoderAttribution: null,
   }));
   const course = (id: string): CourseResponse => {
     const row = MOCK_COURSES.find((c) => c.id === id);
@@ -62,6 +65,7 @@ export function installApiFixture(options: { balance?: number; heldBalance?: num
       progress: row.progress ?? null,
       unlockCost: 40,
       isUnlocked: owned.has(id),
+      ...noCoverImage,
     };
   };
 

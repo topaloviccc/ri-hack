@@ -6,6 +6,7 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { Text } from '@/components/ui/Text';
 import { useCoursesQuery } from '@/features/courses/api/courses.queries';
 import { CourseListItem } from '@/features/courses/components/CourseListItem';
+import { CreateCourseRow } from '@/features/courses/components/CreateCourseRow';
 import { useOpenCourse } from '@/features/courses/hooks/useOpenCourse';
 import type { Course } from '@/features/courses/types';
 
@@ -19,13 +20,14 @@ const groupBySubject = (courses: Course[]) =>
     .filter((section) => section.data.length > 0);
 
 /** Courses tab, Fields mode: every course grouped by subject. */
-export function CourseList() {
-  const { data, isPending, isError, refetch } = useCoursesQuery();
+export function CourseList({ query = '' }: { query?: string }) {
+  const { data, isPending, isError, refetch } = useCoursesQuery(query ? { query } : {});
   const { openCourse, prefetchCourse } = useOpenCourse();
 
   const renderEmpty = () => {
     if (isPending) return <LoadingState />;
     if (isError) return <ErrorState onRetry={refetch} />;
+    if (query) return <CreateCourseRow key={query} query={query} />;
     return <EmptyState title="No courses yet" />;
   };
 
@@ -34,8 +36,9 @@ export function CourseList() {
       sections={data ? groupBySubject(data) : []}
       keyExtractor={(c) => c.id}
       stickySectionHeadersEnabled={false}
+      keyboardShouldPersistTaps="handled"
       contentContainerClassName="gap-3 px-4 pb-8"
-      ListEmptyComponent={renderEmpty}
+      ListEmptyComponent={renderEmpty()}
       renderSectionHeader={({ section }) => (
         <View className="pt-3">
           <Text variant="heading" accessibilityRole="header">

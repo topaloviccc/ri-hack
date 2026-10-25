@@ -19,7 +19,7 @@ The learning/scoring policy is detailed in [LEARNING.md](LEARNING.md).
 | Profiles, people search, suggested friends, send request | `app_user`, `friendship`, `friendship_status` |
 | Completion activity, friends' weekly leaderboard, profile counts/streaks/country badges | Derived from `course_completion` + enrollment/course/country + friendships |
 | Event calendar/list/details, venue coordinates, organizer and external registration | `event`, `event_status`, `place`, `app_user`; read only |
-| NFC badge scan, collection on profiles and once-per-badge coins | `badge`, `user_badge`, `nfc_tag`, `nfc_tag_status` from `007-badges` (tags reference their badge; `place_id` optional), wallet and ledger |
+| NFC badge scan, collection on profiles and once-per-badge coins | `badge`, `user_badge`, `nfc_tag`, `nfc_tag_status` from `010-badges` (tags reference their badge; `place_id` optional), wallet and ledger |
 | Recommended row without AI | `user_interest`, `course_field`; explicit interest-weight ordering |
 | Images, country introductions, bios, place kinds/cities, event categories/languages/prices, event city filter | Columns added by `006-content-details` (not in the reference SQL): `course/place/event.image_url`, `country.blurb`, `app_user.bio`, `place.kind/city`, `event.category/language/price_eur`. Image URLs are public links, not uploaded assets; the app filters events by venue city locally |
 

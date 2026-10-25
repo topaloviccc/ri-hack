@@ -6,17 +6,25 @@ import java.util.UUID;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import tools.jackson.databind.json.JsonMapper;
+import ri.hack.outthere.image.dto.CoverImageResponse;
 import ri.hack.outthere.course.dto.LocationResponse;
 import ri.hack.outthere.course.model.CourseRow;
 
 @Repository
 public class CourseRepository {
     private final JdbcClient jdbc;
+    private final JsonMapper json;
 
-    public CourseRepository(JdbcClient jdbc) { this.jdbc = jdbc; }
+    public CourseRepository(JdbcClient jdbc, JsonMapper json) { this.jdbc = jdbc; this.json = json; }
 
     public List<CourseRow> courses(UUID viewer, String collection, String countryCode,
                                    UUID locationId, List<UUID> ids) {
+        return courses(viewer, collection, countryCode, locationId, ids, "");
+    }
+
+    public List<CourseRow> courses(UUID viewer, String collection, String countryCode,
+                                   UUID locationId, List<UUID> ids, String search) {
         if (ids != null && ids.isEmpty()) return List.of();
         // Ownership is course-wide; progress uses the most recent enrollment's pinned version.
         String sql = """
@@ -34,7 +42,9 @@ public class CourseRepository {
                             / nullif((SELECT count(*) FROM lesson l WHERE l.course_version_id=e.course_version_id)
                               + (SELECT count(*) FROM quiz q WHERE q.course_version_id=e.course_version_id),0)
                        END AS progress,
-                  c.price_coins AS unlock_cost, (ce.id IS NOT NULL) AS unlocked, c.image_url
+                  c.price_coins AS unlock_cost, (ce.id IS NOT NULL) AS unlocked, c.image_url,
+                  c.cover_image::text AS cover_image_json,
+                  EXISTS(SELECT 1 FROM cover_image_job im WHERE im.course_id=c.id AND im.state IN ('QUEUED','RUNNING')) AS cover_image_pending
                 FROM course c LEFT JOIN country n ON n.id=c.country_id
                 JOIN difficulty d ON d.id=c.difficulty_id
                 JOIN visibility vis ON vis.id=c.visibility_id
@@ -49,6 +59,13 @@ public class CourseRepository {
         if (countryCode != null) sql += " AND n.iso_code=:country";
         if (locationId != null) sql += " AND EXISTS (SELECT 1 FROM course_place cp WHERE cp.course_id=c.id AND cp.place_id=:location)";
         if (ids != null) sql += " AND c.id IN (:ids)";
+        if (search != null && !search.isBlank()) sql += """
+                 AND (strpos(lower(c.title),lower(:search))>0
+                   OR to_tsvector('english',c.title || ' ' || coalesce(c.description,''))
+                      @@ plainto_tsquery('english',:search)
+                   OR EXISTS (SELECT 1 FROM course_field cf JOIN field f ON f.id=cf.field_id
+                     WHERE cf.course_id=c.id AND strpos(lower(f.label),lower(:search))>0))
+                """;
         if ("continue".equals(collection)) sql += " AND e.first_opened_at IS NOT NULL AND e.completed_at IS NULL";
         if ("recommended".equals(collection) || "feed".equals(collection)) {
             sql += """
@@ -71,6 +88,7 @@ public class CourseRepository {
         if (countryCode != null) query.param("country", countryCode);
         if (locationId != null) query.param("location", locationId);
         if (ids != null) query.param("ids", ids);
+        if (search != null && !search.isBlank()) query.param("search", search);
         var rows = query.query(CourseRow.class).list();
         // Explicit ID lists are used for profile rows; preserve caller order, as the mock did.
         if (ids == null) return rows;
@@ -85,14 +103,16 @@ public class CourseRepository {
         if (courseIds.isEmpty()) return List.of();
         return jdbc.sql("""
                 SELECT cp.course_id, p.id, p.name, n.iso_code, n.label, p.latitude, p.longitude,
-                       p.image_url, p.kind, p.city
+                       p.image_url, p.kind, p.city, p.geocoder_attribution, p.cover_image::text AS cover_image,
+                       EXISTS(SELECT 1 FROM cover_image_job im WHERE im.place_id=p.id AND im.state IN ('QUEUED','RUNNING')) AS cover_image_pending
                 FROM course_place cp JOIN place p ON p.id=cp.place_id JOIN country n ON n.id=p.country_id
                 WHERE cp.course_id IN (:ids) AND p.archived_at IS NULL ORDER BY p.name, p.id
                 """).param("ids", courseIds).query((rs, row) -> new CourseLocation(
                     rs.getObject("course_id", UUID.class), new LocationResponse(rs.getObject("id", UUID.class),
                     rs.getString("name"), rs.getString("iso_code"), rs.getString("label"),
                     rs.getBigDecimal("latitude"), rs.getBigDecimal("longitude"), rs.getString("image_url"),
-                    rs.getString("kind"), rs.getString("city")))).list();
+                    rs.getString("kind"), rs.getString("city"), rs.getString("geocoder_attribution"),
+                    CoverImageResponse.parse(json, rs.getString("cover_image")), rs.getBoolean("cover_image_pending")))).list();
     }
 
     public boolean exists(UUID id) {

@@ -8,6 +8,7 @@ import { Text } from '@/components/ui/Text';
 import { locationKindIcon, locationSummary } from '@/features/courses/location-kinds';
 import type { Location } from '@/features/courses/types';
 import { useThemeColors } from '@/lib/theme';
+import { CoverImageCredit } from '@/features/courses/components/CoverImageCredit';
 
 export const openLocation = (id: string) =>
   router.push({ pathname: '/location/[id]', params: { id } });
@@ -32,6 +33,7 @@ export const LocationRow = memo(function LocationRow({ location }: LocationItemP
         <Text variant="caption" numberOfLines={1}>
           {locationSummary(location)}
         </Text>
+        <CoverImageCredit image={location.coverImage} compact />
       </View>
       <Ionicons name={locationKindIcon(location.kind)} size={18} color={colors.primary} />
     </Pressable>
@@ -55,6 +57,7 @@ export const LocationCard = memo(function LocationCard({ location }: LocationIte
         <Text variant="caption" numberOfLines={1}>
           {locationSummary(location)}
         </Text>
+        <CoverImageCredit image={location.coverImage} compact />
       </View>
     </Pressable>
   );

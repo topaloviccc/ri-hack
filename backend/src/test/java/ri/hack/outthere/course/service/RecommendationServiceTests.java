@@ -26,6 +26,6 @@ class RecommendationServiceTests {
 
     private CourseRow course(UUID id) {
         return new CourseRow(id, "Course", null, null, null, "Description", 0, 10, "beginner", null, 0, false,
-                null);
+                null, null, false);
     }
 }

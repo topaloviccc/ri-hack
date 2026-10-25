@@ -164,3 +164,22 @@ When a user correction or verified mistake reveals a reusable lesson, append a
 short entry here: the mistake, its cause, and the concrete rule that prevents a
 repeat. Keep lessons relevant to this project, avoid duplicates, and reconcile
 them with existing guidance. Do not turn guesses or task history into rules.
+
+- Test provider authentication with the actual Java client and complete request
+  parameters. Maps.co accepted one header-authenticated probe but rejected the
+  application's request as missing a key; its documented query-key mode worked.
+  Keep authentication configurable and omit URLs/provider bodies from failure logs.
+
+- A generic generation validation message hid both content errors and failed place
+  lookups, and saving only valid drafts erased the evidence. Save parsed drafts
+  before validation, report application-authored field/place diagnostics, and persist
+  any automatic correction budget so retries cannot create an unbounded model loop.
+
+- Array-size and enum requirements mentioned only in a prompt can still be violated
+  during a correction. Include supported constraints in the provider JSON Schema;
+  give lesson and final quizzes distinct definitions when their size limits differ,
+  and retain backend checks for relationships the schema cannot express.
+
+- Commons currently returns thumbnails on `thumb.wikimedia.org` as well as media
+  on `upload.wikimedia.org`. Verify real provider metadata before finalizing a host
+  allowlist, and test both exact hosts rather than allowing arbitrary subdomains.

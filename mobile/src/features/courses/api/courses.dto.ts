@@ -1,4 +1,4 @@
-import type { Difficulty } from '@/features/courses/types';
+import type { CoverImage, Difficulty } from '@/features/courses/types';
 
 export type CountryResponse = {
   code: string;
@@ -20,6 +20,9 @@ export type LocationResponse = {
   /** Lowercase code; see LOCATION_KINDS. */
   kind: string | null;
   city: string | null;
+  geocoderAttribution: string | null;
+  coverImage: CoverImage | null;
+  coverImagePending: boolean;
 };
 
 export type CourseResponse = {
@@ -37,4 +40,6 @@ export type CourseResponse = {
   unlockCost: number;
   isUnlocked: boolean;
   imageUrl: string | null;
+  coverImage: CoverImage | null;
+  coverImagePending: boolean;
 };
