@@ -1,9 +1,8 @@
 -- OPTIONAL LOCAL DEVELOPMENT DATA. Apply after Liquibase, never on production startup.
 -- Stable IDs and a once-only opening ledger entry preserve spending on reruns.
 BEGIN;
-INSERT INTO country(iso_code,label) VALUES
- ('HR','Croatia'),('ES','Spain'),('FR','France'),('IT','Italy'),('PT','Portugal')
-ON CONFLICT (iso_code) DO NOTHING;
+-- Countries (including required flag URLs) are production Liquibase reference
+-- data. Reuse them by ISO code below rather than inserting incomplete rows.
 
 INSERT INTO app_user(id,first_name,last_name,username,email,timezone)
 VALUES ('b0000000-0000-4000-8000-000000000001','Benefits','Sample Learner',
