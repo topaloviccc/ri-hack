@@ -18,7 +18,7 @@ export type UserListItemProps = {
   onPress: (id: string) => void;
 };
 
-/** Person row used by People search and Leaderboards. */
+/** Person row used by People search and the Leaderboard. */
 export const UserListItem = memo(function UserListItem({
   id,
   name,

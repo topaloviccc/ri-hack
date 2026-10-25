@@ -140,6 +140,41 @@ now a rule; don't re-open without a reason.
 ### Scope
 - **Weekly challenge removed** from Network (out of scope): card, demo API/query/mock/type, test and docs.
 
+## 2b. Interaction rules (from the UX review)
+
+Approved in full after the design pass. These are behaviour rules, with the shared piece to use.
+
+### Structure
+- **No pressable inside a pressable row/card** unless it is the row's own trailing action (Add/Accept on person rows). Secondary actions go on the detail page or into `accessibilityActions`.
+- **No modal over a modal.** A sheet lists its choices inline with `OptionRow` (`ui/OptionRow`, also used inside `Select`).
+- **No card-in-card or duplicate titles.** A screen with a native header doesn't repeat the title as a heading.
+- **List → detail → action.** Tapping an item opens its detail page (prefetched on press-in); the detail page holds the action (Redeem → confirm).
+
+### Controls
+- **Icon-only buttons** use `ui/IconButton` (44px circle, surface, primary icon, required `accessibilityLabel`).
+- **Active filters** show as removable chips (`ActiveFilterChips`), one "Clear all" in the filter sheet. Never several buttons that open the same sheet.
+- **Screen-level actions** (e.g. My coupons) sit in the header right, before the coin pill.
+- **Don't show controls for unbuilt features** (Edit profile is hidden, not "Coming soon").
+- **Status is not a disabled button**: show it as a `Chip` ("Friends").
+
+### Feedback and confirmation
+- **Destructive or irreversible actions** confirm with `confirmDestructive()` (`utils/confirm`): native Alert, Cancel + destructive button. Used for unfriend, Mark as used, Log out.
+- **Errors** show inline as orange captions (or in the toast for background actions). `Alert` is only for confirmations and system-level failures (opening files/links).
+- **State changes** show in the control itself (label change, `…` while pending).
+- **Background, undoable actions** use a bottom toast with **Undo** (Scroll's "less like this"; client-side undo window, saved when the toast closes).
+- **Success after navigation** needs no extra message when the destination shows the result.
+
+### Forms and modals
+- **Validation timing**: nothing before the first submit; after it, errors show under each field (`components/shared/FormField`) and update live. Field border turns `primary`. Client rules mirror the backend.
+- **Sheets and pickers close** on backdrop tap, Android back, and an explicit Done/Cancel.
+
+### Content
+- **Counts use `pluralize()`** (`utils/format`): "1 course", "2 courses".
+- **Coins are exact numbers** with grouping (`formatNumber`: "1,240 coins") everywhere, header pill included. Compact `formatCount` ("1.2k") is only for social counts (learners).
+- **Backend enum codes are never shown raw**: map them to labels (`features/benefits/labels.ts`).
+- **Dates and times** use `utils/date` (`formatDayHeading`, `formatTime`, `formatDateTime`), never `toLocaleString()`.
+- **Long text**: titles on cards/heroes get `numberOfLines` (2–3); open-ended lists on a focused screen are capped with `listWithMore()` and the full list lives on the detail page.
+
 ## 3. Exceptions
 
 Intentional differences. Don't flag these.
