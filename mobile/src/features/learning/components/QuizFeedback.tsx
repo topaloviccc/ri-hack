@@ -101,11 +101,13 @@ export function QuizFeedback({ quiz, result, onRetry }: QuizFeedbackProps) {
               }
             />
           ) : null}
-          <LearningAction
-            variant={quiz.finalQuiz ? 'primary' : 'soft'}
-            label="Course outline"
-            onPress={() => router.setParams({ lesson: undefined, quiz: undefined })}
-          />
+          {/* After the final quiz there is no next step; the outline is the way on. */}
+          {quiz.finalQuiz ? (
+            <LearningAction
+              label="Course outline"
+              onPress={() => router.setParams({ lesson: undefined, quiz: undefined })}
+            />
+          ) : null}
           <LearningAction variant="soft" label="Retry quiz" onPress={onRetry} />
         </View>
       }
