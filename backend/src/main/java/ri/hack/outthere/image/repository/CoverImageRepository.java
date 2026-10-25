@@ -85,6 +85,15 @@ public class CoverImageRepository {
         // Otherwise the persisted lease backs off and recovers the job, including after restarts.
     }
 
+    /** Requeues a job after a provider rate limit without spending one of its attempts. */
+    public void retryLater(Job job, java.time.Duration delay) {
+        jdbc.sql("""
+                UPDATE cover_image_job SET state='QUEUED',attempts=greatest(attempts-1,0),
+                    available_at=now()+make_interval(secs=>:secs),updated_at=now()
+                WHERE id=:id AND state='RUNNING' AND lease_token=:token
+                """).param("secs", delay.toSeconds()).param("id", job.id()).param("token", job.leaseToken()).update();
+    }
+
     private void finish(Job job, String state, String message) {
         jdbc.sql("""
                 UPDATE cover_image_job SET state=:state,message=:message,updated_at=now()

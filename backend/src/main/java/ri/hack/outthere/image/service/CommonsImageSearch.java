@@ -19,6 +19,12 @@ import ri.hack.outthere.image.model.ImageCandidate;
 
 @Service
 public class CommonsImageSearch {
+    /** Commons answered 429; callers should stop calling it until {@code retryAfter} has passed. */
+    public static class RateLimited extends IllegalStateException {
+        public final Duration retryAfter;
+        public RateLimited(Duration retryAfter) { super("Commons rate limit"); this.retryAfter = retryAfter; }
+    }
+
     private final RestClient api;
     private final HttpClient http;
     private final String userAgent;
@@ -37,7 +43,10 @@ public class CommonsImageSearch {
                 .queryParam("gsrsearch", "{query}").queryParam("gsrnamespace", 6).queryParam("gsrlimit", 6)
                 .queryParam("prop", "imageinfo").queryParam("iiprop", "url|size|mime|extmetadata")
                 .queryParam("iiurlwidth", 1280).queryParam("format", "json").queryParam("formatversion", 2)
-                .build(query)).retrieve().body(JsonNode.class);
+                .build(query)).retrieve()
+                .onStatus(status -> status.value() == 429, (request, res) -> {
+                    throw new RateLimited(retryAfter(res.getHeaders().getFirst("Retry-After")));
+                }).body(JsonNode.class);
         if (response == null || response.has("error")) throw new IllegalStateException("Commons search unavailable");
         var result = new ArrayList<ImageCandidate>();
         for (var page : response.path("query").path("pages")) {
@@ -76,6 +85,7 @@ public class CommonsImageSearch {
             var response = http.send(HttpRequest.newBuilder(URI.create(image.url())).timeout(Duration.ofSeconds(10))
                     .header("User-Agent", userAgent).method("HEAD", HttpRequest.BodyPublishers.noBody()).build(),
                     HttpResponse.BodyHandlers.discarding());
+            if (response.statusCode() == 429) throw new RateLimited(retryAfter(response.headers().firstValue("Retry-After").orElse(null)));
             return response.statusCode() == 200 && response.headers().firstValue("Content-Type")
                     .map(value -> value.startsWith("image/")).orElse(false);
         } catch (InterruptedException interrupted) {
@@ -84,6 +94,12 @@ public class CommonsImageSearch {
         } catch (java.io.IOException failure) {
             throw new IllegalStateException("Image verification unavailable");
         }
+    }
+
+    static Duration retryAfter(String header) {
+        try {
+            return Duration.ofSeconds(Math.clamp(Long.parseLong(header.strip()), 1, 3600));
+        } catch (RuntimeException missingOrDate) { return Duration.ofSeconds(60); }
     }
 
     static boolean trustedUrl(String value, String host) {
