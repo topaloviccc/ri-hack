@@ -3,6 +3,7 @@ package ri.hack.outthere.user.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,38 @@ public class UserService {
         if (!other.relation().equals("none")) throw ApiException.conflict("Already connected");
         repository.requestFriend(viewer, id);
         return get(viewer, id);
+    }
+
+    @Transactional
+    public UserResponse acceptFriendRequest(UUID viewer, UUID requester) {
+        return update(viewer, requester, () -> repository.updateFriendship(requester, viewer, false, "PENDING", "ACCEPTED"),
+                "No pending friend request from this user");
+    }
+
+    @Transactional
+    public UserResponse declineFriendRequest(UUID viewer, UUID requester) {
+        return update(viewer, requester, () -> repository.updateFriendship(requester, viewer, false, "PENDING", "DECLINED"),
+                "No pending friend request from this user");
+    }
+
+    @Transactional
+    public UserResponse cancelFriendRequest(UUID viewer, UUID addressee) {
+        return update(viewer, addressee, () -> repository.updateFriendship(viewer, addressee, false, "PENDING", "CANCELLED"),
+                "No pending friend request to this user");
+    }
+
+    /** Ends an accepted friendship; either friend may send a new request afterwards. */
+    @Transactional
+    public UserResponse removeFriend(UUID viewer, UUID friend) {
+        return update(viewer, friend, () -> repository.updateFriendship(viewer, friend, true, "ACCEPTED", "CANCELLED"),
+                "Not friends with this user");
+    }
+
+    private UserResponse update(UUID viewer, UUID other, BooleanSupplier change, String conflict) {
+        requireUser(viewer);
+        requireUser(other);
+        if (!change.getAsBoolean()) throw ApiException.conflict(conflict);
+        return get(viewer, other);
     }
 
     private UserResponse response(UserRow row) {

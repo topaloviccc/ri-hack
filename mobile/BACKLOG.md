@@ -42,7 +42,8 @@ demo fields are documented in `API.md` and `../backend/SCOPE.md`.
 - [ ] **Localized country names** — current country names are English ISO reference display names from the backend; image flags are implemented. Translated names remain deferred.
 
 ## Platform / infra
-- [ ] **Auth** — excluded from this integration; "me" comes from `/users/me` using the configured `EXPO_PUBLIC_USER_ID`. Tokens → `expo-secure-store` when authentication is added.
+- [ ] **Persistent web sessions** — `expo-secure-store` has no web implementation, so the web build keeps its token in memory and signs out on reload.
+- [ ] **Account recovery** — no password reset, email verification or profile/password editing.
 - [ ] **Development builds** — Expo Go is enough today; NFC (spec F9) and MapLibre will need `eas build --profile development`.
 - [ ] **i18n** — English only; event languages are a hand-mapped list in `features/events/categories.ts`.
 - [ ] **Map colours as a prop** — the map palette lives in `lib/theme.ts` tokens (`map*`); expose a per-map override if a screen ever needs a different scheme.

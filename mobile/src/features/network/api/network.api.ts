@@ -9,14 +9,15 @@ type LeaderboardEntryResponse = Omit<LeaderboardEntry, 'userAvatarUrl'> & {
 
 export const networkApi = {
   listFeed: async (): Promise<FeedItem[]> =>
-    (await apiRequest<FeedItemResponse[]>('/network/feed', { viewer: true })).map((row) => ({
+    (await apiRequest<FeedItemResponse[]>('/network/feed')).map((row) => ({
       ...row,
       userAvatarUrl: row.userAvatarUrl ?? '',
     })),
   listLeaderboard: async (): Promise<LeaderboardEntry[]> =>
-    (await apiRequest<LeaderboardEntryResponse[]>('/network/leaderboard', { viewer: true })).map(
-      (row) => ({ ...row, userAvatarUrl: row.userAvatarUrl ?? '' }),
-    ),
+    (await apiRequest<LeaderboardEntryResponse[]>('/network/leaderboard')).map((row) => ({
+      ...row,
+      userAvatarUrl: row.userAvatarUrl ?? '',
+    })),
   // Demo only: the schema has no challenge definitions/progress. Never mixed with live scores.
   getChallenge: async (): Promise<WeeklyChallenge> => ({
     ...MOCK_CHALLENGE,

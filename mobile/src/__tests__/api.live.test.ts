@@ -3,8 +3,12 @@ import { eventsApi } from '@/features/events/api/events.api';
 import { networkApi } from '@/features/network/api/network.api';
 import { usersApi } from '@/features/users/api/users.api';
 import { walletApi } from '@/features/wallet/api/wallet.api';
+import { authSession } from '@/lib/auth-session';
 
 // Opt-in: uses only a disposable server loaded with backend's worldlearn-test-data.sql.
+// LIVE_API_TOKEN is a JWT for that data's viewer (00000000-0000-0000-0000-000000000001),
+// signed with the server's JWT_SECRET; seeded test users have no password to log in with.
+const LIVE_VIEWER_ID = '00000000-0000-0000-0000-000000000001';
 const live = process.env.RUN_LIVE_API_TESTS === '1' ? describe : describe.skip;
 
 live('frontend adapters against Spring Boot and PostgreSQL', () => {
@@ -12,12 +16,15 @@ live('frontend adapters against Spring Boot and PostgreSQL', () => {
   beforeAll(() => {
     globalThis.fetch = jest.requireActual('node-fetch');
   });
+  beforeEach(() =>
+    authSession.set({ token: process.env.LIVE_API_TOKEN ?? '', userId: LIVE_VIEWER_ID }),
+  );
 
   it('reads actual DTOs and persists unlock, friend and dismissal mutations', async () => {
     const paid = '10000000-0000-0000-0000-000000000001';
     const started = '10000000-0000-0000-0000-000000000003';
     const me = await usersApi.me();
-    expect(me.id).toBe(process.env.EXPO_PUBLIC_USER_ID);
+    expect(me.id).toBe(LIVE_VIEWER_ID);
     expect((await coursesApi.list({ collection: 'continue' }))[0]).toMatchObject({
       id: started,
       progress: 0.5,

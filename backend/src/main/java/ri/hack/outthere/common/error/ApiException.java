@@ -1,7 +1,7 @@
 package ri.hack.outthere.common.error;
 
 public class ApiException extends RuntimeException {
-    public enum Kind { NOT_FOUND, CONFLICT, INSUFFICIENT_COINS, BAD_REQUEST }
+    public enum Kind { NOT_FOUND, CONFLICT, INSUFFICIENT_COINS, BAD_REQUEST, UNAUTHORIZED }
 
     private final Kind kind;
 
@@ -22,5 +22,9 @@ public class ApiException extends RuntimeException {
 
     public static ApiException badRequest(String message) {
         return new ApiException(Kind.BAD_REQUEST, message);
+    }
+
+    public static ApiException unauthorized(String message) {
+        return new ApiException(Kind.UNAUTHORIZED, message);
     }
 }

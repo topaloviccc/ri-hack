@@ -25,3 +25,12 @@ onlineManager.setEventListener((setOnline) =>
 );
 
 AppState.addEventListener('change', (status) => focusManager.setFocused(status === 'active'));
+
+/**
+ * Tags queries whose results depend on who the signed-in user's friends are, so a friendship
+ * change can refresh them without the users feature importing every feature that shows friends.
+ */
+export const FRIENDSHIP_SCOPED = { friendshipScoped: true } as const;
+
+export const invalidateFriendshipScoped = (client: QueryClient) =>
+  client.invalidateQueries({ predicate: (query) => query.meta?.friendshipScoped === true });

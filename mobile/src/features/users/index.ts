@@ -1,4 +1,5 @@
 export { userKeys, useMeQuery } from './api/users.queries';
+export { FriendRequests } from './components/FriendRequests';
 export { FriendStrip } from './components/FriendStrip';
 export { PeopleSearch } from './components/PeopleSearch';
 export { ProfileButton } from './components/ProfileButton';

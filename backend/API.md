@@ -5,13 +5,13 @@ IDs are UUID strings, not the frontend's mock IDs (`u0`, `c1`, etc.).
 Requests and responses use JSON. Times use ISO 8601 UTC. Nullable source columns
 remain nullable; unsupported frontend fields are omitted, as listed in [SCOPE.md](SCOPE.md).
 
-Viewer-specific endpoints require `X-User-Id: <existing app_user UUID>`.
-This is untrusted caller-supplied context, not authenticated identity. Benefits
-queries and mutations enforce ownership against this declared viewer, but public
-deployment requires authenticated learner identity. Merchant endpoints separately
-verify bearer credentials and partner/venue grants. There is no default "me" user.
-Countries, locations, events and codebooks do not require the header. The mobile frontend now uses these
-endpoints. It reads `EXPO_PUBLIC_API_URL` (including `/api`) and `EXPO_PUBLIC_USER_ID`.
+Every endpoint except `POST /auth/signup` and `POST /auth/login` requires
+`Authorization: Bearer <token>`. Tokens are HS256 JWTs whose subject is the
+`app_user` id, valid for 30 days and signed with `JWT_SECRET` (a local-only default
+is built in; every shared deployment must set it). The viewer is always the token's
+user; there is no default "me" user. A missing, expired or invalid token returns 401.
+Logout is client-side: the app discards its token. The mobile frontend uses these
+endpoints and reads `EXPO_PUBLIC_API_URL` (including `/api`).
 Unsupported fields remain explicitly labelled demo content, per the chosen integration
 policy. See [mobile/API.md](../mobile/API.md) for configuration and demo boundaries.
 Browser CORS allows localhost/127.0.0.1 on port 8081 by default; configure additional
@@ -19,6 +19,8 @@ origins with the backend `CORS_ALLOWED_ORIGINS` environment variable.
 
 | Method | Path | Parameters / result |
 | --- | --- | --- |
+| POST | `/auth/signup` | `{firstName,lastName,username,email,password,timezone}`; 201 `{token,user: User}`. New users have role `USER` and a wallet holding the 500-coin signup bonus (`app.auth.signup-bonus-coins`) |
+| POST | `/auth/login` | `{email,password}`; `{token,user: User}`. Wrong email or password: 401 `Invalid email or password` |
 | GET | `/courses` | `collection=continue\|popular\|recommended\|feed`, `countryCode`, `locationId`, `ids`; `Course[]` |
 | GET | `/courses/{id}` | `Course` |
 | POST | `/courses/{id}/unlock` | Required `Idempotency-Key` header, no body; `Wallet` |
@@ -28,10 +30,14 @@ origins with the backend `CORS_ALLOWED_ORIGINS` environment variable.
 | GET | `/locations` | Optional `countryCode`, `ids`; `Location[]` |
 | GET | `/locations/{id}` | `Location` |
 | GET | `/wallet` | `Wallet`: `{ "balance": 520, "heldBalance": 120, "availableBalance": 400 }` |
-| GET | `/users` | Optional `query`, `relation=friend\|requested\|none`, `suggested=true`; `User[]` excluding viewer |
+| GET | `/users` | Optional `query`, `relation=friend\|requested\|incoming\|none`, `suggested=true`; `User[]` excluding viewer |
 | GET | `/users/me` | Viewer profile; `User` |
 | GET | `/users/{id}` | `User` |
 | POST | `/users/{id}/friend-requests` | No body; updated `User` with `relation="requested"` |
+| POST | `/users/{id}/friend-requests/accept` | `{id}` sent the viewer a pending request; no body; updated `User` with `relation="friend"`. 409 when there is no such request |
+| POST | `/users/{id}/friend-requests/decline` | As accept; `relation="none"`, and either user may send a new request later |
+| POST | `/users/{id}/friend-requests/cancel` | The viewer withdraws their own pending request to `{id}`; `relation="none"`. 409 when there is none |
+| POST | `/users/{id}/unfriend` | Either friend ends an accepted friendship; `relation="none"`. 409 when not friends |
 | GET | `/network/feed` | Latest five friends' completions; `FeedItem[]` |
 | GET | `/network/leaderboard` | Friends and viewer, this UTC week; `LeaderboardEntry[]` |
 | GET | `/events` | All non-cancelled events, ordered by actual start time; `Event[]` |
@@ -42,8 +48,9 @@ origins with the backend `CORS_ALLOWED_ORIGINS` environment variable.
 
 `ids` accepts comma-separated UUIDs or repeated parameters. `ids=` returns an empty
 list. Course ID requests preserve caller order and skip unknown IDs. Other course
-filters combine with AND. Invalid UUIDs, missing required headers and unknown course
-collections return 400. Missing resources return 404; conflicting friend requests
+filters combine with AND. Invalid UUIDs, missing required headers, invalid signup
+fields and unknown course collections return 400. A taken username or email
+(case-insensitive) returns 409. Missing resources return 404; conflicting friend requests
 or reused paid-purchase keys return 409; insufficient coins return 402. Domain errors
 use `application/problem+json` with `status` and `detail`.
 
@@ -54,7 +61,7 @@ use `application/problem+json` with `status` and `detail`.
 | Course | `id`, `title`, `subject`, `countryCode`, `countryName`, `locations: Location[]`, `description`, `learnerCount`, `estimatedMinutes`, `difficulty`, `progress`, `unlockCost`, `isUnlocked` |
 | Country | `code`, `name`, `flagUrl`, `courseCount`, `locationCount` |
 | Location | `id`, `name`, `countryCode`, `countryName`, `lat`, `lng` |
-| User | `id`, `name`, `handle`, `avatarUrl`, `countryCode`, `stats: {completedCount,streakDays,countriesCount}`, `badgeCountryCodes`, `inProgressCourseIds`, `completedCourseIds`, `relation`, `mutualFriendsCount` |
+| User | `id`, `name`, `handle`, `avatarUrl`, `countryCode`, `stats: {completedCount,streakDays,countriesCount}`, `badgeCountryCodes`, `inProgressCourseIds`, `completedCourseIds`, `relation` (`me`, `friend`, `requested` = viewer sent a pending request, `incoming` = viewer received one, `none`), `mutualFriendsCount` |
 | FeedItem | `id`, `userId`, `userName`, `userAvatarUrl`, `courseId`, `courseTitle`, `completedAt` |
 | LeaderboardEntry | `rank`, `userId`, `userName`, `userAvatarUrl`, `completedThisWeek`, `isMe` |
 | Event | `id`, `title`, `startsAt`, `venue`, `lat`, `lng`, `description`, `organizer`, `isFree`, `registrationUrl` |
@@ -116,7 +123,7 @@ There are no arbitrary credit/top-up, generation or course-authoring APIs.
 
 ## Benefits and coupons
 
-All routes below include the `/api` prefix. Learner routes require `X-User-Id`.
+All routes below include the `/api` prefix. Learner routes require the bearer token.
 Catalogue and history pages use `{items,page,size,total}`; coin amounts are integers.
 Country filters refer to eligible venue countries through `place.country_id`, not
 the partner's headquarters or the learner's location. Filters combine with AND.
@@ -142,9 +149,10 @@ Errors use ProblemDetail with stable `code`: 400 malformed input, 404 missing of
 With a provisioned database and real UUIDs:
 
 ```powershell
-$viewerId = '<app_user UUID>'
+$login = @{ email = 'demo.learner@example.test'; password = 'demo1234' } | ConvertTo-Json
+$auth = @{ Authorization = 'Bearer ' + (Invoke-RestMethod 'http://localhost:8080/api/auth/login' -Method Post -ContentType 'application/json' -Body $login).token }
 $courseId = '<course UUID>'
-Invoke-RestMethod 'http://localhost:8080/api/courses?collection=continue' -Headers @{'X-User-Id'=$viewerId}
-Invoke-RestMethod "http://localhost:8080/api/courses/$courseId/unlock" -Method Post -Headers @{'X-User-Id'=$viewerId; 'Idempotency-Key'='purchase-001'}
-Invoke-RestMethod 'http://localhost:8080/api/countries'
+Invoke-RestMethod 'http://localhost:8080/api/courses?collection=continue' -Headers $auth
+Invoke-RestMethod "http://localhost:8080/api/courses/$courseId/unlock" -Method Post -Headers ($auth + @{'Idempotency-Key'='purchase-001'})
+Invoke-RestMethod 'http://localhost:8080/api/countries' -Headers $auth
 ```

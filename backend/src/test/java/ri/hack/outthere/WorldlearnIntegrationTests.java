@@ -34,67 +34,68 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
     @Autowired WalletService wallets;
 
     @Test
-    void allowsExpoWebPreflightWithViewerAndPurchaseHeaders() throws Exception {
+    void allowsExpoWebPreflightWithAuthorizationAndPurchaseHeaders() throws Exception {
         mvc.perform(options("/api/courses/" + PAID + "/unlock")
                         .header("Origin", "http://localhost:8081")
                         .header("Access-Control-Request-Method", "POST")
-                        .header("Access-Control-Request-Headers", "x-user-id,idempotency-key"))
+                        .header("Access-Control-Request-Headers", "authorization,idempotency-key"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:8081"));
     }
 
     @Test
     void browsesSchemaBackedCoursesAndFiltersWithoutInventingFields() throws Exception {
-        mvc.perform(get("/api/courses").header("X-User-Id", ME)).andExpect(status().isOk())
+        mvc.perform(get("/api/courses").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(4));
-        mvc.perform(get("/api/courses/" + PAID).header("X-User-Id", ME)).andExpect(status().isOk())
+        mvc.perform(get("/api/courses/" + PAID).with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.subject").value("History"))
                 .andExpect(jsonPath("$.unlockCost").value(40))
                 .andExpect(jsonPath("$.isUnlocked").value(false))
                 .andExpect(jsonPath("$.locations[0].lat").value(42.424662))
                 .andExpect(jsonPath("$.imageUrl").doesNotExist());
-        mvc.perform(get("/api/courses").header("X-User-Id", ME).param("collection", "continue"))
+        mvc.perform(get("/api/courses").with(viewer(ME)).param("collection", "continue"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(STARTED)).andExpect(jsonPath("$[0].progress").value(0.5));
-        mvc.perform(get("/api/courses").header("X-User-Id", ME).param("ids", STARTED + "," + PAID))
+        mvc.perform(get("/api/courses").with(viewer(ME)).param("ids", STARTED + "," + PAID))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(STARTED));
-        mvc.perform(get("/api/courses").header("X-User-Id", ME).param("countryCode", "HR"))
+        mvc.perform(get("/api/courses").with(viewer(ME)).param("countryCode", "HR"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1));
-        mvc.perform(get("/api/courses").header("X-User-Id", ME)
+        mvc.perform(get("/api/courses").with(viewer(ME))
                         .param("locationId", "70000000-0000-0000-0000-000000000001"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(PAID));
-        mvc.perform(get("/api/courses").header("X-User-Id", ME).param("ids", ""))
+        mvc.perform(get("/api/courses").with(viewer(ME)).param("ids", ""))
                 .andExpect(status().isOk()).andExpect(content().json("[]"));
-        mvc.perform(get("/api/courses").header("X-User-Id", ME).param("collection", "recommended"))
+        mvc.perform(get("/api/courses").with(viewer(ME)).param("collection", "recommended"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(FREE));
-        mvc.perform(post("/api/courses/" + FREE + "/dismiss").header("X-User-Id", ME))
+        mvc.perform(post("/api/courses/" + FREE + "/dismiss").with(viewer(ME)))
                 .andExpect(status().isNoContent());
-        mvc.perform(get("/api/courses").header("X-User-Id", ME).param("collection", "feed"))
+        mvc.perform(get("/api/courses").with(viewer(ME)).param("collection", "feed"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(3));
     }
 
     @Test
     void servesCountriesLocationsEventsAndUuidCodebooks() throws Exception {
-        mvc.perform(get("/api/countries/ME")).andExpect(status().isOk())
+        mvc.perform(get("/api/countries/ME").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.courseCount").value(3)).andExpect(jsonPath("$.locationCount").value(1))
                 .andExpect(jsonPath("$.blurb").doesNotExist());
-        mvc.perform(get("/api/locations").param("countryCode", "ME"))
+        mvc.perform(get("/api/locations").with(viewer(ME)).param("countryCode", "ME"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1));
-        mvc.perform(get("/api/events")).andExpect(status().isOk())
+        mvc.perform(get("/api/events").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("Museum lecture"))
                 .andExpect(jsonPath("$[0].organizer").value("Alex Friend"))
                 .andExpect(jsonPath("$[0].startsAt").isString())
                 .andExpect(jsonPath("$[0].isFree").value(true))
                 .andExpect(jsonPath("$[0].registrationUrl").value("https://example.test/register"));
-        mvc.perform(get("/api/events/a0000000-0000-0000-0000-000000000001"))
+        mvc.perform(get("/api/events/a0000000-0000-0000-0000-000000000001").with(viewer(ME)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.venue").value("Museum"));
-        mvc.perform(get("/api/codebooks/difficulties/08000e35-c398-5283-8335-920c4f7ad08d"))
+        mvc.perform(get("/api/codebooks/difficulties/08000e35-c398-5283-8335-920c4f7ad08d").with(viewer(ME)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.label").value("BEGINNER"));
-        mvc.perform(get("/api/codebooks/fields")).andExpect(status().isOk())
+        mvc.perform(get("/api/codebooks/fields").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
         assertThat(jdbc.sql("""
                 SELECT count(*) FROM pg_constraint co JOIN pg_class t ON t.oid=co.conrelid
                 WHERE co.contype='c' AND co.connamespace='public'::regnamespace
+                  AND co.conname<>'app_user_role_check' -- added deliberately by 005-auth
                   AND t.relname IN ('country','field','visibility','difficulty','publication_status',
                     'enrollment_status','wallet_transaction_type','friendship_status','event_status',
                     'app_user','user_interest','place','course','course_field','course_place',
@@ -108,17 +109,17 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
 
     @Test
     void unlocksAtomicallyAndRetriesWithoutDoubleCharging() throws Exception {
-        mvc.perform(post("/api/courses/" + PAID + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "one"))
+        mvc.perform(post("/api/courses/" + PAID + "/unlock").with(viewer(ME)).header("Idempotency-Key", "one"))
                 .andExpect(status().isOk()).andExpect(content().json("{\"balance\":60,\"heldBalance\":0,\"availableBalance\":60}"));
-        mvc.perform(post("/api/courses/" + PAID + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "one"))
+        mvc.perform(post("/api/courses/" + PAID + "/unlock").with(viewer(ME)).header("Idempotency-Key", "one"))
                 .andExpect(status().isOk()).andExpect(content().json("{\"balance\":60,\"heldBalance\":0,\"availableBalance\":60}"));
-        mvc.perform(post("/api/courses/" + PAID + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "new"))
+        mvc.perform(post("/api/courses/" + PAID + "/unlock").with(viewer(ME)).header("Idempotency-Key", "new"))
                 .andExpect(status().isOk()).andExpect(content().json("{\"balance\":60,\"heldBalance\":0,\"availableBalance\":60}"));
-        mvc.perform(post("/api/courses/" + FREE + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "one"))
+        mvc.perform(post("/api/courses/" + FREE + "/unlock").with(viewer(ME)).header("Idempotency-Key", "one"))
                 .andExpect(status().isConflict());
-        mvc.perform(post("/api/courses/" + FREE + "/unlock").header("X-User-Id", ME).header("Idempotency-Key", "free"))
+        mvc.perform(post("/api/courses/" + FREE + "/unlock").with(viewer(ME)).header("Idempotency-Key", "free"))
                 .andExpect(status().isOk()).andExpect(content().json("{\"balance\":60,\"heldBalance\":0,\"availableBalance\":60}"));
-        mvc.perform(get("/api/courses/" + PAID).header("X-User-Id", ME))
+        mvc.perform(get("/api/courses/" + PAID).with(viewer(ME)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.isUnlocked").value(true));
         assertThat(jdbc.sql("SELECT count(*) FROM wallet_transaction").query(Long.class).single()).isEqualTo(1);
         assertThat(jdbc.sql("SELECT count(*) FROM course_entitlement WHERE user_id=:user")
@@ -138,9 +139,9 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
     @Test
     void rejectsUnaffordableUnlockWithoutAnyWrites() throws Exception {
         mvc.perform(post("/api/courses/10000000-0000-0000-0000-000000000004/unlock")
-                        .header("X-User-Id", ME).header("Idempotency-Key", "expensive"))
+                        .with(viewer(ME)).header("Idempotency-Key", "expensive"))
                 .andExpect(status().isPaymentRequired()).andExpect(jsonPath("$.status").value(402));
-        mvc.perform(get("/api/wallet").header("X-User-Id", ME))
+        mvc.perform(get("/api/wallet").with(viewer(ME)))
                 .andExpect(status().isOk()).andExpect(content().json("{\"balance\":100,\"heldBalance\":0,\"availableBalance\":100}"));
         assertThat(jdbc.sql("SELECT count(*) FROM wallet_transaction").query(Long.class).single()).isZero();
     }
@@ -164,37 +165,87 @@ class WorldlearnIntegrationTests extends PostgresTestSupport {
 
     @Test
     void readsProfilesFriendFeedAndWeeklyLeaderboard() throws Exception {
-        mvc.perform(get("/api/users/me").header("X-User-Id", ME)).andExpect(status().isOk())
+        mvc.perform(get("/api/users/me").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.relation").value("me"))
                 .andExpect(jsonPath("$.inProgressCourseIds[0]").value(STARTED));
-        mvc.perform(get("/api/users/" + FRIEND).header("X-User-Id", ME)).andExpect(status().isOk())
+        mvc.perform(get("/api/users/" + FRIEND).with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.stats.completedCount").value(1))
                 .andExpect(jsonPath("$.stats.streakDays").value(1))
                 .andExpect(jsonPath("$.badgeCountryCodes[0]").value("ME"));
-        mvc.perform(get("/api/users").header("X-User-Id", ME).param("query", "sam"))
+        mvc.perform(get("/api/users").with(viewer(ME)).param("query", "sam"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(OTHER));
-        mvc.perform(get("/api/network/feed").header("X-User-Id", ME)).andExpect(status().isOk())
+        mvc.perform(get("/api/network/feed").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1)).andExpect(jsonPath("$[0].userId").value(FRIEND));
-        mvc.perform(get("/api/network/leaderboard").header("X-User-Id", ME)).andExpect(status().isOk())
+        mvc.perform(get("/api/network/leaderboard").with(viewer(ME))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2)).andExpect(jsonPath("$[0].userId").value(FRIEND))
                 .andExpect(jsonPath("$[0].rank").value(1)).andExpect(jsonPath("$[0].completedThisWeek").value(1));
-        mvc.perform(post("/api/users/" + OTHER + "/friend-requests").header("X-User-Id", ME))
+        mvc.perform(post("/api/users/" + OTHER + "/friend-requests").with(viewer(ME)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.relation").value("requested"));
-        mvc.perform(post("/api/users/" + OTHER + "/friend-requests").header("X-User-Id", ME))
+        mvc.perform(post("/api/users/" + OTHER + "/friend-requests").with(viewer(ME)))
                 .andExpect(status().isConflict());
-        mvc.perform(post("/api/users/" + ME + "/friend-requests").header("X-User-Id", ME))
+        mvc.perform(post("/api/users/" + ME + "/friend-requests").with(viewer(ME)))
                 .andExpect(status().isConflict());
     }
 
     @Test
+    void recipientSeesAnIncomingRequestAndCanAcceptOrDeclineIt() throws Exception {
+        mvc.perform(post("/api/users/" + OTHER + "/friend-requests").with(viewer(ME))).andExpect(status().isOk());
+        mvc.perform(get("/api/users/" + ME).with(viewer(OTHER)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.relation").value("incoming"));
+        mvc.perform(get("/api/users").with(viewer(OTHER)).param("relation", "incoming"))
+                .andExpect(jsonPath("$.length()").value(1)).andExpect(jsonPath("$[0].id").value(ME));
+        // Only the recipient can answer.
+        mvc.perform(post("/api/users/" + OTHER + "/friend-requests/accept").with(viewer(ME)))
+                .andExpect(status().isConflict());
+        mvc.perform(post("/api/users/" + OTHER + "/friend-requests").with(viewer(OTHER)))
+                .andExpect(status().isConflict());
+
+        mvc.perform(post("/api/users/" + ME + "/friend-requests/decline").with(viewer(OTHER)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.relation").value("none"));
+        mvc.perform(post("/api/users/" + ME + "/friend-requests/accept").with(viewer(OTHER)))
+                .andExpect(status().isConflict());
+
+        mvc.perform(post("/api/users/" + OTHER + "/friend-requests").with(viewer(ME))).andExpect(status().isOk());
+        mvc.perform(post("/api/users/" + ME + "/friend-requests/accept").with(viewer(OTHER)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.relation").value("friend"));
+        mvc.perform(get("/api/users/" + OTHER).with(viewer(ME))).andExpect(jsonPath("$.relation").value("friend"));
+        mvc.perform(get("/api/network/leaderboard").with(viewer(ME))).andExpect(jsonPath("$.length()").value(3));
+    }
+
+    @Test
+    void senderCanCancelARequestAndEitherFriendCanUnfriend() throws Exception {
+        mvc.perform(post("/api/users/" + OTHER + "/friend-requests").with(viewer(ME))).andExpect(status().isOk());
+        // Only the sender can cancel.
+        mvc.perform(post("/api/users/" + ME + "/friend-requests/cancel").with(viewer(OTHER)))
+                .andExpect(status().isConflict());
+        mvc.perform(post("/api/users/" + OTHER + "/friend-requests/cancel").with(viewer(ME)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.relation").value("none"));
+        mvc.perform(get("/api/users/" + ME).with(viewer(OTHER))).andExpect(jsonPath("$.relation").value("none"));
+        mvc.perform(post("/api/users/" + ME + "/friend-requests/accept").with(viewer(OTHER)))
+                .andExpect(status().isConflict());
+
+        // FRIEND accepted ME's request in the seed; the addressee can unfriend too.
+        mvc.perform(post("/api/users/" + OTHER + "/unfriend").with(viewer(ME))).andExpect(status().isConflict());
+        mvc.perform(post("/api/users/" + ME + "/unfriend").with(viewer(FRIEND)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.relation").value("none"));
+        mvc.perform(get("/api/users").with(viewer(ME)).param("relation", "friend"))
+                .andExpect(jsonPath("$.length()").value(0));
+        mvc.perform(get("/api/network/feed").with(viewer(ME))).andExpect(jsonPath("$.length()").value(0));
+        mvc.perform(post("/api/users/" + ME + "/unfriend").with(viewer(FRIEND))).andExpect(status().isConflict());
+        // The pair row is reused for a fresh request.
+        mvc.perform(post("/api/users/" + FRIEND + "/friend-requests").with(viewer(ME)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.relation").value("requested"));
+    }
+
+    @Test
     void returnsHttpErrorsForMissingResourcesAndMalformedBindings() throws Exception {
-        mvc.perform(get("/api/courses/10000000-0000-0000-0000-000000000099").header("X-User-Id", ME))
+        mvc.perform(get("/api/courses/10000000-0000-0000-0000-000000000099").with(viewer(ME)))
                 .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value(404));
-        mvc.perform(get("/api/courses")).andExpect(status().isBadRequest());
-        mvc.perform(get("/api/courses").header("X-User-Id", ME).param("collection", "unknown"))
+        mvc.perform(get("/api/courses")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/courses").with(viewer(ME)).param("collection", "unknown"))
                 .andExpect(status().isBadRequest());
-        mvc.perform(get("/api/courses/bad").header("X-User-Id", ME)).andExpect(status().isBadRequest());
-        mvc.perform(get("/api/countries/XX")).andExpect(status().isNotFound());
-        mvc.perform(get("/api/codebooks/difficulties/bad")).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/courses/bad").with(viewer(ME))).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/countries/XX").with(viewer(ME))).andExpect(status().isNotFound());
+        mvc.perform(get("/api/codebooks/difficulties/bad").with(viewer(ME))).andExpect(status().isBadRequest());
     }
 }

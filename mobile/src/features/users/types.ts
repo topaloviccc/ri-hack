@@ -1,5 +1,6 @@
-/** How the signed-in user relates to this user. */
-export type Relation = 'me' | 'friend' | 'requested' | 'none';
+/** How the signed-in user relates to this user. `requested`: they were sent a request;
+ * `incoming`: they sent the signed-in user a request. */
+export type Relation = 'me' | 'friend' | 'requested' | 'incoming' | 'none';
 
 export type UserSummary = {
   id: string;
@@ -26,3 +27,6 @@ export type UserFilters = {
   relation?: Relation;
   suggested?: boolean;
 };
+
+/** `accept`/`decline`: a request you received; `cancel`: one you sent; `unfriend`: an accepted friend. */
+export type FriendshipAction = 'accept' | 'decline' | 'cancel' | 'unfriend';

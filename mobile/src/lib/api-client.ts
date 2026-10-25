@@ -1,3 +1,4 @@
+import { authSession } from '@/lib/auth-session';
 import { env } from '@/lib/env';
 
 export class ApiError extends Error {
@@ -19,7 +20,6 @@ type RequestOptions = {
   method?: 'GET' | 'POST';
   query?: Record<string, QueryValue>;
   headers?: Record<string, string>;
-  viewer?: boolean;
   body?: JsonValue;
 };
 
@@ -34,9 +34,6 @@ const errorMessage = (body: unknown, fallback: string) => {
 /** All remote feature adapters use this client; failures never fall back to mock records. */
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   if (!env.apiUrl) throw new ApiError(400, 'Set EXPO_PUBLIC_API_URL to connect to the server.');
-  if (options.viewer && !env.userId) {
-    throw new ApiError(400, 'Set EXPO_PUBLIC_USER_ID to an existing user UUID.');
-  }
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(options.query ?? {})) {
     if (value !== undefined)
@@ -45,13 +42,14 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const suffix = params.toString() ? `?${params.toString()}` : '';
   const abort = new AbortController();
   const timer = setTimeout(() => abort.abort(), REQUEST_TIMEOUT_MS);
+  const session = authSession.get();
   try {
     const response = await fetch(`${env.apiUrl}${path}${suffix}`, {
       method: options.method ?? 'GET',
       headers: {
         Accept: 'application/json',
         ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
-        ...(options.viewer && env.userId ? { 'X-User-Id': env.userId } : {}),
+        ...(session ? { Authorization: `Bearer ${session.token}` } : {}),
         ...options.headers,
       },
       signal: abort.signal,
@@ -64,6 +62,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     } catch {
       if (response.ok) throw new ApiError(502, 'The server returned an invalid response.');
     }
+    // An expired or revoked token signs the user out; the root layout then shows sign-in.
+    if (response.status === 401 && session) void authSession.clear();
     if (!response.ok) {
       throw new ApiError(
         response.status,

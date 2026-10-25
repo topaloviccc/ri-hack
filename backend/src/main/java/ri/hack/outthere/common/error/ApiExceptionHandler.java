@@ -14,6 +14,7 @@ public class ApiExceptionHandler {
             case CONFLICT -> HttpStatus.CONFLICT;
             case INSUFFICIENT_COINS -> HttpStatus.PAYMENT_REQUIRED;
             case BAD_REQUEST -> HttpStatus.BAD_REQUEST;
+            case UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
         };
         return ProblemDetail.forStatusAndDetail(status, exception.getMessage());
     }
